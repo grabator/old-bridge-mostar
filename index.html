@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mostar · A city on the Neretva</title>
+<meta name="description" content="Scroll through Mostar: the Old Bridge, the emerald Neretva, the old bazaar and the places worth the walk.">
+<meta name="theme-color" content="#1c2444">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231c2444'/%3E%3Cpath d='M10 44 Q32 8 54 44' fill='none' stroke='%23f2b77c' stroke-width='5' stroke-linecap='round'/%3E%3Cpath d='M18 44 Q32 22 46 44' fill='none' stroke='%23fbf3e6' stroke-width='3'/%3E%3C/svg%3E">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Mostar · A city on the Neretva">
+<meta property="og:description" content="A cinematic scroll through the Old Bridge, the Neretva and the old bazaar.">
+<link rel="preload" href="assets/fonts/fraunces-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/dm-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="css/style.css">
+<script src="js/i18n.js" defer></script>
+<script src="js/scene.js" defer></script>
+<script src="js/app.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#plan">Skip to content</a>
+
+<header class="bar" id="bar">
+  <a class="brand" href="#film" data-at="0">
+    <svg class="brand-mark" viewBox="0 0 48 32" aria-hidden="true"><path d="M3 28 Q24 -4 45 28" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="M11 28 Q24 10 37 28" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+    <span data-t="brand">Bosnia &amp; Herzegovina</span>
+  </a>
+  <nav class="links" aria-label="Chapters">
+    <a href="#film" data-at="intro" data-t="nav.intro">Intro</a>
+    <a href="#film" data-at="bridge" data-t="nav.bridge">Bridge</a>
+    <a href="#film" data-at="town" data-t="nav.town">Old town</a>
+    <a href="#film" data-at="places" data-t="nav.places">Places</a>
+    <a href="#plan" data-t="nav.plan">Plan</a>
+  </nav>
+  <div class="lang" role="group" aria-label="Language">
+    <button type="button" data-lang="en" lang="en">EN</button>
+    <button type="button" data-lang="bs" lang="bs">BS</button>
+    <button type="button" data-lang="de" lang="de">DE</button>
+  </div>
+</header>
+
+<main>
+  <section class="film" id="film" aria-label="Mostar, a scrolling story">
+    <div class="stage" id="stage">
+      <div class="lyr sky" data-art="sky"></div>
+      <div class="lyr mount" data-art="mountains"></div>
+      <div class="lyr town" data-art="town"></div>
+      <h1 class="title"><span class="kicker" data-t="kicker">A city on the Neretva</span><span class="word" data-t="title">Mostar</span></h1>
+      <div class="lyr bridge" data-art="bridge"></div>
+      <div class="lyr river" data-art="river"></div>
+      <div class="lyr cliff cliff-l" data-art="cliffLeft"></div>
+      <div class="lyr cliff cliff-r" data-art="cliffRight"></div>
+      <div class="veil"></div>
+
+      <div class="intro">
+        <p data-t="intro"></p>
+        <ul class="tags" data-list="tags"></ul>
+      </div>
+
+      <article class="panel p-bridge" aria-label="Stari Most">
+        <p class="eyebrow" data-t="bridgeK"></p>
+        <h2 data-t="bridgeH"></h2>
+        <p data-t="bridgeP"></p>
+        <dl class="facts" data-list="facts"></dl>
+      </article>
+
+      <article class="panel p-river" aria-label="Neretva">
+        <p class="eyebrow" data-t="riverS"></p>
+        <h2 class="quote" data-t="riverQ"></h2>
+      </article>
+
+      <article class="panel p-town" aria-label="Kujundžiluk">
+        <p class="eyebrow" data-t="townK"></p>
+        <h2 data-t="townH"></h2>
+        <p data-t="townP"></p>
+        <a class="pill" href="https://www.google.com/maps/search/?api=1&amp;query=Stari%20grad%20Mostar" target="_blank" rel="noopener"><span aria-hidden="true">↗</span><span data-t="townBtn"></span></a>
+      </article>
+
+      <section class="places" aria-labelledby="places-h">
+        <div class="places-head">
+          <div>
+            <h2 id="places-h" data-t="placesH"></h2>
+            <p data-t="placesS"></p>
+          </div>
+          <div class="places-nav">
+            <button type="button" class="round" data-step="-1" data-t-label="prev"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+            <button type="button" class="round" data-step="1" data-t-label="next"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+          </div>
+        </div>
+        <div class="track-wrap"><div class="track" id="track"></div></div>
+      </section>
+
+      <div class="cue" aria-hidden="true"><span data-t="scroll"></span><i></i></div>
+      <ol class="rail" aria-label="Chapters"></ol>
+    </div>
+  </section>
+
+  <section class="plan" id="plan" tabindex="-1">
+    <div class="wrap">
+      <p class="eyebrow" data-t="planK"></p>
+      <h2 data-t="planH"></h2>
+      <ol class="day" data-list="plan"></ol>
+      <h3 data-t="infoH"></h3>
+      <dl class="info" data-list="info"></dl>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <p class="foot-word">Mostar</p>
+    <p data-t="foot"></p>
+    <a class="pill pill-dark" href="#film" data-at="0"><span aria-hidden="true">↑</span><span data-t="top"></span></a>
+  </div>
+</footer>
+<noscript><p style="padding:24px;color:#fbf3e6;background:#1c2444">Mostar: Stari Most (1566), the Neretva river and the old bazaar Kujundžiluk.</p></noscript>
+</body>
+</html>
