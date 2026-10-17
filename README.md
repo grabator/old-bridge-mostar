@@ -1,25 +1,23 @@
 # Old Bridge Mostar
 
-Web stranica o Mostaru koja se prikazuje kao film dok se skrola: Stari most, Neretva, stara čaršija, mjesta za obići i plan dana.
+A website about Mostar that plays like a film as you scroll: the Old Bridge, the Neretva, the old bazaar, places to visit and a day plan.
 
-## Pokretanje
+## What's inside
 
-```bash
+- Layered SVG scenes of the Old Bridge and the river, with a diver leaping from the arch
+- An endless slider of places to visit
+- English, Bosnian and German
+
+## Tech
+
+Plain HTML, CSS and JavaScript, no framework and no build step. Illustrations are drawn in code (`js/scene.js`).
+
+## Run locally
+
+```
 node serve.mjs
 ```
 
-Otvoriti http://localhost:8080
+Then open http://localhost:8080.
 
-## Tehnologije
-
-- HTML, CSS, JavaScript
-- Jezici: engleski, bosanski, njemački
-
-## Struktura
-
-- `index.html` – stranica
-- `css/style.css` – izgled
-- `js/app.js` – animacije i logika
-- `js/scene.js` – ilustracije
-- `js/i18n.js` – tekstovi
-- `assets/fonts/` – fontovi
+Made by [Ahmed Grabus (Graba)](https://graba-portofolio.grabafaceit.workers.dev)
