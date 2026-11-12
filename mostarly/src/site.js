@@ -429,6 +429,26 @@
       b.addEventListener('click', function () { var k = b.getAttribute('data-s'); cnt[k] = Math.max(k === 'adults' ? 1 : 0, Math.min(40, cnt[k] + (+b.getAttribute('data-d')))); $('[data-v=' + k + ']', f).textContent = cnt[k]; $('[name=' + k + ']', f).value = cnt[k]; renderTickets(); });
     });
     sel.addEventListener('change', renderTickets); renderTickets();
+    tk.addEventListener('change', function () { var n = $$('[name=tickets]:checked', f).length; $('.tk-n', f).textContent = n ? n + ' added' : ''; });
+    // two steps: tour and date first, then tickets and contact details
+    function goStep(n) {
+      $$('.fstep', f).forEach(function (st) { st.hidden = st.getAttribute('data-fstep') !== String(n); });
+      $$('.fsteps li', f).forEach(function (li) { var k = +li.getAttribute('data-goto'); li.classList.toggle('on', k === n); li.classList.toggle('ok', k < n); });
+      if (n === 2) {
+        var t = tourBy(sel.value), dv = val('date'), tm = val('time');
+        $('.fsum-txt', f).textContent = (t ? t.name.split(' – ')[0] : 'Custom request') + ' · ' + (dv ? new Date(dv + 'T12:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : 'date flexible') + (tm ? ', ' + tm.toLowerCase() : '') + ' · ' + cnt.adults + ' adult' + (cnt.adults > 1 ? 's' : '') + (cnt.children ? ', ' + cnt.children + ' child' + (cnt.children > 1 ? 'ren' : '') : '');
+        var nm = f.elements.name; if (nm && !nm.value && innerWidth > 900) nm.focus({ preventScroll: true });
+      }
+      var card = wrap.closest('.enq-card') || wrap; var r = card.getBoundingClientRect(); if (r.top < 70 || r.top > innerHeight * .6) card.scrollIntoView({ block: 'start', behavior: reduce ? 'auto' : 'smooth' });
+      fitAside();
+    }
+    $$('[data-next]', f).forEach(function (b) { b.addEventListener('click', function () { goStep(2); }); });
+    $$('[data-back]', f).forEach(function (b) { b.addEventListener('click', function () { goStep(1); }); });
+    $$('.fsteps li', f).forEach(function (li) { li.addEventListener('click', function () { goStep(+li.getAttribute('data-goto')); }); });
+    // a sticky form must fit on the screen, otherwise it scrolls with the page
+    function fitAside() { var a = wrap.closest('.aside'); if (!a) return; a.classList.toggle('tall', (a.firstElementChild || a).offsetHeight > innerHeight - 110); }
+    addEventListener('resize', fitAside); setTimeout(fitAside, 300);
+    wrap._goStep = goStep;
     function val(n) { var el = f.elements[n]; return el ? String(el.value || '').trim() : ''; }
     function collect() {
       var t = tourBy(sel.value);
@@ -443,6 +463,7 @@
       if (d.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(d.email)) bad.push('email');
       bad.forEach(function (n) { f.elements[n] && f.elements[n].classList.add('err'); });
       $('.formerr', f).textContent = bad.length ? 'Please add your name and an email address or WhatsApp number.' : '';
+      if (bad.length && wrap._goStep) wrap._goStep(2);
       return !bad.length;
     }
     function message(d) {
@@ -475,7 +496,7 @@
         })
         .then(function () { btn.disabled = false; btn.textContent = 'Send enquiry by email'; });
     });
-    $('[data-again]', wrap).addEventListener('click', function () { wrap.classList.remove('sent'); });
+    $('[data-again]', wrap).addEventListener('click', function () { wrap.classList.remove('sent'); goStep(1); });
   });
 
   // pre-select a tour from ?tour= on the contact page

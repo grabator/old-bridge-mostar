@@ -184,6 +184,8 @@ function enquiryForm(selected = '') {
   const opts = S.categories.map((c) => `<optgroup label="${esc(c.name)}">${TOURS.filter((t) => t.category === c.id).map((t) => `<option value="${t.slug}"${t.slug === selected ? ' selected' : ''}>${esc(t.name)}</option>`).join('')}</optgroup>`).join('');
   return `<div class="enq-wrap" data-enq>
 <form class="form" novalidate>
+  <ol class="fsteps" aria-label="Enquiry steps"><li class="on" data-goto="1"><b>1</b><span>Tour &amp; date</span></li><li data-goto="2"><b>2</b><span>Your details</span></li></ol>
+  <div class="fstep" data-fstep="1">
   <div class="fld"><span class="flabel" id="tl-${selected || 'x'}">Tour</span><div class="dd" data-dd><select name="tour" class="native" tabindex="-1" aria-hidden="true"><option value="">Not sure yet / custom request</option>${opts}</select><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="tl-${selected || 'x'}"><span>Not sure yet / custom request</span><svg viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button><div class="dd-pop" role="listbox" hidden></div></div></div>
   <div class="two">
     <div class="fld"><span class="flabel">Preferred date</span><div class="dp" data-dp><input type="hidden" name="date"><button type="button" class="dd-btn dp-btn" aria-haspopup="dialog" aria-expanded="false">${I.cal}<span>Choose a date</span></button><div class="dp-pop" role="dialog" aria-label="Choose a date" hidden></div></div></div>
@@ -194,14 +196,19 @@ function enquiryForm(selected = '') {
     <label>Children<span class="step"><button type="button" data-s="children" data-d="-1" aria-label="Fewer children">−</button><b data-v="children">0</b><button type="button" data-s="children" data-d="1" aria-label="More children">+</button></span><input type="hidden" name="children" value="0"></label>
   </div>
   <label class="ages" hidden>Children’s ages<input name="ages" placeholder="e.g. 6 and 9"></label>
-  <fieldset class="ticks" hidden><legend>Add entrance tickets?</legend><div class="tk-list"></div><small>${esc(S.ticketsNote)}</small></fieldset>
+  <button type="button" class="btn mint block fnext" data-next>Next: your details ${I.arrow}</button>
+  </div>
+  <div class="fstep" data-fstep="2" hidden>
+  <div class="fsum"><span class="fsum-txt"></span><button type="button" class="fback" data-back>Edit</button></div>
+  <details class="ticks" hidden><summary><span>Add entrance tickets</span><span class="opt">optional</span><i class="tk-n"></i></summary><div class="tk-list"></div><small>${esc(S.ticketsNote)}</small></details>
   <label>Your name<input name="name" autocomplete="name" required></label>
   <div class="two"><label>Email<input type="email" name="email" autocomplete="email" inputmode="email"></label><label>WhatsApp / phone<input type="tel" name="phone" autocomplete="tel" inputmode="tel"></label></div>
-  <label>Message <span class="opt">(optional)</span><textarea name="message" placeholder="Anything we should know: interests, mobility, where you are staying"></textarea></label>
+  <details class="fmsg"><summary>+ Add a message <span class="opt">(optional)</span></summary><textarea name="message" aria-label="Message" placeholder="Anything we should know: interests, mobility, where you are staying"></textarea></details>
   <div class="hp" aria-hidden="true"><label>Website<input name="website" tabindex="-1" autocomplete="off"></label></div>
   <p class="formerr" role="alert"></p>
   <div class="actions"><button type="button" class="btn wa block" data-send="wa">${I.wa} Send on WhatsApp</button><button type="submit" class="btn block">Send enquiry by email</button></div>
   <p class="tiny">This is an enquiry, not a confirmed booking. Mirna confirms availability, the final price and arrangements personally. No payment needed now.</p>
+  </div>
 </form>
 <div class="done" role="status" aria-live="polite">${I.check}<h3>Thank you</h3><p class="done-how"></p><p style="margin-top:.6rem"><b>Your tour is not confirmed yet.</b> Mirna will reply personally to confirm availability, the final price and arrangements.</p><p style="margin-top:1rem"><button type="button" class="btn sm line" data-again>Send another enquiry</button></p></div>
 </div>`;

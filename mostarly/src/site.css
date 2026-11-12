@@ -985,3 +985,65 @@ html.is-night .carve .hi .dot{fill:#c07f48}
 @media (min-width:1000px){.thero{aspect-ratio:auto;height:clamp(240px,34vh,380px)}}
 .thero img{object-position:50% 45%}
 .dd,.dp,.dd-btn{min-width:0;max-width:100%}
+
+/* enquiry card: two short steps that fit on the screen */
+.enq-card{position:relative;overflow:hidden;padding:1.5rem 1.4rem 1.3rem}
+.enq-card::before{content:"";position:absolute;left:0;right:0;top:0;height:6px;background:#272838 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 6' shape-rendering='crispEdges'%3E%3Cpath fill='%23c8271c' d='M0 0h6v6H0z'/%3E%3Cpath fill='%23efaa2f' d='M2 2h2v2H2zM8 2h2v2H8z'/%3E%3C/svg%3E") 0 0/24px 6px}
+.enq-card h2{font-size:1.5rem}
+.enq-card>p{margin-bottom:1.1rem}
+.form{gap:1rem}
+.fsteps{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin:0 0 .2rem;padding:.3rem;background:var(--cream);border:1px solid var(--line);border-radius:14px}
+.fsteps li{display:flex;align-items:center;gap:.5rem;padding:.5rem .6rem;border-radius:10px;font:600 .8rem var(--sans);color:var(--mut);cursor:pointer;transition:background .25s,color .25s}
+.fsteps li b{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:.72rem;background:var(--paper);border:1px solid var(--line);color:var(--ink);flex:none}
+.fsteps li.on{background:var(--paper);color:var(--ink);box-shadow:0 6px 14px -10px rgba(40,30,20,.5)}
+.fsteps li.on b{background:#c8271c;border-color:#c8271c;color:#fff}
+.fsteps li.ok b{background:var(--emer);border-color:var(--emer);color:#fff;font-size:0}
+.fsteps li.ok b::before{content:"✓";font-size:.75rem}
+.fstep{display:grid;gap:1rem;animation:fstepIn .3s ease}
+@keyframes fstepIn{from{opacity:0;transform:translateX(8px)}}
+.fnext{margin-top:.3rem}
+.fsum{display:flex;align-items:center;justify-content:space-between;gap:.6rem;padding:.65rem .8rem;border-radius:12px;background:#e9f8f3;border:1px solid #bfe9dc;font-size:.85rem;color:#0b6e58}
+.fsum-txt{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+.fback{flex:none;border:0;background:none;font:700 .8rem var(--sans);color:#0b6e58;text-decoration:underline;cursor:pointer;padding:.2rem}
+.ticks{padding:.7rem .8rem .8rem}
+.tk-list{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-top:.2rem}
+.ticks label{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:.1rem;padding:.55rem .65rem .55rem 2rem;border:1px solid var(--line);border-radius:12px;font-size:.82rem;line-height:1.25;background:var(--paper);transition:border-color .2s,background .2s}
+.ticks label input{position:absolute;left:.6rem;top:.65rem;width:16px;height:16px}
+.ticks label span{margin-left:0;font-size:.75rem;color:var(--copper);font-weight:600}
+.ticks label:has(input:checked){border-color:var(--emer);background:#e9f8f3}
+.fmsg{border:1px dashed var(--line);border-radius:14px;padding:.2rem .9rem}
+.fmsg summary{cursor:pointer;list-style:none;font:600 .88rem var(--sans);color:var(--emer);padding:.6rem 0}
+.fmsg summary::-webkit-details-marker{display:none}
+.fmsg[open]{padding-bottom:.8rem;border-style:solid}
+.fmsg textarea{margin-top:.2rem}
+.form .actions{gap:.6rem}
+.tiny{margin-top:.2rem}
+@media (min-width:1000px){.aside.tall{position:static}}
+html.is-night .fsum{background:#173a33;border-color:#24594d;color:#8ff0d6}
+html.is-night .fback{color:#8ff0d6}
+html.is-night .ticks label:has(input:checked){background:#173a33}
+
+/* the card always fits the screen: it stays beside you and scrolls inside if it must */
+.form,.fstep,.fld,.two>*{min-width:0}
+@media (min-width:1000px){
+  .aside.tall{position:sticky}
+  .aside{top:84px}
+  .enq-card{max-height:calc(100vh - 100px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+}
+.ticks{padding:0;background:transparent;border:1px solid var(--line);border-radius:14px}
+.ticks summary{list-style:none;display:flex;align-items:center;gap:.5rem;padding:.8rem .9rem;cursor:pointer;font:600 .9rem var(--sans);color:var(--ink)}
+.ticks summary::-webkit-details-marker{display:none}
+.ticks summary::after{content:"";margin-left:auto;width:9px;height:9px;border-right:2px solid var(--copper);border-bottom:2px solid var(--copper);transform:rotate(45deg) translateY(-3px);transition:transform .25s}
+.ticks[open] summary::after{transform:rotate(-135deg) translateY(-2px)}
+.ticks summary .opt{font-size:.75rem;color:var(--mut);font-weight:500}
+.tk-n{font-style:normal;font-size:.72rem;font-weight:700;color:#0b6e58;background:#e9f8f3;border-radius:99px;padding:.1rem .5rem}
+.tk-n:empty{display:none}
+.ticks .tk-list,.ticks small{margin:0 .8rem}
+.ticks small{padding:.4rem 0 .8rem}
+.ticks[open] summary{border-bottom:1px dashed var(--line);margin-bottom:.6rem}
+html.is-night .ticks{background:transparent}
+html.is-night .tk-n{background:#173a33;color:#8ff0d6}
+/* narrow cards: one field per row, nothing gets cut */
+.enq-card{container-type:inline-size}
+@container (max-width:340px){.form .two{grid-template-columns:1fr}.tk-list{grid-template-columns:1fr}}
+.form,.fstep{grid-template-columns:minmax(0,1fr)}.fsum,.ticks,.fmsg{min-width:0;max-width:100%}
