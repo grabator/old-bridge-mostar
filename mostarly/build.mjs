@@ -50,7 +50,10 @@ const I = {
   menu: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16M4 16h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
   close: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
   check: '<svg viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="27" fill="#48e5c2" opacity=".2"/><path d="M17 29l7 7 15-16" fill="none" stroke="#0a8a71" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-  sun: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.5" fill="currentColor"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></g></svg>',
+  car: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 10.5V8.2l1.4-3.3A1.5 1.5 0 0 1 5.3 4h5.4a1.5 1.5 0 0 1 1.4.9l1.4 3.3v2.3M2.5 10.5h11v1.7h-11zM2.8 8h10.4" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><circle cx="4.8" cy="12.3" r="1.1" fill="currentColor"/><circle cx="11.2" cy="12.3" r="1.1" fill="currentColor"/></svg>',
+  eye: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 8S4 3.5 8 3.5 14.5 8 14.5 8 12 12.5 8 12.5 1.5 8 1.5 8z" fill="none" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="8" r="2" fill="currentColor"/></svg>',
+  layers: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2.5 8 12 13l9.5-5zM2.5 12.5 12 17.5l9.5-5M2.5 16.5 12 21.5l9.5-5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>',
+sun: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.5" fill="currentColor"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></g></svg>',
   moon: '<svg viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z" fill="currentColor"/></svg>'
 };
 const HLOGO = '<img class="lg-dark" src="/img/logo-dark.png" alt="Mostarly Guide" width="167" height="34"><img class="lg-light" src="/img/logo-light.png" alt="Mostarly Guide" width="167" height="34">';
@@ -230,10 +233,19 @@ function phead(c, h1, lead, extra = '') {
 // straight-line distance x 1.3 for winding roads, rounded to 5 km: an honest "about" for the legs
 const hav = (a, b) => { const R = 6371, r1 = (a.lat * Math.PI) / 180, r2 = (b.lat * Math.PI) / 180, dl = ((b.lon - a.lon) * Math.PI) / 180, dp = r2 - r1; return 2 * R * Math.asin(Math.sqrt(Math.sin(dp / 2) ** 2 + Math.cos(r1) * Math.cos(r2) * Math.sin(dl / 2) ** 2)); };
 const roadKm = (a, b) => Math.max(5, Math.round((hav(a, b) * 1.3) / 5) * 5);
-const placeImg = (p) => p.image ? `<img src="/img/${esc(p.image)}" alt="${esc(p.name)}" loading="lazy">` : p.photo ? `<img src="/img/places/${esc(p.photo)}" alt="${esc(p.name)}" loading="lazy">` : '<span class="pc-art" aria-hidden="true"></span>';
+const placeImg = (p, src) => (src || p.image) ? `<img src="/img/${esc(src || p.image)}" alt="${esc(p.name)}" loading="lazy">` : p.photo ? `<img src="/img/places/${esc(p.photo)}" alt="${esc(p.name)}" loading="lazy">` : '<span class="pc-art" aria-hidden="true"></span>';
 const shortName = (t) => { const [a, b] = t.name.split(' – '); return a === 'Mostar City Tour' && b ? b : a; };
-const tourLink = (slug) => { const x = TOURS.find((q) => q.slug === slug); return x ? `<a href="/tours/${slug}/">${esc(shortName(x))} ${I.arrow}</a>` : ''; };
-const fromMostar = (p) => p.km ? `≈ ${p.km} km · ${p.min >= 60 ? Math.floor(p.min / 60) + ' h' + (p.min % 60 ? ' ' + (p.min % 60) + ' min' : '') : p.min + ' min'} from Mostar` : '';
+const tourLink = (slug) => { const x = TOURS.find((q) => q.slug === slug); return x ? `<a class="jr-tour" href="/tours/${slug}/"><span>${esc(shortName(x))}</span>${I.arrow}</a>` : ''; };
+const minTxt = (m) => (m >= 60 ? Math.floor(m / 60) + ' h' + (m % 60 ? ' ' + (m % 60) + ' min' : '') : m + ' min');
+const hasPhoto = (p, src) => !!(src || p.image || p.photo);
+
+/* A stop card: a photo with the name on it, quick facts, the story, then what is next */
+function stopCard({ p, kicker, num, facts, body, next, src }) {
+  return `<div class="jr-hero${hasPhoto(p, src) ? '' : ' art'}">${placeImg(p, src)}<div class="jr-hero-txt">${num ? `<span class="jr-n">${num}</span>` : ''}<p class="jr-kick">${kicker}</p><h3>${esc(p.name)}</h3></div></div>
+<div class="jr-body">${facts.length ? `<ul class="jr-facts">${facts.join('')}</ul>` : ''}${body}${next ? `<p class="jr-next">${next}</p>` : ''}${p.credit ? `<small class="pc-credit">Photo: ${esc(p.credit)}</small>` : ''}</div>`;
+}
+const fact = (ic, txt, cls = '') => `<li${cls ? ` class="${cls}"` : ''}>${ic || ''}<span>${txt}</span></li>`;
+const tagFacts = (p) => (p.tags || []).filter((x) => x !== 'Meeting point').map((x) => fact('', esc(x), 'tag'));
 
 /* Journey player: a map the camera flies across, stop by stop, with a card for every stop.
    Everything a visitor reads is in the HTML; without JavaScript the cards are a plain list. */
@@ -247,19 +259,41 @@ function journey({ cfg, stops, title, intro, hint, label, end, endText, endCta, 
   <div class="jr-start"><div class="jr-panel"><p class="eyebrow">${mini}${esc(N)} stops</p><h3>${title}</h3><p>${intro}</p>
     <div class="jr-btns"><button type="button" class="btn mint" data-begin>Start the journey ${I.arrow}</button><button type="button" class="btn line" data-autoplay>Play it all</button></div><small>${esc(hint)}</small></div></div>
   <div class="jr-end"><div class="jr-panel"><p class="eyebrow">${mini}${esc(end)}</p><h3>${endText}</h3><div class="jr-btns">${endCta}<button type="button" class="btn line" data-restart>Watch again</button></div></div></div>
-  <div class="jr-ctrl"><button type="button" class="jr-b" data-step="-1" aria-label="Previous stop">←</button><button type="button" class="jr-b jr-play" data-play aria-pressed="false"><i aria-hidden="true"></i><span>Play</span></button><span class="jr-count">0 / ${N}</span><button type="button" class="jr-b" data-step="1" aria-label="Next stop">→</button></div>
+  <div class="jr-ctrl"><button type="button" class="jr-b" data-step="-1" aria-label="Previous stop">←</button><button type="button" class="jr-b jr-play" data-play aria-pressed="false"><i aria-hidden="true"></i><span>Play</span></button><span class="jr-count">0 / ${N}</span>${cfg.map === 'region' ? `<button type="button" class="jr-b jr-sat" data-sat aria-pressed="true" aria-label="Satellite view">${I.layers}</button>` : ''}<button type="button" class="jr-b" data-step="1" aria-label="Next stop">→</button></div>
   <p class="jr-live sr" role="status" aria-live="polite"></p>
 </div>`;
 }
 
 function routeBlock(t) {
   const r = t.route, stops = r.stops.map(placeBy).filter(Boolean), N = stops.length, walk = r.mode === 'walk';
-  const leg = (i) => (i < N - 1 ? (walk ? 'Then a short walk to ' : `Then ≈ ${roadKm(stops[i], stops[i + 1])} km by car to `) + esc(stops[i + 1].name) : 'Last stop of the route');
-  const card = (p, i) => `<div class="jr-img">${placeImg(p)}<span class="jr-n">${i + 1}</span></div><div class="jr-body"><p class="jr-kick">Stop ${i + 1} of ${N}${p.kind === 'meet' ? ' · <b>Meeting point</b>' : ''}</p><h3>${esc(p.name)}</h3><p>${esc(p.text)}</p><p class="jr-leg">${leg(i)}</p>${p.credit ? `<small class="pc-credit">Photo: ${esc(p.credit)}</small>` : ''}</div>`;
+  const card = (p, i) => {
+    const nx = stops[i + 1];
+    const facts = [];
+    if (p.kind === 'meet') facts.push(fact(I.pin, 'Meeting point', 'tag red'));
+    if (!walk && p.km) facts.push(fact(I.car, `≈ ${p.km} km · ${minTxt(p.min)} from Mostar`));
+    facts.push(...tagFacts(p));
+    const next = nx ? `${walk ? I.walk : I.car}<span>Next: <b>${esc(nx.name)}</b> · ${walk ? 'a short walk' : `≈ ${roadKm(p, nx)} km by car`}</span>` : `${I.yes}<span>Last stop of the route</span>`;
+    return stopCard({ p, num: i + 1, kicker: `Stop ${i + 1} of ${N}`, facts, body: `<p>${esc(p.text)}</p>`, next });
+  };
   return `<section class="tsec route-sec" id="route"><h2>The route</h2>
 <p class="muted rt-mode">${walk ? 'On foot along the old kaldrma' : 'By car from Mostar'} · ${N} stops</p>
 ${journey({ cfg: { map: r.map, mode: r.mode, stops: r.stops }, stops, title: esc(shortName(t)), intro: walk ? 'Walk the route stop by stop: the stones of the kaldrma are laid down as you go.' : 'Follow the road from stop to stop and see what waits at each one.', hint: 'Buttons, arrow keys, swipe, or tap a pin on the map.', label: 'Route map of ' + t.name, end: 'End of the route', endText: 'Like this route?', endCta: `<a class="btn mint" href="#enquire">Enquire about this tour</a>`, card })}
 ${notes(r.map === 'oldtown' ? [PL.oldtownNote] : [PL.note].concat(stops.flatMap((p) => p.notes || [])))}</section>`;
+}
+
+/* Home: town by town, from Mostar out to the rest of Herzegovina */
+function homeJourney() {
+  const H = PL.home.map((h) => Object.assign({}, placeBy(h.id), h)), N = H.length;
+  const card = (p, i) => {
+    const facts = i ? [fact(I.car, `≈ ${p.km} km`), fact(I.clock, `${minTxt(p.min)} drive`)] : [fact(I.pin, 'Home base', 'tag red'), fact('', 'Every tour starts here')];
+    facts.push(...(p.tags || []).map((x) => fact('', esc(x), 'tag')));
+    if (p.sights.some((x) => /UNESCO/.test(x[1]) || /Stari Most/.test(x[0]))) facts.push(fact('', 'UNESCO World Heritage', 'tag'));
+    const sights = `<h4>${I.eye}What to see</h4><ul class="jr-sights">${p.sights.map(([n, t, img]) => `<li${img ? ' class="ph"' : ''}>${img ? `<img src="/img/${esc(img)}" alt="" loading="lazy">` : ''}<b>${esc(n)}</b><span>${esc(t)}</span></li>`).join('')}</ul>`;
+    const tours = (p.tours || []).map(tourLink).filter(Boolean).slice(0, 4);
+    const toursHtml = tours.length ? `<h4>Tours here</h4><div class="jr-tours">${tours.join('')}</div>` : `<div class="jr-tours"><a class="jr-tour wa" href="${wa('Hello Mirna, could we visit ' + p.name + '?')}"><span>Ask Mirna about a visit</span>${I.arrow}</a></div>`;
+    return stopCard({ p, num: i + 1, kicker: `${i + 1} / ${N} · ${esc(p.area)}`, facts, body: `<p>${esc(p.text)}</p>${sights}${toursHtml}` });
+  };
+  return journey({ cfg: { map: 'region', mode: 'hub', globe: true, stops: H.map((p) => p.id) }, stops: H, title: 'Herzegovina', intro: 'From the whole world down to Mostar, then town by town to every place Mirna takes you.', hint: 'Buttons, arrow keys, swipe, or tap a pin on the map.', label: 'Satellite map of Herzegovina with the towns Mirna visits', end: 'All the places', endText: 'Where would you like <em>to go?</em>', endCta: `<a class="btn mint" href="/tours/">See the tours</a>`, card });
 }
 
 /* ---------- pages ---------- */
@@ -298,10 +332,9 @@ const emit = (url, html) => out.push([url, html]);
 
 <section class="sec explore"><div class="wrap">
   <div class="head-row"><div><p class="eyebrow rv">${mini}Where we go</p><h2 class="rv d1">From Mostar <em>to all of Herzegovina</em></h2></div></div>
-  <p class="lead rv d2">Mostar is home. From here Mirna takes you to Blagaj, Počitelj, the Kravice Waterfalls and beyond. Take the journey: the globe dives into Herzegovina and the map flies from place to place.</p>
-  ${(() => { const stops = PLACES.filter((p) => p.area === 'region'); return journey({ cfg: { map: 'region', mode: 'hub', globe: true, stops: stops.map((p) => p.id) }, stops, title: 'Herzegovina', intro: 'From the whole world to Mostar, then out to every place Mirna takes you.', hint: 'Buttons, arrow keys, swipe, or tap a pin on the map.', label: 'Map of Herzegovina with the places Mirna visits', end: 'All the places', endText: 'Where would you like <em>to go?</em>', endCta: `<a class="btn mint" href="/tours/">See the tours</a>`,
-    card: (p, i) => `<div class="jr-img">${placeImg(p)}</div><div class="jr-body"><p class="jr-kick">${i ? esc(fromMostar(p)) : 'Home base · every tour starts here'}</p><h3>${esc(p.name)}</h3><p>${esc(p.text)}</p><p class="jr-links">${(p.tours || []).slice(0, 3).map(tourLink).join('') || `<a href="${wa('Hello Mirna, could we visit ' + p.name + '?')}">Ask Mirna about ${esc(p.name)} ${I.arrow}</a>`}</p>${p.credit ? `<small class="pc-credit">Photo: ${esc(p.credit)}</small>` : ''}</div>` }); })()}
-  ${notes([PL.note].concat(placeBy('zitomislic').notes || []))}
+  <p class="lead rv d2">Mostar is home. From here Mirna takes you town by town: Blagaj, Počitelj, the Kravice Waterfalls, Stolac and beyond. Take the journey: the globe dives into Herzegovina and the satellite map flies from town to town.</p>
+  ${homeJourney()}
+  ${notes([PL.note, PL.homeNote])}
 </div></section>
 
 <section class="sec dark"><div class="wrap">

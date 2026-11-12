@@ -20,7 +20,9 @@
   /* ---------- projections ---------- */
   var REGION = { lon0: 17.9, lat0: 43.4, s: 600 };   // 1° latitude = 600 units
   var OLDTOWN = { lon0: 17.815, lat0: 43.3375, s: 60000 };
-  function P(view) { var c = Math.cos(view.lat0 * Math.PI / 180); return function (lon, lat) { return [(lon - view.lon0) * c * view.s, (view.lat0 - lat) * view.s]; }; }
+  // Web Mercator (the projection of the satellite tiles), scaled so 1° of latitude near lat0 = s units
+  function merc(lat) { return Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360)) * 180 / Math.PI; }
+  function P(view) { var c = Math.cos(view.lat0 * Math.PI / 180), m0 = merc(view.lat0); return function (lon, lat) { return [(lon - view.lon0) * c * view.s, (m0 - merc(lat)) * c * view.s]; }; }
   var pr = P(REGION), po = P(OLDTOWN);
   function pathFrom(flat, proj, close) { var d = ''; for (var i = 0; i < flat.length; i += 2) { var p = proj(flat[i], flat[i + 1]); d += (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1); } return d + (close ? 'Z' : ''); }
   function smooth(pts) { // Catmull-Rom through points -> cubic path
@@ -29,6 +31,9 @@
     for (var i = 0; i < pts.length - 1; i++) { var p0 = pts[i - 1] || pts[i], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2] || p2; d += 'C' + (p1[0] + (p2[0] - p0[0]) / 6).toFixed(1) + ' ' + (p1[1] + (p2[1] - p0[1]) / 6).toFixed(1) + ',' + (p2[0] - (p3[0] - p1[0]) / 6).toFixed(1) + ' ' + (p2[1] - (p3[1] - p1[1]) / 6).toFixed(1) + ',' + p2[0].toFixed(1) + ' ' + p2[1].toFixed(1); }
     return d;
   }
+  // towns for orientation (labels only, not stops): name, lat, lon, bigger
+  var TOWNS = [['Konjic', 43.6519, 17.9611], ['Čapljina', 43.1214, 17.6847], ['Ljubuški', 43.1969, 17.545], ['Široki Brijeg', 43.3833, 17.5939], ['Međugorje', 43.1886, 17.6775], ['Neum', 42.9233, 17.6156], ['Trebinje', 42.7119, 18.3436], ['Dubrovnik', 42.6507, 18.0944, 1], ['Makarska', 43.2969, 17.0178], ['Posušje', 43.4717, 17.3292], ['Nevesinje', 43.2586, 18.1131], ['Prozor-Rama', 43.8217, 17.6097], ['Split', 43.5081, 16.4402, 1]];
+  var SAT = null;
   // rivers drawn as an illustration through known points on their course
   var NERETVA = [[17.76, 43.66], [17.79, 43.6], [17.84, 43.53], [17.86, 43.47], [17.835, 43.4], [17.812, 43.36], [17.8148, 43.3385], [17.815, 43.3369], [17.817, 43.32], [17.83, 43.27], [17.83, 43.24], [17.8, 43.2], [17.77, 43.16], [17.735, 43.13], [17.7, 43.11], [17.66, 43.07], [17.62, 43.04], [17.55, 43.03], [17.45, 43.02]];
   var BUNA = [[17.9036, 43.2573], [17.87, 43.25], [17.83, 43.245]];
@@ -68,10 +73,26 @@
       region.land.forEach(function (r) { el('path', { d: pathFrom(r, pr, true), class: 'land' }, g); });
       region.bih.forEach(function (r) { el('path', { d: pathFrom(r, pr, true), class: 'bih' }, g); });
       region.borders.forEach(function (r) { el('path', { d: pathFrom(r, pr, false), class: 'border' }, g); });
+      if (SAT) {
+        var gs = el('g', { class: 'sat' }, g);
+        SAT.layers.forEach(function (L, i) {
+          var a = pr(L.bbox[0], L.bbox[3]), b = pr(L.bbox[2], L.bbox[1]);
+          var im = el('image', { x: a[0].toFixed(2), y: a[1].toFixed(2), width: (b[0] - a[0]).toFixed(2), height: (b[1] - a[1]).toFixed(2), preserveAspectRatio: 'none', 'data-src': '/geo/' + L.file }, gs);
+          if (!i) im.setAttribute('href', '/geo/' + L.file);
+        });
+        setTimeout(function () { $$('image[data-src]', gs).forEach(function (im) { if (!im.getAttribute('href')) im.setAttribute('href', im.getAttribute('data-src')); }); }, 1200); // sharper layers after the first view
+      }
+      region.bih.forEach(function (r) { el('path', { d: pathFrom(r, pr, true), class: 'bih-line' }, g); });
       [[NERETVA, 'river big'], [BUNA, 'river'], [TREBIZAT, 'river']].forEach(function (r) { el('path', { d: smooth(r[0].map(function (p) { return pr(p[0], p[1]); })), class: r[1] }, g); });
       s = pr(17.775, 43.5); var t = el('text', { x: s[0], y: s[1], class: 'rlabel', transform: 'rotate(-62 ' + s[0] + ' ' + s[1] + ')' }, g); t.textContent = 'Neretva';
       s = pr(17.35, 42.92); t = el('text', { x: s[0], y: s[1], class: 'sealabel' }, g); t.textContent = 'Adriatic Sea';
       s = pr(18.05, 43.62); t = el('text', { x: s[0], y: s[1], class: 'clabel' }, g); t.textContent = 'BOSNIA AND HERZEGOVINA';
+      [['CROATIA', 17.05, 43.05], ['MONTENEGRO', 18.75, 42.62]].forEach(function (c) { var q = pr(c[1], c[2]), tc = el('text', { x: q[0], y: q[1], class: 'clabel other' }, g); tc.textContent = c[0]; });
+      var gt = el('g', { class: 'towns' }, g);
+      TOWNS.forEach(function (tw) {
+        var q = pr(tw[2], tw[1]), gg = el('g', { class: 'town' + (tw[3] ? ' big' : ''), transform: 'translate(' + q[0].toFixed(1) + ' ' + q[1].toFixed(1) + ')' }, gt), ii = el('g', { class: 'town-in' }, gg);
+        el('circle', { r: tw[3] ? 2.6 : 2 }, ii); var tt = el('text', { x: 5, y: 3 }, ii); tt.textContent = tw[0];
+      });
     } else {
       el('rect', { x: -2000, y: -2000, width: 4000, height: 4000, class: 'ground' }, g);
       OT_STREETS.forEach(function (st) { el('path', { d: smooth(st.map(function (p) { return po(p[0], p[1]); })), class: 'street' }, g); });
@@ -219,7 +240,7 @@
       if (i < 0 || i >= N) return overview();
       return { x: P[i][0], y: P[i][1], w: stationW(i), a: wide ? [.36, .52] : [.5, .3] };
     }
-    function apply(s) { var h = s.w * H / W; mv.setVB([s.x - s.a[0] * s.w, s.y - s.a[1] * h, s.w, h]); }
+    function apply(s) { var h = s.w * H / W; mv.setVB([s.x - s.a[0] * s.w, s.y - s.a[1] * h, s.w, h]); mv.svg.classList.toggle('far', s.w > 520); } // small towns only when close
     function lerp(a, b, t) { return a + (b - a) * t; }
     function between(a, b, t) {
       var d = Math.hypot(b.x - a.x, b.y - a.y), far = Math.max(a.w, b.w, d * 1.5), dip = Math.max(0, Math.log(far / Math.max(a.w, b.w))) * Math.sin(Math.PI * t);
@@ -309,6 +330,7 @@
       if (t.closest('[data-restart]')) { setPlaying(true); go(0); return; }
       if (t.closest('[data-play]')) { if (playing) setPlaying(false); else { setPlaying(true); if (mode === 'start' || mode === 'end') go(0); else if (!flying) go(idx + 1); } return; }
       if ((b = t.closest('[data-step]'))) { setPlaying(false); step(+b.getAttribute('data-step')); }
+      if ((b = t.closest('[data-sat]'))) { var on = !root.classList.contains('sat'); root.classList.toggle('sat', on); b.setAttribute('aria-pressed', String(on)); }
     });
     var down = null;
     stage.addEventListener('pointerdown', function (e) { down = { x: e.clientX, y: e.clientY }; }, { passive: true });
@@ -332,8 +354,9 @@
     var started = false;
     function boot() {
       if (started) return; started = true;
-      Promise.all([cfg.map === 'region' ? geo('region') : Promise.resolve(null), cfg.globe ? geo('world') : Promise.resolve(null)]).then(function (r) {
-        region = r[0]; world = r[1];
+      Promise.all([cfg.map === 'region' ? geo('region') : Promise.resolve(null), cfg.globe ? geo('world') : Promise.resolve(null), cfg.map === 'region' ? geo('sat').catch(function () { return null; }) : Promise.resolve(null)]).then(function (r) {
+        region = r[0]; world = r[1]; SAT = r[2];
+        if (SAT) { root.classList.add('has-sat', 'sat'); var cr = document.createElement('small'); cr.className = 'jr-credit'; cr.innerHTML = 'Satellite: <a href="https://cloudless.eox.at" rel="noopener">EOxCloudless 2016</a> by EOX, Copernicus Sentinel data, CC BY 4.0'; root.appendChild(cr); }
         mv = new MapView(stage, { view: cfg.map, label: root.getAttribute('data-label') || 'Route map' });
         stage.insertBefore(mv.svg, stage.firstChild);
         mv.drawBase(region); measure();
