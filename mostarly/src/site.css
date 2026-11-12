@@ -980,3 +980,8 @@ html.is-night .carve .hi .dot{fill:#c07f48}
 .jr.is-flying .mly-map .town,.jr.is-flying .mly-map .clabel,.jr.is-flying .mly-map .rlabel,.jr.is-flying .mly-map .sealabel{visibility:hidden}
 .jr.js .jr-st{visibility:hidden;transition:opacity .35s,transform .45s cubic-bezier(.2,.8,.2,1),visibility 0s linear .35s}
 .jr.js .jr-st.on{visibility:visible;transition:opacity .35s .05s,transform .45s cubic-bezier(.2,.8,.2,1) .05s,visibility 0s}
+/* tour pages: the photo is a banner, the title and price are seen straight away */
+.thero{aspect-ratio:auto;height:clamp(190px,30vh,280px);max-height:none}
+@media (min-width:1000px){.thero{aspect-ratio:auto;height:clamp(240px,34vh,380px)}}
+.thero img{object-position:50% 45%}
+.dd,.dp,.dd-btn{min-width:0;max-width:100%}
