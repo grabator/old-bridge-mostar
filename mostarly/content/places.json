@@ -17,7 +17,27 @@
     "mostar-old-town-historic-sites",
     "modern-mostar",
     "taste-of-mostar-food-tour"
-   ]
+   ],
+   "view": {
+    "photos": [
+     {
+      "src": "hero-d.jpg",
+      "title": "Stari Most by day"
+     },
+     {
+      "src": "sumrak.jpg",
+      "title": "Stari Most at dusk"
+     },
+     {
+      "src": "panorama.jpg",
+      "title": "The Old Town from the hill"
+     }
+    ],
+    "sv": [
+     43.33726,
+     17.81503
+    ]
+   }
   },
   {
    "id": "blagaj",
@@ -184,7 +204,19 @@
    "lat": 43.3381,
    "lon": 17.8131,
    "image": "kriva.jpg",
-   "text": "The Crooked Bridge: a small single-arch stone bridge over the Radobolja stream."
+   "text": "The Crooked Bridge: a small single-arch stone bridge over the Radobolja stream.",
+   "view": {
+    "photos": [
+     {
+      "src": "kriva.jpg",
+      "title": "Kriva ćuprija"
+     }
+    ],
+    "sv": [
+     43.3381,
+     17.8131
+    ]
+   }
   },
   {
    "id": "stari-most",
@@ -197,7 +229,27 @@
    "text": "The Old Bridge, built in 1566 and rebuilt in 2004, guarded by the Halebija and Tara towers. Home of the divers.",
    "tags": [
     "UNESCO World Heritage"
-   ]
+   ],
+   "view": {
+    "photos": [
+     {
+      "src": "hero-d.jpg",
+      "title": "Stari Most by day"
+     },
+     {
+      "src": "sumrak.jpg",
+      "title": "Stari Most at dusk"
+     },
+     {
+      "src": "panorama.jpg",
+      "title": "The Old Town from the hill"
+     }
+    ],
+    "sv": [
+     43.33726,
+     17.81503
+    ]
+   }
   },
   {
    "id": "kujundziluk",
@@ -352,5 +404,6 @@
     ]
    ]
   }
- ]
+ ],
+ "viewNote": "“Look around” uses our photos for now. A real 360° photo (any phone can take one, or Google Street View app) can be added for each place and will turn all the way round."
 }

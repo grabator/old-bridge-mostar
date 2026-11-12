@@ -238,8 +238,9 @@
     }
     function target(i) {
       if (i < 0 || i >= N) return overview();
-      return { x: P[i][0], y: P[i][1], w: stationW(i), a: wide ? [.36, .52] : [.5, .3] };
+      return { x: P[i][0], y: P[i][1], w: stationW(i), a: wide ? (hasView(i) ? [.55, .56] : [.36, .52]) : [.5, .3] };
     }
+    function hasView(i) { var p = PLACES[ids[i]]; return !!(p && p.view && p.view.photos); }
     function apply(s) { var h = s.w * H / W; mv.setVB([s.x - s.a[0] * s.w, s.y - s.a[1] * h, s.w, h]); mv.svg.classList.toggle('far', s.w > 520); } // small towns only when close
     function lerp(a, b, t) { return a + (b - a) * t; }
     function between(a, b, t) {
@@ -264,7 +265,7 @@
       var ms = Math.max(1100, Math.min(2600, 900 + d * 1100)), r0 = rev, r1 = cfg.mode === 'hub' ? 1 : Math.min(j, N - 1), t0 = performance.now();
       if (cfg.mode !== 'hub' && r1 < r0) r0 = r1; // going back: the route shrinks at once
       clearTimeout(dwellT); playBtn.classList.remove('timing');
-      root.classList.remove('is-start', 'is-end', 'is-landed'); root.classList.add('is-flying');
+      root.classList.remove('is-start', 'is-end', 'is-landed', 'tilt'); root.classList.add('is-flying'); closeView();
       mode = 'fly'; setCard(-2); setHud(j);
       var tok = flying = {};
       if (reduce) { state = to; apply(to); rev = r1; route.show(cfg.mode === 'hub' ? 1 : r1, j); return land(j); }
@@ -290,6 +291,10 @@
       mv.mark(j < N ? j : -1);
       if (j >= N) { mode = 'end'; root.classList.add('is-end'); setPlaying(false); setCard(N); live.textContent = root.getAttribute('data-end'); return; }
       mode = 'station'; root.classList.add('is-landed'); setCard(j);
+      // the camera tips forward over the place, like looking out of a plane
+      var an = state.a; root.style.setProperty('--ox', (an[0] * 100).toFixed(1) + '%'); root.style.setProperty('--oy', (an[1] * 100).toFixed(1) + '%');
+      if (!reduce) requestAnimationFrame(function () { root.classList.add('tilt'); });
+      if (wide && hasView(j)) setTimeout(function () { if (idx === j && mode === 'station') openView(j); }, 650);
       live.textContent = 'Stop ' + (j + 1) + ' of ' + N + ': ' + PLACES[ids[j]].name;
       if (playing) dwell();
     }
@@ -321,6 +326,36 @@
       });
     }
 
+    /* "Look around": a photo you drag with a finger or the mouse (a 360° photo turns all the way round) */
+    var view = $('.jr-view', root), vpic = view && $('.jr-view-pic', view), vimg = view && $('img', view), vx = 0, vy = 0, vdrag = null, vraf = 0, vdir = 1, vloop = false, vtouched = false;
+    function vbounds() { var W2 = vpic.clientWidth, H2 = vpic.clientHeight, iw = vimg.offsetWidth, ih = vimg.offsetHeight; return [Math.min(0, W2 - iw), Math.min(0, H2 - ih)]; }
+    function vset() { var b = vbounds(); if (!vloop) vx = Math.max(b[0], Math.min(0, vx)); vy = Math.max(b[1], Math.min(0, vy)); vimg.style.transform = 'translate3d(' + vx.toFixed(1) + 'px,' + vy.toFixed(1) + 'px,0)'; }
+    function vdrift() { // slow pan until someone touches it
+      if (!view || view.hidden || vtouched || reduce) return;
+      var b = vbounds(); vx += vdir * .25; if (vx > 0 || vx < b[0]) { vdir = -vdir; } vset(); vraf = requestAnimationFrame(vdrift);
+    }
+    function showPhoto(p, k) {
+      var ph = p.view.photos[k]; vtouched = false; cancelAnimationFrame(vraf);
+      $$('.jr-view-tabs button', view).forEach(function (b, n) { b.setAttribute('aria-pressed', String(n === k)); });
+      $('.jr-view-top b', view).textContent = ph.title || p.name; vimg.alt = ph.title || p.name; vloop = !!ph.pano;
+      vimg.onload = function () { var b = vbounds(); vx = b[0] / 2; vy = b[1] / 2; vset(); vraf = requestAnimationFrame(vdrift); };
+      vimg.src = '/img/' + ph.src; if (vimg.complete) vimg.onload();
+    }
+    function openView(i) {
+      var p = PLACES[ids[i]]; if (!view || !p || !p.view) return;
+      var tabs = $('.jr-view-tabs', view); tabs.innerHTML = '';
+      p.view.photos.forEach(function (ph, k) { var b = document.createElement('button'); b.type = 'button'; b.textContent = ph.title; b.addEventListener('click', function () { showPhoto(p, k); }); tabs.appendChild(b); });
+      var sv = p.view.sv || [p.lat, p.lon]; $('.jr-view-bar .jr-svbtn', view).href = 'https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=' + sv[0] + ',' + sv[1];
+      view.hidden = false; requestAnimationFrame(function () { root.classList.add('view-on'); }); showPhoto(p, 0);
+    }
+    function closeView() { if (!view || view.hidden) return; root.classList.remove('view-on'); cancelAnimationFrame(vraf); setTimeout(function () { if (!root.classList.contains('view-on')) view.hidden = true; }, 350); }
+    if (view) {
+      vpic.addEventListener('pointerdown', function (e) { vtouched = true; cancelAnimationFrame(vraf); vdrag = { x: e.clientX - vx, y: e.clientY - vy }; vpic.setPointerCapture(e.pointerId); vpic.classList.add('grab'); root.classList.add('view-touched'); });
+      vpic.addEventListener('pointermove', function (e) { if (!vdrag) return; vx = e.clientX - vdrag.x; vy = e.clientY - vdrag.y; vset(); });
+      ['pointerup', 'pointercancel'].forEach(function (ev) { vpic.addEventListener(ev, function () { vdrag = null; vpic.classList.remove('grab'); }); });
+      addEventListener('resize', function () { if (!view.hidden) vset(); });
+    }
+
     /* input */
     root.addEventListener('click', function (e) {
       var t = e.target, b;
@@ -330,6 +365,8 @@
       if (t.closest('[data-restart]')) { setPlaying(true); go(0); return; }
       if (t.closest('[data-play]')) { if (playing) setPlaying(false); else { setPlaying(true); if (mode === 'start' || mode === 'end') go(0); else if (!flying) go(idx + 1); } return; }
       if ((b = t.closest('[data-step]'))) { setPlaying(false); step(+b.getAttribute('data-step')); }
+      if (t.closest('[data-view]')) { setPlaying(false); openView(idx); return; }
+      if (t.closest('[data-view-close]')) { closeView(); return; }
       if ((b = t.closest('[data-sat]'))) { var on = !root.classList.contains('sat'); root.classList.toggle('sat', on); b.setAttribute('aria-pressed', String(on)); }
     });
     var down = null;

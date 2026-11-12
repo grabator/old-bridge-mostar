@@ -242,8 +242,11 @@ const hasPhoto = (p, src) => !!(src || p.image || p.photo);
 /* A stop card: a photo with the name on it, quick facts, the story, then what is next */
 function stopCard({ p, kicker, num, facts, body, next, src }) {
   return `<div class="jr-hero${hasPhoto(p, src) ? '' : ' art'}">${placeImg(p, src)}<div class="jr-hero-txt">${num ? `<span class="jr-n">${num}</span>` : ''}<p class="jr-kick">${kicker}</p><h3>${esc(p.name)}</h3></div></div>
-<div class="jr-body">${facts.length ? `<ul class="jr-facts">${facts.join('')}</ul>` : ''}${body}${next ? `<p class="jr-next">${next}</p>` : ''}${p.credit ? `<small class="pc-credit">Photo: ${esc(p.credit)}</small>` : ''}</div>`;
+<div class="jr-body">${facts.length ? `<ul class="jr-facts">${facts.join('')}</ul>` : ''}${lookRow(p)}${body}${next ? `<p class="jr-next">${next}</p>` : ''}${p.credit ? `<small class="pc-credit">Photo: ${esc(p.credit)}</small>` : ''}</div>`;
 }
+const svUrl = (lat, lon) => `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${lat},${lon}`;
+// "Look around": our photos in the viewer, and Google Street View for a real 360° look
+const lookRow = (p) => { const sv = (p.view && p.view.sv) || [p.lat, p.lon]; return `<div class="jr-look">${p.view && p.view.photos ? `<button type="button" class="jr-lookbtn" data-view>${I.eye}<span>Look around</span></button>` : ''}<a class="jr-svbtn" href="${svUrl(sv[0], sv[1])}" target="_blank" rel="noopener"><b>360°</b><span>Street View</span></a></div>`; };
 const fact = (ic, txt, cls = '') => `<li${cls ? ` class="${cls}"` : ''}>${ic || ''}<span>${txt}</span></li>`;
 const tagFacts = (p) => (p.tags || []).filter((x) => x !== 'Meeting point').map((x) => fact('', esc(x), 'tag'));
 
@@ -260,6 +263,7 @@ function journey({ cfg, stops, title, intro, hint, label, end, endText, endCta, 
     <div class="jr-btns"><button type="button" class="btn mint" data-begin>Start the journey ${I.arrow}</button><button type="button" class="btn line" data-autoplay>Play it all</button></div><small>${esc(hint)}</small></div></div>
   <div class="jr-end"><div class="jr-panel"><p class="eyebrow">${mini}${esc(end)}</p><h3>${endText}</h3><div class="jr-btns">${endCta}<button type="button" class="btn line" data-restart>Watch again</button></div></div></div>
   <div class="jr-ctrl"><button type="button" class="jr-b" data-step="-1" aria-label="Previous stop">←</button><button type="button" class="jr-b jr-play" data-play aria-pressed="false"><i aria-hidden="true"></i><span>Play</span></button><span class="jr-count">0 / ${N}</span>${cfg.map === 'region' ? `<button type="button" class="jr-b jr-sat" data-sat aria-pressed="true" aria-label="Satellite view">${I.layers}</button>` : ''}<button type="button" class="jr-b" data-step="1" aria-label="Next stop">→</button></div>
+  <div class="jr-view" hidden><div class="jr-view-pic"><img alt="" draggable="false"></div><div class="jr-view-top"><p><small>Look around</small><b></b></p><button type="button" class="jr-view-x" data-view-close aria-label="Close">×</button></div><div class="jr-view-bar"><div class="jr-view-tabs"></div><a class="jr-svbtn" target="_blank" rel="noopener"><b>360°</b><span>Street View</span></a></div><span class="jr-view-hint">Drag to look around</span></div>
   <p class="jr-live sr" role="status" aria-live="polite"></p>
 </div>`;
 }
@@ -278,7 +282,7 @@ function routeBlock(t) {
   return `<section class="tsec route-sec" id="route"><h2>The route</h2>
 <p class="muted rt-mode">${walk ? 'On foot along the old kaldrma' : 'By car from Mostar'} · ${N} stops</p>
 ${journey({ cfg: { map: r.map, mode: r.mode, stops: r.stops }, stops, title: esc(shortName(t)), intro: walk ? 'Walk the route stop by stop: the stones of the kaldrma are laid down as you go.' : 'Follow the road from stop to stop and see what waits at each one.', hint: 'Buttons, arrow keys, swipe, or tap a pin on the map.', label: 'Route map of ' + t.name, end: 'End of the route', endText: 'Like this route?', endCta: `<a class="btn mint" href="#enquire">Enquire about this tour</a>`, card })}
-${notes(r.map === 'oldtown' ? [PL.oldtownNote] : [PL.note].concat(stops.flatMap((p) => p.notes || [])))}</section>`;
+${notes(r.map === 'oldtown' ? [PL.oldtownNote, PL.viewNote] : [PL.note].concat(stops.flatMap((p) => p.notes || [])))}</section>`;
 }
 
 /* Home: town by town, from Mostar out to the rest of Herzegovina */
@@ -334,7 +338,7 @@ const emit = (url, html) => out.push([url, html]);
   <div class="head-row"><div><p class="eyebrow rv">${mini}Where we go</p><h2 class="rv d1">From Mostar <em>to all of Herzegovina</em></h2></div></div>
   <p class="lead rv d2">Mostar is home. From here Mirna takes you town by town: Blagaj, Počitelj, the Kravice Waterfalls, Stolac and beyond. Take the journey: the globe dives into Herzegovina and the satellite map flies from town to town.</p>
   ${homeJourney()}
-  ${notes([PL.note, PL.homeNote])}
+  ${notes([PL.note, PL.homeNote, PL.viewNote])}
 </div></section>
 
 <section class="sec dark"><div class="wrap">
