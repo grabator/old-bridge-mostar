@@ -73,5 +73,16 @@
     "Brief also mentions a 2–2.5 hour City Tour: decide whether it stays separate from Highlights and the Coffee Tour."
   ],
   "seoTitle": "Mostar City Tour: Old Town Highlights with a Local Guide",
-  "seoDescription": "One-hour walk through Mostar’s Old Town with a licensed local guide: Crooked Bridge, Old Bridge, Kujundžiluk and Koski Mehmed Pasha Mosque."
+  "seoDescription": "One-hour walk through Mostar’s Old Town with a licensed local guide: Crooked Bridge, Old Bridge, Kujundžiluk and Koski Mehmed Pasha Mosque.",
+  "route": {
+    "map": "oldtown",
+    "mode": "walk",
+    "stops": [
+      "hamam",
+      "kriva",
+      "stari-most",
+      "kujundziluk",
+      "koski"
+    ]
+  }
 }

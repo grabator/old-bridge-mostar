@@ -56,5 +56,13 @@
     "Confirm €40 per person and transport from Mostar."
   ],
   "seoTitle": "Počitelj Tour: Historic Stone Village near Mostar",
-  "seoDescription": "Guided walk through Počitelj, the historic stone village above the Neretva: architecture, fortification and views over the river valley."
+  "seoDescription": "Guided walk through Počitelj, the historic stone village above the Neretva: architecture, fortification and views over the river valley.",
+  "route": {
+    "map": "region",
+    "mode": "drive",
+    "stops": [
+      "mostar",
+      "pocitelj"
+    ]
+  }
 }

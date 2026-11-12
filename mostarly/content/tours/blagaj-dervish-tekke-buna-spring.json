@@ -58,5 +58,13 @@
     "Confirm the actual time including driving. Distance \"about 12 km\" is our addition: confirm."
   ],
   "seoTitle": "Blagaj Tour from Mostar: Dervish Tekke & Buna Spring",
-  "seoDescription": "Half-day visit to Blagaj with a local guide from Mostar: the Buna River spring, the Dervish Tekke and the riverside setting."
+  "seoDescription": "Half-day visit to Blagaj with a local guide from Mostar: the Buna River spring, the Dervish Tekke and the riverside setting.",
+  "route": {
+    "map": "region",
+    "mode": "drive",
+    "stops": [
+      "mostar",
+      "blagaj"
+    ]
+  }
 }

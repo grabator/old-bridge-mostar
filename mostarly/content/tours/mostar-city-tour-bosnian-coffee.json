@@ -70,5 +70,15 @@
     "The tour-ending line about alternatives to coffee is our suggestion: confirm or remove."
   ],
   "seoTitle": "Mostar City Tour with Bosnian Coffee Tasting",
-  "seoDescription": "Two-hour Mostar walking tour with a licensed local guide and a traditional Bosnian coffee tasting: džezva, fildžan and the serving ritual explained."
+  "seoDescription": "Two-hour Mostar walking tour with a licensed local guide and a traditional Bosnian coffee tasting: džezva, fildžan and the serving ritual explained.",
+  "route": {
+    "map": "oldtown",
+    "mode": "walk",
+    "stops": [
+      "hamam",
+      "kriva",
+      "stari-most",
+      "kujundziluk"
+    ]
+  }
 }

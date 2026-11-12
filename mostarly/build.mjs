@@ -19,7 +19,13 @@ const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').
 const hash = (s) => crypto.createHash('sha1').update(s).digest('hex').slice(0, 8);
 const CSS = fs.readFileSync(path.join(ROOT, 'src/site.css'), 'utf8');
 const JS = fs.readFileSync(path.join(ROOT, 'src/site.js'), 'utf8');
-const V = { css: hash(CSS), js: hash(JS) };
+const MAPJS = fs.readFileSync(path.join(ROOT, 'src/maps.js'), 'utf8');
+const V = { css: hash(CSS), js: hash(JS), maps: hash(MAPJS) };
+// places for the maps; photos from Wikimedia Commons (src/img/places/credits.json) are added when present
+const PL = read('content/places.json');
+const PHOTOS = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, 'src/img/places/credits.json'), 'utf8')); } catch { return {}; } })();
+const PLACES = PL.places.map((p) => Object.assign({}, p, !p.image && PHOTOS[p.id] ? { photo: p.id + '.jpg', credit: `${PHOTOS[p.id].artist || 'Wikimedia Commons'}, ${PHOTOS[p.id].license} (Wikimedia Commons)` } : {}));
+const placeBy = (id) => PLACES.find((p) => p.id === id);
 const wa = (text) => `https://wa.me/${S.contact.whatsapp}?text=${encodeURIComponent(text)}`;
 const tel = 'tel:' + S.contact.phone.replace(/\s/g, '');
 // Runs in <head> before the page paints: the visitor's saved choice, otherwise day or night in Mostar right now.
@@ -150,9 +156,9 @@ function sticky(label, sub, href, waText) {
   return `<div class="sticky off" id="sticky"><div><b>${esc(label)}</b>${esc(sub)}</div><a class="wa-mini" href="${wa(waText)}" aria-label="Ask on WhatsApp">${I.wa}</a><a class="btn mint" href="${href}">Enquire</a></div>`;
 }
 function dataScript() {
-  return `<script type="application/json" id="mly-data">${JSON.stringify({ tours: TOURS.map((t) => ({ slug: t.slug, name: t.name, tickets: t.tickets || [] })), tickets: S.tickets, whatsapp: S.contact.whatsapp, email: S.contact.email, ga4: S.analytics.ga4 || '' }).replace(/</g, '\\u003c')}</script>`;
+  return `<script type="application/json" id="mly-data">${JSON.stringify({ tours: TOURS.map((t) => ({ slug: t.slug, name: t.name, tickets: t.tickets || [] })), tickets: S.tickets, places: PLACES.map(({ notes, ...p }) => p), whatsapp: S.contact.whatsapp, email: S.contact.email, ga4: S.analytics.ga4 || '' }).replace(/</g, '\\u003c')}</script>`;
 }
-function page({ current = '', hero = false, body, tour = '', stickyArgs, extraTop = '' }) {
+function page({ current = '', hero = false, body, tour = '', stickyArgs, extraTop = '', maps = false }) {
   return `<body${tour ? ` data-tour="${esc(tour)}"` : ''}><a class="skip" href="#main">Skip to content</a>
 ${DRAFT ? '<div class="draftbar" title="Yellow notes and ‘to confirm’ labels are only visible in the draft">Draft</div>' : ''}
 ${extraTop}${nav(current, hero)}
@@ -160,7 +166,7 @@ ${extraTop}${nav(current, hero)}
 ${foot()}
 ${stickyArgs ? sticky(...stickyArgs) : ''}
 <div class="rail" id="rail" aria-hidden="true"><svg></svg></div>
-${dataScript()}<script src="/site.js?v=${V.js}" defer></script></body></html>`;
+${dataScript()}<script src="/site.js?v=${V.js}" defer></script>${maps ? `<script src="/maps.js?v=${V.maps}" defer></script>` : ''}</body></html>`;
 }
 
 /* ---------- reusable blocks ---------- */
@@ -221,6 +227,19 @@ function phead(c, h1, lead, extra = '') {
   return `<header class="phead"><div class="wrap">${crumbs(c)}<p class="eyebrow">${mini}${esc(c[c.length - 1][1])}</p><h1>${h1}</h1>${lead ? `<p class="lead">${lead}</p>` : ''}${extra}</div></header><div class="band weave" data-band="0" style="--bh:22px" aria-hidden="true"></div>`;
 }
 
+function routeBlock(t) {
+  const r = t.route, stops = r.stops.map(placeBy).filter(Boolean);
+  // straight-line distance x 1.3 for winding roads, rounded to 5 km: an honest "about" for the legs
+  const hav = (a, b) => { const R = 6371, r1 = (a.lat * Math.PI) / 180, r2 = (b.lat * Math.PI) / 180, dl = ((b.lon - a.lon) * Math.PI) / 180, dp = r2 - r1; return 2 * R * Math.asin(Math.sqrt(Math.sin(dp / 2) ** 2 + Math.cos(r1) * Math.cos(r2) * Math.sin(dl / 2) ** 2)); };
+  const leg = (a, b) => (r.mode === 'drive' ? `≈ ${Math.max(5, Math.round((hav(a, b) * 1.3) / 5) * 5)} km by car` : r.mode === 'walk' ? 'a short walk' : '');
+  const img = (p) => p.image ? `<img src="/img/${esc(p.image)}" alt="${esc(p.name)}" loading="lazy">` : p.photo ? `<img src="/img/places/${esc(p.photo)}" alt="${esc(p.name)}" loading="lazy">` : '<span class="pc-art" aria-hidden="true"></span>';
+  return `<section class="tsec route-sec" data-route='${esc(JSON.stringify(r))}'><h2>The route</h2>
+<p class="muted rt-mode">${r.mode === 'walk' ? 'On foot along the old kaldrma' : 'By car from Mostar'} · ${stops.length} stops · tap a stop</p>
+<div class="rt-stage"></div>
+<ol class="rt-steps">${stops.map((p, i) => `<li class="rt-step" data-id="${p.id}"><span class="rt-n">${i + 1}</span><div class="rt-img">${img(p)}</div><div class="rt-txt"><b>${esc(p.name)}</b>${p.kind === 'meet' ? '<em>Meeting point</em>' : ''}<p>${esc(p.text)}</p>${p.credit ? `<small class="pc-credit">Photo: ${esc(p.credit)}</small>` : ''}${i < stops.length - 1 ? `<span class="rt-leg">↓ ${leg(p, stops[i + 1])}</span>` : ''}</div></li>`).join('')}</ol>
+${notes(r.map === 'oldtown' ? [PL.oldtownNote] : [PL.note].concat(stops.flatMap((p) => p.notes || [])))}</section>`;
+}
+
 /* ---------- pages ---------- */
 const out = [];
 const emit = (url, html) => out.push([url, html]);
@@ -253,6 +272,16 @@ const emit = (url, html) => out.push([url, html]);
 <section class="sec alt"><div class="wrap">
   <div class="head-row"><div><p class="eyebrow rv">${mini}Featured tours</p><h2 class="rv d1">Start <em>here</em></h2></div><a class="btn line sm rv" href="/tours/">All tours ${I.arrow}</a></div>
   <div class="cards four">${featured.map(card).join('')}</div>
+</div></section>
+
+<section class="sec explore" data-explore><div class="wrap">
+  <div class="head-row"><div><p class="eyebrow rv">${mini}Where we go</p><h2 class="rv d1">From Mostar <em>to all of Herzegovina</em></h2></div></div>
+  <p class="lead rv d2">Mostar is home. From here Mirna takes you to the Old Town, to Blagaj, Počitelj, the Kravice Waterfalls and beyond. Tap a place to see what is there and which tours go.</p>
+  <div class="ex-grid">
+    <div class="ex-stage rv"><canvas aria-hidden="true"></canvas><button type="button" class="ex-back btn sm" hidden>← Herzegovina</button></div>
+    <div class="ex-side"><div class="ex-card" aria-live="polite"></div><div class="ex-chips" role="group" aria-label="Places"></div></div>
+  </div>
+  ${notes([PL.note, PL.oldtownNote].concat(placeBy('zitomislic').notes || []))}
 </div></section>
 
 <section class="sec dark"><div class="wrap">
@@ -289,7 +318,7 @@ const emit = (url, html) => out.push([url, html]);
   <div class="contact-row rv d3"><a class="btn mint" href="/contact/">Send an enquiry</a><a class="btn wa" href="${wa('Hello Mirna, I would like to ask about a tour in Mostar.')}">${I.wa} WhatsApp</a><a class="btn ghost" href="${tel}">${I.phone} Call</a></div>
 </div></section>`;
   const loader = `<div class="loader" id="loader" aria-hidden="true"><div class="loom2">${bridge('draw')}<img class="lg2" src="/img/logo-light.png" alt=""></div></div>`;
-  emit('/', head({ title: 'Mostarly Guide · Private Tours in Mostar with a Licensed Local Guide', desc: S.description, url: '/', ld: [orgLd] }) + page({ current: '/', hero: true, body, extraTop: loader, stickyArgs: ['Tours in Mostar', 'With a licensed local guide', '/contact/', 'Hello Mirna, I would like to ask about a tour in Mostar.'] }));
+  emit('/', head({ title: 'Mostarly Guide · Private Tours in Mostar with a Licensed Local Guide', desc: S.description, url: '/', ld: [orgLd] }) + page({ current: '/', hero: true, maps: true, body, extraTop: loader, stickyArgs: ['Tours in Mostar', 'With a licensed local guide', '/contact/', 'Hello Mirna, I would like to ask about a tour in Mostar.'] }));
 }
 
 // TOURS CATALOGUE
@@ -323,6 +352,7 @@ for (const t of TOURS) {
   <dl class="facts">${fact(I.clock, 'Duration', t.duration)}${fact(I.pin, 'Location', t.location)}${fact(I.group, 'Group size', t.groupSize)}${fact(I.walk, 'Walking level', t.level)}${fact(I.lang, 'Language', t.languages)}${fact(I.cal, 'Availability', t.availability)}${fact(I.pin, 'Meeting point', t.meetingPoint, true)}</dl>
   ${notes(t.notes)}</div>
   <section class="tsec"><h2>About this tour</h2><div class="prose"><p>${esc(t.description)}</p></div></section>
+  ${t.route ? routeBlock(t) : ''}
   <section class="tsec"><h2>What you do</h2><ol class="steps">${t.itinerary.map((s) => `<li${s.optional ? ' class="opt"' : ''}>${esc(s.text)}${s.optional ? '<span class="tag">Optional</span>' : ''}</li>`).join('')}</ol>
   ${t.itinerary.some((s) => s.optional) ? '<p class="muted" style="font-size:.85rem;margin-top:.4rem">Optional stops depend on the season, opening hours and your preferences.</p>' : ''}</section>
   <section class="tsec"><h2>Price details</h2><div class="incl">
@@ -341,7 +371,7 @@ for (const t of TOURS) {
   const ld = [crumbLd(c), Object.assign({ '@context': 'https://schema.org', '@type': 'TouristTrip', name: t.name, description: t.description, url: BASE + '/tours/' + t.slug + '/', touristType: ['Independent travellers', 'Families', 'Small groups'], provider: { '@id': BASE + '/#business' }, itinerary: { '@type': 'ItemList', itemListElement: t.itinerary.map((s, i) => ({ '@type': 'ListItem', position: i + 1, name: s.text })) } },
     t.image ? { image: BASE + '/img/' + t.image } : {},
     t.price.confirmed && t.price.basis !== 'request' ? { offers: { '@type': 'Offer', price: t.price.amount, priceCurrency: 'EUR', description: priceInfo(t.price).text, url: BASE + '/tours/' + t.slug + '/' } } : {})];
-  emit('/tours/' + t.slug + '/', head({ title: t.seoTitle + ' · Mostarly Guide', desc: t.seoDescription, url: '/tours/' + t.slug + '/', image: t.image ? '/img/' + t.image : '/img/hero-d.jpg', ld }) + page({ current: '/tours/', body, tour: t.slug, stickyArgs: [t.name.split(' – ')[0], p.text, '#enquire', waText] }));
+  emit('/tours/' + t.slug + '/', head({ title: t.seoTitle + ' · Mostarly Guide', desc: t.seoDescription, url: '/tours/' + t.slug + '/', image: t.image ? '/img/' + t.image : '/img/hero-d.jpg', ld }) + page({ current: '/tours/', body, tour: t.slug, maps: !!t.route, stickyArgs: [t.name.split(' – ')[0], p.text, '#enquire', waText] }));
 }
 
 // ABOUT
@@ -461,6 +491,8 @@ for (const [url, html] of out) {
 fs.writeFileSync(path.join(DIST, 'site.css'), CSS);
 fs.writeFileSync(path.join(DIST, 'site.js'), JS);
 fs.cpSync(path.join(ROOT, 'src/img'), path.join(DIST, 'img'), { recursive: true });
+fs.cpSync(path.join(ROOT, 'src/geo'), path.join(DIST, 'geo'), { recursive: true });
+fs.writeFileSync(path.join(DIST, 'maps.js'), MAPJS);
 fs.cpSync(path.join(ROOT, 'admin'), path.join(DIST, 'admin'), { recursive: true });
 const urls = out.map(([u]) => u).filter((u) => u !== '/404' && !['/privacy/', '/terms/', '/cancellation-policy/'].includes(u));
 fs.writeFileSync(path.join(DIST, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((u) => `<url><loc>${BASE}${u}</loc></url>`).join('\n')}\n</urlset>\n`);
