@@ -1,0 +1,624 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Mostarly Guide · Licensed local guide in Mostar</title>
+<meta name="theme-color" content="#2b2a3c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..500&family=Inter:wght@300..700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#2b2a3c;--navy2:#22212f;--ink:#26252f;--mut:#6f6a66;
+  --cream:#f6f0e6;--stone:#ece3d4;--stone2:#e2d7c4;--line:#ddd2bf;
+  --mint:#1de9b6;--emer:#0a8a71;--copper:#b5683d;--copper2:#e2a272;--red:#b93a32;--yellow:#f2cf3a;
+  --cu:linear-gradient(135deg,#8f4a26 0%,#c97b4b 35%,#f0b98d 50%,#c47647 65%,#8f4a26 100%);
+  --g:1.25rem;--r:26px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{font-family:Inter,system-ui,sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;font-size:16px;overflow-x:hidden}
+img{display:block;max-width:100%}
+[hidden]{display:none!important}
+a{color:inherit;text-decoration:none}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;font-weight:400;line-height:1.04;letter-spacing:-.015em}
+h2{font-size:clamp(2.1rem,7.4vw,3.6rem);margin:.5rem 0 1.25rem}
+h2 em{font-style:italic;color:var(--emer)}
+h3{font-size:1.55rem}
+.wrap{padding:0 var(--g);max-width:1240px;margin:0 auto}
+.eyebrow{display:flex;align-items:center;gap:.6rem;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;font-weight:600;color:var(--copper)}
+.eyebrow svg{width:14px;height:14px;flex:none}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.55rem;background:var(--navy);color:#fff;font-weight:600;font-size:1rem;padding:1rem 1.55rem;border-radius:999px;border:0;cursor:pointer;transition:transform .2s,box-shadow .2s}
+.btn:active{transform:scale(.97)}
+.btn.mint{background:var(--mint);color:var(--navy)}
+.btn.ghost{background:rgba(255,255,255,.14);color:#fff;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.35)}
+.btn.sm{padding:.62rem 1.05rem;font-size:.88rem}
+.ic{width:1.25em;height:1.25em;flex:none}
+.stars{display:inline-flex;gap:2px;color:var(--yellow)}
+.stars i{font-style:normal;opacity:.25;transform:scale(.6);transition:opacity .3s,transform .4s cubic-bezier(.3,1.6,.5,1)}
+.in .stars i,.stars.on i{opacity:1;transform:none}
+.stars i:nth-child(2){transition-delay:.09s}.stars i:nth-child(3){transition-delay:.18s}.stars i:nth-child(4){transition-delay:.27s}.stars i:nth-child(5){transition-delay:.36s}
+
+/* nav */
+.nav{position:absolute;inset:0 0 auto;z-index:20;display:flex;align-items:center;gap:.7rem;padding:calc(.9rem + env(safe-area-inset-top)) var(--g) .9rem;color:#fff}
+.nav .logo{width:42px;height:42px;flex:none}
+.brand{font-family:Fraunces,serif;font-size:1.2rem;line-height:1}
+.brand small{display:block;font-family:Inter,sans-serif;font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;opacity:.75;margin-top:.25rem}
+.links{display:none}
+.lang{margin-left:auto;font-size:.78rem;font-weight:600;letter-spacing:.08em;border:1px solid rgba(255,255,255,.4);border-radius:99px;padding:.35rem .7rem}
+
+/* hero */
+.hero{position:relative;min-height:100svh;color:#fff;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;background:var(--navy)}
+.hero picture,.hero picture img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.hero picture img{object-position:50% 40%;transform:scale(1.08);animation:heroIn 2.4s cubic-bezier(.2,.7,.2,1) forwards}
+@keyframes heroIn{to{transform:scale(1)}}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,19,30,.5) 0%,rgba(20,19,30,0) 20%,rgba(20,19,30,0) 38%,rgba(20,19,30,.55) 55%,rgba(20,19,30,.88) 100%)}
+.hero-in{text-shadow:0 1px 18px rgba(10,10,20,.35)}
+.hero-in{position:relative;z-index:2;padding:0 var(--g) 1.6rem;max-width:1240px;margin:0 auto;width:100%}
+.kick{font-size:.72rem;letter-spacing:.24em;text-transform:uppercase;font-weight:600;color:#fff;display:flex;align-items:center;gap:.5rem}
+.hero h1{font-size:clamp(4.3rem,22.5vw,15.5rem);line-height:.8;letter-spacing:-.035em;font-weight:350;margin:.9rem 0 1rem;margin-left:-.04em}
+.hero h1 span{display:inline-block;opacity:0;transform:translateY(.35em);animation:up .9s cubic-bezier(.2,.8,.2,1) forwards}
+.hero h1 span:nth-child(2){animation-delay:.06s}.hero h1 span:nth-child(3){animation-delay:.12s}.hero h1 span:nth-child(4){animation-delay:.18s}.hero h1 span:nth-child(5){animation-delay:.24s}.hero h1 span:nth-child(6){animation-delay:.3s}
+@keyframes up{to{opacity:1;transform:none}}
+.lead{font-family:Fraunces,serif;font-size:1.3rem;line-height:1.3;max-width:20ch;opacity:0;animation:up .9s .45s forwards}
+.cta{display:flex;flex-wrap:wrap;gap:.8rem;align-items:center;margin-top:1.5rem;opacity:0;animation:up .9s .6s forwards}
+.rating{display:flex;align-items:center;gap:.5rem;font-size:.85rem;margin-top:1.2rem;opacity:0;animation:up .9s .75s forwards}
+.rating .stars i{opacity:1;transform:none}
+
+/* kilim band */
+.band{position:relative;z-index:3;width:100%;height:var(--bh,66px);background-repeat:repeat-x;background-size:auto 100%;background-position:center}
+.weave{clip-path:inset(0 0 100% 0)}
+.weave.in{animation:weave 1.1s steps(11,end) forwards}
+@keyframes weave{to{clip-path:inset(0 0 0 0)}}
+
+/* sections */
+.sec{padding:4.5rem 0}
+.rv{opacity:0;transform:translateY(22px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
+.rv.in{opacity:1;transform:none}
+.d1{transition-delay:.08s}.d2{transition-delay:.16s}.d3{transition-delay:.24s}
+
+/* trust */
+.trust{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;padding:1.6rem var(--g) 0;max-width:1240px;margin:0 auto}
+.trust div{text-align:center;padding:.9rem .3rem;border-radius:18px;background:#fff8ee;border:1px solid var(--line)}
+.trust b{display:block;font-family:Fraunces,serif;font-weight:500;font-size:1.05rem;line-height:1.15}
+.trust span{font-size:.72rem;color:var(--mut)}
+
+/* reviews */
+.reviews{position:relative;overflow:hidden}
+.reviews .ghost-rhomb{position:absolute;right:-90px;top:10px;width:320px;opacity:.07;pointer-events:none;display:none}
+.rev-score{display:flex;align-items:center;gap:.9rem;margin-bottom:1.6rem}
+.rev-score .num{font-family:Fraunces,serif;font-size:3rem;line-height:1}
+.rev-score small{display:block;color:var(--mut);font-size:.8rem}
+.rows{display:flex;gap:1rem;overflow-x:auto;scroll-snap-type:x mandatory;padding:0 var(--g) 1.2rem;margin:0 calc(var(--g)*-1);scrollbar-width:none}
+.rows::-webkit-scrollbar{display:none}
+.rev{position:relative;flex:0 0 84%;scroll-snap-align:center;background:#fffaf2;border-radius:var(--r);padding:1.8rem 1.5rem 1.4rem;display:flex;flex-direction:column;gap:1rem;border:1px solid var(--line)}
+.rev .corner{position:absolute;width:22px;height:22px}
+.rev .c1{top:10px;left:10px}.rev .c2{top:10px;right:10px;transform:scaleX(-1)}.rev .c3{bottom:10px;left:10px;transform:scaleY(-1)}.rev .c4{bottom:10px;right:10px;transform:scale(-1)}
+.rev blockquote{font-family:Fraunces,serif;font-size:1.2rem;line-height:1.38}
+.rev figcaption{display:flex;align-items:center;gap:.65rem;font-size:.85rem;color:var(--mut);margin-top:auto}
+.av{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-weight:600;color:#fff;font-size:.9rem}
+.rev figcaption b{color:var(--ink);display:block;line-height:1.2}
+.ta{margin-left:auto;display:flex;align-items:center;gap:.3rem;font-size:.7rem;font-weight:700;color:var(--ink);border:1px solid var(--line);border-radius:99px;padding:.25rem .55rem;background:#fff}
+.ta i{width:8px;height:8px;border-radius:50%;background:#34e0a1;display:block}
+.dots{display:flex;gap:6px;justify-content:center}
+.dots i{width:6px;height:6px;border-radius:9px;background:var(--line);transition:width .3s,background .3s}
+.dots i.on{width:22px;background:var(--emer)}
+.more{display:inline-flex;align-items:center;gap:.4rem;margin-top:1.4rem;font-weight:600;color:var(--emer);border-bottom:1px solid currentColor;padding-bottom:2px}
+
+/* mirna */
+.mirna{display:grid;gap:2.4rem;align-items:center}
+.arch{position:relative;width:min(100%,380px);margin:0 auto;aspect-ratio:4/5.3;border-radius:999px 999px 26px 26px;padding:12px;
+  background:
+   repeating-linear-gradient(45deg,transparent 0 9px,rgba(181,104,61,.55) 9px 10.5px),
+   repeating-linear-gradient(-45deg,transparent 0 9px,rgba(181,104,61,.55) 9px 10.5px),#efe3cf}
+.arch-in{width:100%;height:100%;border-radius:999px 999px 18px 18px;background:linear-gradient(160deg,#d9cbb3,#c4b293);display:grid;place-items:center;text-align:center;color:#6c604f;font-size:.85rem;overflow:hidden}
+.arch-in svg{display:block;width:56px;opacity:.5;margin:0 auto .5rem}
+.rozeta{position:absolute;right:-6px;bottom:28px;width:118px;height:118px;filter:drop-shadow(0 8px 18px rgba(80,40,20,.25))}
+.rozeta .spin{transform-origin:60px 60px;animation:spin 40s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.mirna p{max-width:44ch;color:#4a4642}
+.mirna p+p{margin-top:.9rem}
+.sig{font-family:Fraunces,serif;font-style:italic;font-size:1.5rem;color:var(--copper);margin-top:1.2rem!important}
+.facts{display:flex;gap:1.6rem;margin-top:1.6rem}
+.facts b{font-family:Fraunces,serif;font-weight:400;font-size:2rem;display:block;line-height:1;color:var(--navy)}
+.facts span{font-size:.75rem;color:var(--mut);text-transform:uppercase;letter-spacing:.1em}
+
+/* tours */
+.tours{background:var(--stone)}
+.cards{display:grid;gap:1.6rem}
+.card{position:relative;background:#fffaf2;border-radius:30px;overflow:hidden;border:1px solid var(--line);box-shadow:0 1px 0 rgba(0,0,0,.02),0 20px 40px -24px rgba(60,40,20,.25);transition:transform .35s cubic-bezier(.2,.7,.2,1)}
+.card:hover{transform:translateY(-4px)}
+.cimg{position:relative;aspect-ratio:4/3;overflow:hidden}
+.cimg img{width:100%;height:100%;object-fit:cover;transition:transform .9s cubic-bezier(.2,.7,.2,1)}
+.card:hover .cimg img{transform:scale(1.05)}
+.cnum{position:absolute;left:1rem;top:1rem;font-family:Fraunces,serif;font-size:1.05rem;color:#fff;background:rgba(30,25,20,.35);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:.2rem .75rem;border-radius:99px}
+.tag{position:absolute;right:1rem;top:1rem;font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:var(--mint);color:var(--navy);padding:.3rem .65rem;border-radius:99px}
+.cbody{position:relative;padding:1.5rem 1.4rem 1.4rem;display:grid;gap:.85rem}
+.cbody>p{color:var(--mut)}
+.arab{position:absolute;right:10px;top:-34px;width:64px;height:64px;pointer-events:none}
+.cbody h3{padding-right:52px}
+.meta{list-style:none;display:flex;flex-wrap:wrap;gap:.45rem}
+.meta li{display:flex;align-items:center;gap:.35rem;font-size:.8rem;border:1px solid var(--line);background:#fff;border-radius:99px;padding:.3rem .7rem}
+.meta svg{width:14px;height:14px;color:var(--copper)}
+.incl{display:grid;gap:.35rem;font-size:.9rem;color:#4a4642}
+.incl li{list-style:none;display:flex;gap:.5rem;align-items:flex-start}
+.incl li::before{content:"";flex:none;width:8px;height:8px;margin-top:.5em;transform:rotate(45deg);background:var(--emer)}
+.crow{display:flex;justify-content:space-between;align-items:center;padding-top:1rem;margin-top:.2rem;border-top:1px dashed var(--line)}
+.price small{display:block;font-size:.72rem;color:var(--mut);text-transform:uppercase;letter-spacing:.1em}
+.price b{font-family:Fraunces,serif;font-weight:400;font-size:1.9rem;line-height:1;background:var(--cu);-webkit-background-clip:text;background-clip:text;color:transparent}
+.shine::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 35%,rgba(255,226,190,.55) 50%,transparent 65%);transform:translateX(-120%);pointer-events:none}
+.shine.in::after{animation:shine 1.6s .4s ease-out}
+.card:hover .shine::after{animation:shine 1.2s ease-out}
+@keyframes shine{to{transform:translateX(120%)}}
+.dtimg{aspect-ratio:4/3;position:relative;overflow:hidden;background:var(--navy)}
+
+/* walk */
+.walk{display:grid;gap:2rem}
+.map{position:relative;background:#efe6d6;border-radius:30px;border:1px solid var(--line);overflow:hidden}
+.map svg{display:block;width:100%;height:auto}
+.map .lbl{font:600 12.5px Inter,sans-serif;fill:var(--ink)}
+.map .lbl2{font:italic 400 13px Fraunces,serif;fill:var(--mut)}
+.wave{fill:none;stroke:#fff;stroke-width:1.4;stroke-linecap:round;stroke-dasharray:10 28;opacity:.65;animation:flow 6s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-152}}
+.stone{transform-box:fill-box;transform-origin:center;opacity:0;transform:scale(.2);transition:opacity .35s,transform .45s cubic-bezier(.3,1.5,.5,1)}
+.stone.on{opacity:1;transform:none}
+.pin{opacity:0;transition:opacity .5s}.pin.on{opacity:1}
+.steps{list-style:none;display:grid;gap:0;margin-top:1.4rem;counter-reset:s}
+.steps li{display:grid;grid-template-columns:2.2rem 1fr;gap:.2rem .8rem;padding:.75rem 0;border-bottom:1px solid var(--line)}
+.steps li::before{counter-increment:s;content:counter(s,decimal-leading-zero);font-family:Fraunces,serif;color:var(--copper);font-size:1.05rem;grid-row:span 2}
+.steps b{font-weight:600}.steps span{font-size:.88rem;color:var(--mut)}
+.polaroid{position:relative;width:62%;max-width:280px;margin:-4.5rem 0 0 auto;transform:rotate(3deg);background:#fff;padding:8px 8px 34px;border-radius:6px;box-shadow:0 18px 40px -16px rgba(40,30,20,.45)}
+.polaroid img{aspect-ratio:4/5;object-fit:cover;border-radius:3px}
+.polaroid figcaption{position:absolute;bottom:8px;left:0;right:0;text-align:center;font:italic 14px Fraunces,serif;color:var(--mut)}
+
+/* trip */
+.stops{display:grid;gap:1rem;margin-top:.5rem}
+.stop{display:grid;grid-template-columns:92px 1fr;gap:1rem;align-items:center;background:#fffaf2;border:1px solid var(--line);border-radius:22px;padding:.6rem}
+.stop .tile{aspect-ratio:1;border-radius:16px;display:grid;place-items:center;overflow:hidden}
+.stop .tile svg{width:62%}
+.stop b{font-family:Fraunces,serif;font-weight:500;font-size:1.35rem;display:block;line-height:1.1}
+.stop span{font-size:.85rem;color:var(--mut)}
+.stop em{display:inline-block;font-style:normal;font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--copper);margin-bottom:.15rem}
+.road{display:flex;align-items:center;gap:.5rem;font-size:.75rem;color:var(--mut);padding:.1rem 0 .1rem 2.6rem}
+.road::before{content:"";width:2px;height:20px;background:repeating-linear-gradient(var(--copper) 0 4px,transparent 4px 8px)}
+
+/* meanings */
+.mean{background:var(--navy);color:var(--cream);position:relative;overflow:hidden}
+.mean .eyebrow{color:var(--mint)}
+.mean h2 em{color:var(--mint)}
+.mean>.wrap>p{color:#c9c4d6;max-width:46ch}
+.signs{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-top:2rem}
+.sign{border:1px solid rgba(255,255,255,.12);border-radius:22px;padding:1.2rem 1rem;background:rgba(255,255,255,.03)}
+.sign svg{width:46px;height:46px;margin-bottom:.8rem}
+.sign b{font-family:Fraunces,serif;font-weight:400;font-size:1.25rem;display:block}
+.sign i{font-size:.75rem;color:var(--mint);font-style:normal;letter-spacing:.06em}
+.sign p{font-size:.85rem;color:#c9c4d6;margin-top:.35rem;line-height:1.45}
+
+/* booking */
+.book{position:relative;color:#fff;overflow:hidden;background:var(--navy2)}
+.book>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.55}
+.book::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(34,33,47,.35),rgba(34,33,47,.92) 55%)}
+.book .wrap{position:relative;z-index:2;padding-top:4.5rem;padding-bottom:4.5rem}
+.book .eyebrow{color:var(--mint)}
+.book .intro p{color:#d9d5e3;max-width:36ch}
+.form{margin-top:1.8rem;background:#fffaf2;color:var(--ink);border-radius:28px;padding:1.3rem;display:grid;gap:.85rem;max-width:480px;box-shadow:0 30px 60px -20px rgba(0,0,0,.5)}
+.form label{display:grid;gap:.35rem;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#8a847c}
+.form input,.form select,.form textarea{font:inherit;font-size:1rem;color:var(--ink);border:1px solid var(--line);background:#fff;border-radius:14px;padding:.8rem .85rem;width:100%;appearance:none;-webkit-appearance:none}
+.form select{background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23b5683d' stroke-width='1.8'/%3E%3C/svg%3E") no-repeat right .9rem center/12px}
+.form textarea{min-height:76px;resize:vertical}
+.tours-pick{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+.tours-pick input{position:absolute;opacity:0;pointer-events:none}
+.tours-pick label{position:relative;display:block;border:1.5px solid var(--line);border-radius:16px;padding:.75rem .8rem;background:#fff;cursor:pointer;text-transform:none;letter-spacing:0;color:var(--ink);font-size:.9rem;font-weight:600;line-height:1.25;transition:border-color .2s,background .2s}
+.tours-pick label small{display:block;font-weight:400;color:var(--mut);font-size:.75rem;margin-top:.2rem}
+.tours-pick input:checked+label{border-color:var(--emer);background:#ecfbf6}
+.tours-pick input:checked+label::after{content:"";position:absolute;right:.6rem;top:.6rem;width:10px;height:10px;transform:rotate(45deg);background:var(--emer)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+.step{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:14px;padding:.4rem;background:#fff;font-size:1.05rem;color:var(--ink);text-transform:none;letter-spacing:0;font-weight:600}
+.step button{width:2.3rem;height:2.3rem;border-radius:50%;border:1px solid var(--line);background:var(--cream);font-size:1.2rem;color:var(--navy);cursor:pointer}
+.btn.wa{width:100%;background:#25d366;color:#0f2b1b;font-size:1.02rem;padding:1.05rem}
+.tiny{font-size:.75rem;color:#8a847c;text-align:center;line-height:1.45}
+
+/* footer */
+.foot{background:var(--navy2);color:#bdb8cc;font-size:.88rem}
+.foot .wrap{display:grid;gap:1.6rem;padding-top:2.8rem;padding-bottom:7rem}
+.foot .logo{width:54px}
+.foot b{font-family:Fraunces,serif;font-weight:400;font-size:1.3rem;color:#fff;display:block}
+.foot ul{list-style:none;display:grid;gap:.4rem}
+.foot small{font-size:.72rem;opacity:.7}
+
+/* sticky */
+.sticky{position:fixed;left:.7rem;right:.7rem;bottom:calc(.7rem + env(safe-area-inset-bottom));z-index:30;display:flex;align-items:center;gap:.7rem;padding:.55rem .55rem .55rem 1rem;border-radius:999px;background:rgba(43,42,60,.94);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:#fff;box-shadow:0 14px 34px -10px rgba(0,0,0,.45);transition:transform .45s cubic-bezier(.2,.8,.2,1),opacity .3s}
+.sticky.off{transform:translateY(150%);opacity:0}
+.sticky div{font-size:.78rem;line-height:1.25}.sticky div b{display:block;font-size:.95rem}
+.sticky .btn{margin-left:auto;padding:.8rem 1.2rem}
+
+@media (min-width:900px){
+  :root{--g:3rem}
+  .sticky{display:none}
+  .nav{padding:1.4rem var(--g)}
+  .links{display:flex;gap:2rem;margin-left:3rem;font-size:.92rem}
+  .links a{opacity:.85}
+  .nav .btn{margin-left:1.2rem}
+  .hero-in{padding-bottom:3rem}
+  .hero h1{font-size:clamp(8rem,16vw,15rem)}
+  .hero-row{display:grid;grid-template-columns:1fr auto;align-items:end;gap:3rem}
+  .lead{font-size:1.6rem;max-width:22ch}
+  .trust{gap:1.2rem;padding-top:2.4rem}
+  .trust div{display:flex;flex-direction:column;align-items:center;padding:1.3rem}
+  .trust b{font-size:1.3rem}.trust span{font-size:.85rem}
+  .sec{padding:7.5rem 0}
+  .rows{display:grid;grid-template-columns:repeat(3,1fr);overflow:visible;margin:0;padding:0}
+  .rev{flex:auto}.dots{display:none}
+  .reviews .ghost-rhomb{display:block;width:460px;right:-140px;top:40px}
+  .mirna{grid-template-columns:5fr 6fr;gap:6rem}
+  .cards{grid-template-columns:1fr 1fr;gap:2rem}
+  .walk{grid-template-columns:1fr 1.05fr;gap:5rem;align-items:center}
+  .stops{grid-template-columns:repeat(3,1fr);gap:1.4rem}
+  .stop{grid-template-columns:1fr;padding:.8rem}.stop .tile{aspect-ratio:4/3}
+  .road{display:none}
+  .signs{grid-template-columns:repeat(4,1fr);gap:1.2rem}
+  .book .wrap{display:grid;grid-template-columns:1fr 480px;gap:5rem;align-items:center;padding-top:7rem;padding-bottom:7rem}
+  .form{margin-top:0}
+  .foot .wrap{grid-template-columns:auto 1fr 1fr 1fr;padding-bottom:3rem}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .rv,.stone,.pin,.hero h1 span,.lead,.cta,.rating{opacity:1!important;transform:none!important}
+  .weave{clip-path:none}
+}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <svg class="logo" viewBox="0 0 448 448" aria-label="Mostarly Guide"><circle cx="224" cy="224" r="224" fill="#2b2a3c"/><g fill="none" stroke="#fff" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"><path d="M120 262V88l152 134"/><path d="M272 88v134"/><path d="M240 300v56M240 356a62 62 0 1 1 78-4"/></g><circle cx="282" cy="268" r="19" fill="#f2cf3a"/><path d="M92 282h54l-27 26z" fill="#1de9b6"/></svg>
+  <span class="brand">Mostarly<small>Guide · Mostar</small></span>
+  <nav class="links"><a href="#reviews">Reviews</a><a href="#mirna">Your guide</a><a href="#tours">Tours</a><a href="#book">Contact</a></nav>
+  <span class="lang">EN</span>
+</header>
+
+<section class="hero">
+  <picture>
+    <source media="(min-width:900px)" srcset="img/hero-d.jpg">
+    <img src="img/hero-m.jpg" alt="Stari Most over the emerald Neretva river in Mostar">
+  </picture>
+  <div class="hero-in">
+    <p class="kick"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M0 2h12L6 11z" fill="#1de9b6"/></svg>Licensed local guide · Mostar</p>
+    <h1 aria-label="Mostar"><span>M</span><span>O</span><span>S</span><span>T</span><span>A</span><span>R</span></h1>
+    <div class="hero-row">
+      <div>
+        <p class="lead">See the city through the eyes of someone born here.</p>
+        <div class="cta"><a class="btn mint" href="#book">Book a tour</a><a class="btn ghost" href="#tours">See tours</a></div>
+      </div>
+      <p class="rating"><span class="stars"><i>★</i><i>★</i><i>★</i><i>★</i><i>★</i></span> Loved by travellers on Tripadvisor</p>
+    </div>
+  </div>
+  <div class="band weave" data-band="1" style="--bh:62px"></div>
+</section>
+
+<div class="trust">
+  <div class="rv"><b>Born here</b><span>Mostar native</span></div>
+  <div class="rv d1"><b>Licensed</b><span>Official guide</span></div>
+  <div class="rv d2"><b>Private</b><span>Your own pace</span></div>
+</div>
+
+<section class="sec reviews" id="reviews">
+  <div class="wrap">
+    <p class="eyebrow rv"><svg data-mini></svg>Guest stories</p>
+    <h2 class="rv d1">“Like walking with a friend who <em>knows everything.</em>”</h2>
+    <div class="rev-score rv d2">
+      <span class="num">5.0</span>
+      <div><span class="stars"><i>★</i><i>★</i><i>★</i><i>★</i><i>★</i></span><small>Tripadvisor reviews · placeholder</small></div>
+    </div>
+    <div class="rows" id="rows"></div>
+    <div class="dots" id="dots"></div>
+    <a class="more" href="#">Read all reviews on Tripadvisor <span>→</span></a>
+  </div>
+</section>
+
+<div class="band weave" data-band="2" style="--bh:40px"></div>
+
+<section class="sec" id="mirna">
+  <div class="wrap mirna">
+    <div class="arch rv">
+      <div class="arch-in"><div><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" fill="currentColor"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8" fill="currentColor"/></svg>Mirna's photo</div></div>
+      <svg class="rozeta" viewBox="0 0 120 120" aria-label="Licensed guide">
+        <defs>
+          <linearGradient id="cuG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8f4a26"/><stop offset=".45" stop-color="#e7aa7c"/><stop offset=".6" stop-color="#c47647"/><stop offset="1" stop-color="#7d3f1f"/></linearGradient>
+          <path id="circ" d="M60 60m-43 0a43 43 0 1 1 86 0a43 43 0 1 1-86 0"/>
+        </defs>
+        <circle cx="60" cy="60" r="58" fill="url(#cuG)"/>
+        <circle cx="60" cy="60" r="52" fill="none" stroke="#fbe1c8" stroke-width=".8" opacity=".8"/>
+        <g class="spin"><text font-family="Inter" font-size="8.2" font-weight="700" letter-spacing="2.2" fill="#fff4e8"><textPath href="#circ">LICENSED GUIDE · MOSTAR · BORN HERE ·</textPath></text></g>
+        <circle cx="60" cy="60" r="31" fill="#2b2a3c"/>
+        <g fill="none" stroke="url(#cuG)" stroke-width="1.6" id="petals"></g>
+        <circle cx="60" cy="60" r="4" fill="#f2cf3a"/>
+      </svg>
+    </div>
+    <div>
+      <p class="eyebrow rv"><svg data-mini></svg>Your guide</p>
+      <h2 class="rv d1">Hi, I’m <em>Mirna.</em></h2>
+      <p class="rv d2">I was born and raised in Mostar. I know the stories behind the stones, the quiet corners for the best photos and the places where locals really drink their coffee.</p>
+      <p class="rv d2">Walk with me and you will not just see Stari Most, you will understand why this city loves it so much.</p>
+      <p class="sig rv d3">Mirna Cemalović Kukrića</p>
+      <div class="facts rv d3"><div><b>1566</b><span>Stari Most built</span></div><div><b>2004</b><span>Rebuilt</span></div><div><b>2005</b><span>UNESCO</span></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec tours" id="tours">
+  <div class="wrap">
+    <p class="eyebrow rv"><svg data-mini></svg>Tours</p>
+    <h2 class="rv d1">Choose <em>your</em> Mostar</h2>
+    <div class="cards">
+      <article class="card rv">
+        <div class="cimg shine"><img src="img/panorama.jpg" alt="Stari Most and the old town below Hum hill"><span class="cnum">01</span><span class="tag">Most loved</span></div>
+        <div class="cbody">
+          <svg class="arab" data-arab viewBox="0 0 80 80"></svg>
+          <h3>Old Town Walking Tour</h3>
+          <p>Stari Most, Kujundžiluk, hidden viewpoints and stories you won’t find in a guidebook. We finish the way Mostar does: with Bosnian coffee.</p>
+          <ul class="meta"><li><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 4.5V8l2.5 1.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>2 hours</li><li><svg viewBox="0 0 16 16"><circle cx="6" cy="5.5" r="2.5" fill="currentColor"/><circle cx="11.5" cy="6.5" r="2" fill="currentColor"/><path d="M1.5 14c0-2.8 2-4.5 4.5-4.5s4.5 1.7 4.5 4.5M10 9.6c2.6-.4 4.5 1.3 4.5 4.4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>Private or small group</li><li>EN · DE · BS</li></ul>
+          <ul class="incl"><li>Licensed local guide</li><li>Best photo spots of Stari Most</li><li>Bosnian coffee &amp; ćejf at the end</li></ul>
+          <div class="crow"><div class="price"><small>from</small><b>€25</b></div><a class="btn sm" href="#book" data-tour="walk">Send inquiry</a></div>
+        </div>
+      </article>
+      <article class="card rv d1">
+        <div class="cimg dtimg shine"><svg data-pattern viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%"></svg><span class="cnum">02</span><span class="tag">Full day</span></div>
+        <div class="cbody">
+          <svg class="arab" data-arab viewBox="0 0 80 80"></svg>
+          <h3>Herzegovina Day Trip</h3>
+          <p>The Buna spring and Dervish Tekke in Blagaj, the stone village of Počitelj and a swim under the Kravice waterfalls. Private driver and guide.</p>
+          <ul class="meta"><li><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 4.5V8l2.5 1.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>8 hours</li><li><svg viewBox="0 0 16 16"><path d="M2 10.5V8l1.5-3.5h9L14 8v2.5zM2 10.5v2h2.5v-2M11.5 10.5v2H14v-2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>Hotel pickup</li><li>EN · DE · BS</li></ul>
+          <ul class="incl"><li>Private car with driver-guide</li><li>3 places, one unhurried day</li><li>Time to swim at Kravice in summer</li></ul>
+          <div class="crow"><div class="price"><small>from</small><b>€65</b></div><a class="btn sm" href="#book" data-tour="trip">Send inquiry</a></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="walk">
+  <div class="wrap walk">
+    <div>
+      <p class="eyebrow rv"><svg data-mini></svg>The walk</p>
+      <h2 class="rv d1">Five places, <em>a hundred stories.</em></h2>
+      <p class="rv d2" style="color:#4a4642;max-width:42ch">We follow the old kaldrma, the river stones that paved Mostar's streets, from one bridge to another.</p>
+      <ol class="steps rv d3">
+        <li><b>Kriva ćuprija</b><span>The small stone bridge over the Radobolja</span></li>
+        <li><b>Stari Most</b><span>The bridge, the divers, the story</span></li>
+        <li><b>Kujundžiluk</b><span>The old coppersmiths' bazaar</span></li>
+        <li><b>Koski Mehmed-pašina džamija</b><span>The best view of the bridge</span></li>
+        <li><b>Bosnian coffee</b><span>Ćejf: slow coffee, the Mostar way</span></li>
+      </ol>
+    </div>
+    <div>
+      <div class="map rv" id="map">
+        <svg viewBox="0 0 400 460" id="mapsvg">
+          <defs><linearGradient id="riv" x1="0" x2="1"><stop offset="0" stop-color="#3fd2b0"/><stop offset="1" stop-color="#18b893"/></linearGradient></defs>
+          <path d="M268 -20 C 220 80, 300 150, 236 230 S 170 380, 222 480" fill="none" stroke="url(#riv)" stroke-width="46" stroke-linecap="round"/>
+          <path class="wave" d="M262 -20 C 214 80, 294 150, 230 230 S 164 380, 216 480"/>
+          <path class="wave" d="M276 -20 C 228 80, 308 150, 244 230 S 178 380, 230 480" style="animation-duration:8s"/>
+          <path d="M40 140 C 70 150, 90 170, 120 172" fill="none" stroke="#7fd8c4" stroke-width="10" stroke-linecap="round" opacity=".8"/>
+          <text class="lbl2" x="40" y="128">Radobolja</text>
+          <text class="lbl2" x="300" y="300" transform="rotate(62 300 300)">Neretva</text>
+          <rect x="212" y="214" width="62" height="10" rx="3" fill="#d8ccb6" stroke="#b9a98d"/>
+          <path id="route" d="M96 168 C 130 190, 170 205, 214 219 L 272 219 C 300 214, 318 190, 312 160 C 306 130, 300 110, 318 92 M 272 219 C 300 240, 300 280, 268 318 C 250 340, 236 362, 262 392" fill="none"/>
+          <g id="stones"></g>
+          <g id="pins"></g>
+        </svg>
+      </div>
+      <figure class="polaroid rv d2"><img src="img/kriva.jpg" alt="Kriva ćuprija in Mostar"><figcaption>Kriva ćuprija</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="trip" style="padding-top:0">
+  <div class="wrap">
+    <p class="eyebrow rv"><svg data-mini></svg>Day trip</p>
+    <h2 class="rv d1">Herzegovina <em>in one day</em></h2>
+    <div class="stops">
+      <div class="stop rv"><div class="tile" style="background:#d9efe8" data-tile="eye"></div><div><em>Stop 1</em><b>Blagaj</b><span>Buna spring &amp; Dervish Tekke</span></div></div>
+      <div class="road">≈ 20 min drive</div>
+      <div class="stop rv d1"><div class="tile" style="background:#efe0cb" data-tile="star"></div><div><em>Stop 2</em><b>Počitelj</b><span>Stone village above the Neretva</span></div></div>
+      <div class="road">≈ 25 min drive</div>
+      <div class="stop rv d2"><div class="tile" style="background:#cfe9f0" data-tile="water"></div><div><em>Stop 3</em><b>Kravice</b><span>Waterfalls &amp; a summer swim</span></div></div>
+    </div>
+  </div>
+</section>
+
+<div class="band weave" data-band="3" style="--bh:40px"></div>
+
+<section class="sec mean">
+  <div class="wrap">
+    <p class="eyebrow rv"><svg data-mini></svg>Woven into Bosnia</p>
+    <h2 class="rv d1">Every ćilim <em>tells a story</em></h2>
+    <p class="rv d2">Bosnian kilims are read like a language. These are some of the signs you will spot in the old shops of Mostar, and on this page.</p>
+    <div class="signs">
+      <div class="sign rv"><svg data-sign="eye"></svg><b>Eye</b><i>oko</i><p>Protection against the evil eye.</p></div>
+      <div class="sign rv d1"><svg data-sign="amulet"></svg><b>Amulet</b><i>hamajlija</i><p>A wish for protection and good luck.</p></div>
+      <div class="sign rv d2"><svg data-sign="star"></svg><b>Star</b><i>zvijezda</i><p>Happiness and a guiding light.</p></div>
+      <div class="sign rv d3"><svg data-sign="water"></svg><b>Running water</b><i>tekuća voda</i><p>Life that keeps flowing, like the Neretva.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="book" id="book">
+  <img src="img/sumrak.jpg" alt="" loading="lazy">
+  <div class="band weave" data-band="4" style="--bh:40px;position:relative;z-index:3"></div>
+  <div class="wrap">
+    <div class="intro">
+      <p class="eyebrow rv"><svg data-mini></svg>Book</p>
+      <h2 class="rv d1">Let’s plan your <em style="color:var(--mint)">Mostar day</em></h2>
+      <p class="rv d2">Choose a tour, a date and how many of you are coming. We open WhatsApp with your message ready, and Mirna replies personally.</p>
+    </div>
+    <form class="form rv d2" id="form">
+      <div class="tours-pick">
+        <input type="radio" name="tour" id="t1" value="Old Town Walking Tour" checked><label for="t1">Old Town Walk<small>2 h · from €25</small></label>
+        <input type="radio" name="tour" id="t2" value="Herzegovina Day Trip"><label for="t2">Herzegovina Day Trip<small>8 h · from €65</small></label>
+      </div>
+      <div class="two"><label>Date<input type="date" id="date" value="2027-06-14"></label><label>Time<select id="time"><option>09:00</option><option selected>10:00</option><option>17:00</option><option>Flexible</option></select></label></div>
+      <div class="two">
+        <label>Adults<span class="step"><button type="button" data-s="ad" data-d="-1">−</button><b id="ad">2</b><button type="button" data-s="ad" data-d="1">+</button></span></label>
+        <label>Children<span class="step"><button type="button" data-s="ch" data-d="-1">−</button><b id="ch">0</b><button type="button" data-s="ch" data-d="1">+</button></span></label>
+      </div>
+      <div class="two"><label>Language<select id="lang"><option>English</option><option>Deutsch</option><option>Bosanski</option></select></label><label>Your name<input id="name" placeholder="Ana" autocomplete="given-name"></label></div>
+      <label id="hotelL" hidden>Hotel for pickup<input id="hotel" placeholder="Hotel name"></label>
+      <label>Anything else? <span style="text-transform:none;letter-spacing:0;font-weight:400">(optional)</span><textarea id="note" placeholder="e.g. we travel with a stroller"></textarea></label>
+      <a class="btn wa" id="wa" href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" class="ic"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2c0 1.3 1 2.6 1.1 2.8.1.2 1.9 2.9 4.6 4 1.7.7 2.4.8 3.2.7.5-.1 1.5-.6 1.8-1.2.2-.6.2-1.1.1-1.2l-.4-.2z"/></svg>Send inquiry on WhatsApp</a>
+      <p class="tiny">No payment now. Mirna confirms availability and the final price.<br>+387 60 000 000 (demo)</p>
+    </form>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="band" data-band="5" style="--bh:30px"></div>
+  <div class="wrap">
+    <svg class="logo" viewBox="0 0 448 448"><circle cx="224" cy="224" r="224" fill="#38374b"/><g fill="none" stroke="#fff" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"><path d="M120 262V88l152 134"/><path d="M272 88v134"/><path d="M240 300v56M240 356a62 62 0 1 1 78-4"/></g><circle cx="282" cy="268" r="19" fill="#f2cf3a"/><path d="M92 282h54l-27 26z" fill="#1de9b6"/></svg>
+    <div><b>Mostarly Guide</b>Licensed local guide in Mostar,<br>Bosnia and Herzegovina</div>
+    <ul><li>WhatsApp +387 60 000 000</li><li>hello@example.com</li><li>Instagram @mostarly.guide</li></ul>
+    <ul><li>Tours</li><li>Reviews</li><li>Privacy</li><li><small>EN · DE · BS</small></li></ul>
+  </div>
+</footer>
+
+<div class="sticky off" id="sticky"><div><b>From €25</b>Private local guide</div><a class="btn mint" href="#book">Book a tour</a></div>
+
+<script>
+/* ---------- kilim engine: grids -> svg rects ---------- */
+const C={n:'#2b2a3c',c:'#f6f0e6',m:'#1de9b6',k:'#d08a55',r:'#c8423a',y:'#f2cf3a',e:'#0a8a71',w:'#fffaf2'};
+function rects(grid,map,ox=0,oy=0){let s='';grid.forEach((row,y)=>{let x=0;while(x<row.length){const ch=row[x];if(ch==='.'||!map[ch]){x++;continue}let e=x;while(e<row.length&&row[e]===ch)e++;s+=`<rect x="${x+ox}" y="${y+oy}" width="${e-x}" height="1" fill="${map[ch]}"/>`;x=e}});return s}
+const HORN=[
+'.AA...........AA.',
+'A..A.........A..A',
+'A.AAA.......AAA.A',
+'.AAAAA.....AAAAA.',
+'....AAA.B.AAA....',
+'.....AABBBAA.....',
+'....AAABCBAAA....',
+'.....AABBBAA.....',
+'....AAA.B.AAA....',
+'.AAAAA.....AAAAA.',
+'A.AAA.......AAA.A',
+'A..A.........A..A',
+'.AA...........AA.'];
+const RHOMB=[
+'.......A.......','......AAA......','.....AA.AA.....','....AA.B.AA....','...AA.BBB.AA...','..AA.BBCBB.AA..','.AA.BBC.CBB.AA.',
+'AA.BBC.D.CBB.AA','.AA.BBC.CBB.AA.','..AA.BBCBB.AA..','...AA.BBB.AA...','....AA.B.AA....','.....AA.AA.....','......AAA......','.......A.......'];
+const MINI=['...A...','..AAA..','.AA.AA.','AA.B.AA','.AA.AA.','..AAA..','...A...'];
+const SIGNS={
+ eye:['....A....','...AAA...','..AA.AA..','.AA.B.AA.','AA.BBB.AA','.AA.B.AA.','..AA.AA..','...AAA...','....A....'],
+ amulet:['....A....','...AAA...','..AA.AA..','.AA.B.AA.','AAAAAAAAA','.........','A.A.A.A.A','A.A.A.A.A','.........'],
+ star:['A...A...A','.A..A..A.','..A.A.A..','...AAA...','AAAAB.AAAA'.slice(0,9),'...AAA...','..A.A.A..','.A..A..A.','A...A...A'],
+ water:['.........','...AAA...','..A...A..','.A.....A.','A...A...A','...A.A...','..A...A..','.........','.........']};
+SIGNS.star[4]='AAAABAAAA';
+SIGNS.water=['A.....A.....A','.A...A.A...A.','..A.A...A.A..','...A.....A...','.............','A.....A.....A','.A...A.A...A.','..A.A...A.A..','...A.....A...'];
+function svgGrid(el,grid,map,pad=0){const w=grid[0].length,h=grid.length;el.setAttribute('viewBox',`${-pad} ${-pad} ${w+pad*2} ${h+pad*2}`);el.setAttribute('shape-rendering','crispEdges');el.innerHTML=rects(grid,map)}
+
+/* band tile */
+function bandTile(kind){
+  const H=21,motW=17,gap=5,count=5;const W=(motW+gap)*count;
+  const pal=[['c','r','y'],['m','n','c'],['k','c','r'],['r','y','n'],['y','r','c']];
+  let s=`<rect width="${W}" height="${H}" fill="${C.n}"/>`;
+  // zigzag edges
+  for(let x=0;x<W;x++){
+    s+=`<rect x="${x}" y="0" width="1" height="1" fill="${C.r}"/><rect x="${x}" y="${H-1}" width="1" height="1" fill="${C.r}"/>`;
+    const p=x%4; if(p<3){s+=`<rect x="${x}" y="1" width="1" height="1" fill="${C.r}"/><rect x="${x}" y="${H-2}" width="1" height="1" fill="${C.r}"/>`}
+    if(p===1){s+=`<rect x="${x}" y="2" width="1" height="1" fill="${C.r}"/><rect x="${x}" y="${H-3}" width="1" height="1" fill="${C.r}"/>`}
+  }
+  for(let i=0;i<count;i++){const [a,b,c]=pal[(i+kind)%pal.length];const ox=i*(motW+gap)+Math.floor(gap/2);
+    s+=rects(HORN,{A:C[a],B:C[b],C:C[c]},ox,4);
+    const fx=ox+motW+Math.floor(gap/2)-1; // filler dots
+    [6,10,14].forEach(y=>s+=`<rect x="${fx}" y="${y}" width="1" height="1" fill="${C.c}" opacity=".85"/>`);
+    s+=`<rect x="${fx-1}" y="10" width="3" height="1" fill="${C.c}" opacity=".85"/>`;}
+  return {svg:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" shape-rendering="crispEdges">${s}</svg>`,W,H};
+}
+function bandSlim(){const H=9,W=24;let s=`<rect width="${W}" height="${H}" fill="${C.n}"/>`;
+  for(let x=0;x<W;x++){const p=x%6;s+=`<rect x="${x}" y="0" width="1" height="1" fill="${C.r}"/><rect x="${x}" y="8" width="1" height="1" fill="${C.r}"/>`;}
+  const d=['..A..','.ABA.','ABCBA','.ABA.','..A..'];const cols=[['c','m','y'],['k','c','r']];
+  for(let i=0;i<4;i++){const [a,b,c]=cols[i%2];s+=rects(d,{A:C[a],B:C[b],C:C[c]},i*6+.5,2)}
+  return {svg:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" shape-rendering="crispEdges">${s}</svg>`,W,H}}
+document.querySelectorAll('[data-band]').forEach(el=>{
+  const k=+el.dataset.band;const t=(k===5||k===3)?bandSlim():bandTile(k);
+  const h=parseFloat(getComputedStyle(el).getPropertyValue('--bh'))||60;const cell=h/t.H;
+  el.style.backgroundImage=`url("data:image/svg+xml,${encodeURIComponent(t.svg)}")`;
+  el.style.backgroundSize=`${t.W*cell}px ${h}px`;
+});
+document.querySelectorAll('[data-mini]').forEach(el=>svgGrid(el,MINI,{A:C.k,B:C.m}));
+document.querySelectorAll('[data-rhomb]').forEach(el=>svgGrid(el,RHOMB,{A:C.n,B:C.r,C:C.k,D:C.m}));
+document.querySelectorAll('[data-sign]').forEach(el=>{const g=SIGNS[el.dataset.sign];svgGrid(el,g,{A:C.c,B:C.m},.5)});
+document.querySelectorAll('[data-tile]').forEach(el=>{const k=el.dataset.tile;const s=document.createElementNS('http://www.w3.org/2000/svg','svg');svgGrid(s,SIGNS[k],{A:k==='star'?C.k:C.e,B:k==='star'?C.r:C.k},.5);el.appendChild(s)});
+
+/* day trip pattern panel */
+(function(){const el=document.querySelector('[data-pattern]');if(!el)return;let s=`<rect width="400" height="300" fill="${C.n}"/>`;
+  const sz=6;const cols=[['r','y','c'],['m','n','c'],['k','c','r'],['c','r','y']];let i=0;
+  for(let gy=-1;gy<4;gy++)for(let gx=-1;gx<5;gx++){const [a,b,c]=cols[(i++)%cols.length];const ox=gx*16+(gy%2?8:0),oy=gy*16;
+    s+=`<g transform="translate(${ox*sz/1.2} ${oy*sz/1.2}) scale(${sz/1.2})">${rects(RHOMB,{A:C[a],B:C[b],C:C[c],D:C.y})}</g>`}
+  s+=`<rect width="400" height="300" fill="url(#fade)"/><defs><linearGradient id="fade" x1="0" y1="0" x2="0" y2="1"><stop offset=".45" stop-color="#2b2a3c" stop-opacity="0"/><stop offset="1" stop-color="#2b2a3c" stop-opacity=".85"/></linearGradient></defs>`;
+  s+=`<text x="22" y="270" font-family="Fraunces" font-size="26" fill="#fff">Blagaj · Počitelj · Kravice</text>`;
+  el.setAttribute('shape-rendering','crispEdges');el.innerHTML=s})();
+
+/* copper arabesque corners */
+document.querySelectorAll('[data-arab]').forEach((el,i)=>{el.innerHTML=`<defs><linearGradient id="ag${i}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8f4a26"/><stop offset=".5" stop-color="#eab087"/><stop offset="1" stop-color="#a65a30"/></linearGradient></defs>
+<g fill="none" stroke="url(#ag${i})" stroke-width="1.6" stroke-linecap="round">
+<path d="M76 4 C 52 6, 34 18, 30 40 C 27 56, 38 66, 50 62 C 60 58, 60 46, 52 43 C 46 41, 42 46, 45 50"/>
+<path d="M76 14 C 60 16, 48 26, 46 38"/>
+<path d="M30 40 C 22 34, 12 36, 10 44 C 8 52, 16 56, 21 52"/>
+<path d="M50 62 C 54 70, 64 74, 72 70"/>
+<circle cx="66" cy="30" r="2.2" fill="url(#ag${i})" stroke="none"/><circle cx="20" cy="66" r="1.6" fill="url(#ag${i})" stroke="none"/>
+</g>`});
+
+/* rozeta petals */
+(function(){const g=document.getElementById('petals');let s='';for(let i=0;i<8;i++){s+=`<path transform="rotate(${i*45} 60 60)" d="M60 60 C 65 52, 65 40, 60 33 C 55 40, 55 52, 60 60"/>`;s+=`<circle transform="rotate(${i*45+22.5} 60 60)" cx="60" cy="36" r="1.4" fill="#e7aa7c" stroke="none"/>`}g.innerHTML=s})();
+
+/* reviews (placeholder) */
+const REV=[['Sarah','United Kingdom','#b5683d','The best part of our whole Balkan trip. Mirna showed us viewpoints we would never have found, and the story of the bridge gave us goosebumps.'],
+['Jonas','Germany','#0a8a71','Super persönlich, lustig und voller Geschichten. Am Ende gab es echten bosnischen Kaffee. Wir kommen wieder!'],
+['Elena','Italy','#2b2a3c','Felt like walking with a friend who happens to know everything about Mostar. Book her, you will not regret it.']];
+const corner=`<svg viewBox="0 0 7 7" shape-rendering="crispEdges">${rects(['AAAA...','A......','A.BB...','A.B....','.......','.......','.......'],{A:C.k,B:C.m})}</svg>`;
+document.getElementById('rows').innerHTML=REV.map(([n,c,col,t],i)=>`<figure class="rev rv ${i?'d'+i:''}"><span class="corner c1">${corner}</span><span class="corner c2">${corner}</span><span class="corner c3">${corner}</span><span class="corner c4">${corner}</span><span class="stars"><i>★</i><i>★</i><i>★</i><i>★</i><i>★</i></span><blockquote>“${t}”</blockquote><figcaption><span class="av" style="background:${col}">${n[0]}</span><span><b>${n}</b>${c}</span><span class="ta"><i></i>Tripadvisor</span></figcaption></figure>`).join('');
+const dots=document.getElementById('dots');dots.innerHTML=REV.map((_,i)=>`<i class="${i?'':'on'}"></i>`).join('');
+const rows=document.getElementById('rows');rows.addEventListener('scroll',()=>{const i=Math.round(rows.scrollLeft/(rows.firstElementChild.offsetWidth+16));[...dots.children].forEach((d,j)=>d.classList.toggle('on',j===i))},{passive:true});
+
+/* kaldrma route */
+(function(){const svg=document.getElementById('mapsvg'),p=document.getElementById('route'),g=document.getElementById('stones'),pins=document.getElementById('pins');
+  const L=p.getTotalLength(),greys=['#9b958b','#857f75','#b4ada1','#6f6a61','#a8a196'];let s='',n=0;
+  const rnd=(i)=>{const x=Math.sin(i*99.13)*43758.5453;return x-Math.floor(x)};
+  for(let l=0;l<L;l+=10.5){const a=p.getPointAtLength(l),b=p.getPointAtLength(Math.min(L,l+1));if(Math.hypot(b.x-a.x,b.y-a.y)>3)continue;const ang=Math.atan2(b.y-a.y,b.x-a.x)*57.3+(rnd(n)-.5)*30;
+    s+=`<ellipse class="stone" data-i="${n}" cx="${a.x.toFixed(1)}" cy="${a.y.toFixed(1)}" rx="${(4+rnd(n+3)*1.8).toFixed(1)}" ry="${(2.8+rnd(n+7)*1.3).toFixed(1)}" transform="rotate(${ang.toFixed(0)} ${a.x.toFixed(1)} ${a.y.toFixed(1)})" fill="${greys[Math.floor(rnd(n+11)*greys.length)]}" stroke="#f3ece0" stroke-width="1"/>`;n++}
+  g.innerHTML=s;
+  const P=[[96,168,'Kriva ćuprija',-10,-22,'start'],[243,219,'Stari Most',-34,-26,'start'],[318,92,'Kujundžiluk',-30,-22,'start'],[268,318,'Koski Mehmed-pašina',10,-22,'end'],[262,392,'Coffee & ćejf',-58,32,'start']];
+  pins.innerHTML=P.map(([x,y,t,dx,dy],i)=>{let ring='';for(let k=0;k<12;k++){const a=k/12*6.283;ring+=`<ellipse cx="${(x+Math.cos(a)*15).toFixed(1)}" cy="${(y+Math.sin(a)*15).toFixed(1)}" rx="3.4" ry="2.4" transform="rotate(${(a*57.3+90).toFixed(0)} ${(x+Math.cos(a)*15).toFixed(1)} ${(y+Math.sin(a)*15).toFixed(1)})" fill="#7d776e" stroke="#f3ece0" stroke-width=".8"/>`}
+    const mark=i===4?`<path d="M${x-8} ${y-5}h16l-8 11z" fill="#1de9b6" stroke="#2b2a3c" stroke-width="1.2"/>`:`<circle cx="${x}" cy="${y}" r="${i===1?7:5}" fill="${i===1?'#2b2a3c':'#fffaf2'}" stroke="#2b2a3c" stroke-width="1.6"/>${i===1?`<circle cx="${x}" cy="${y}" r="2.2" fill="#f2cf3a"/>`:''}`;
+    const tx=i===3?x-20:x+dx, anchor=i===3?'end':'start';
+    return `<g class="pin" data-p="${i}">${ring}${mark}<rect x="${anchor==='end'?tx-(t.length*7.1)-8:tx-6}" y="${y+dy-14}" width="${t.length*7.1+14}" height="21" rx="10.5" fill="#fffaf2" stroke="#ddd2bf"/><text class="lbl" x="${anchor==='end'?tx-(t.length*7.1)-1:tx+1}" y="${y+dy+1}">${t}</text></g>`}).join('');
+  window.__route=()=>{const st=[...g.children];st.forEach((e,i)=>setTimeout(()=>e.classList.add('on'),i*28));const marks=[0,9,20,32,st.length-1];
+    [...pins.children].forEach((e,i)=>{const idx=[0,Math.round(st.length*.3),Math.round(st.length*.55),Math.round(st.length*.78),st.length-1][i];setTimeout(()=>e.classList.add('on'),idx*28+150)})};
+})();
+
+/* reveal on scroll */
+const proxy=new Map();
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){const t=proxy.get(e.target)||e.target;t.classList.add('in');if(t.id==='map')window.__route();io.unobserve(e.target)}}),{threshold:.18,rootMargin:'0px 0px -6% 0px'});
+document.querySelectorAll('.rv,.shine,.reviews,.rev-score').forEach(el=>io.observe(el));
+/* clipped elements have no visible area, so watch a stand-in */
+document.querySelectorAll('.weave').forEach(el=>{let w;if(el.classList.contains('band')){w=document.createElement('div');w.style.position='relative';w.style.zIndex=3;el.replaceWith(w);w.appendChild(el)}else w=el.parentElement;proxy.set(w,el);io.observe(w)});
+if(matchMedia('(prefers-reduced-motion: reduce)').matches){document.querySelectorAll('.stone,.pin').forEach(e=>e.classList.add('on'))}
+
+/* sticky CTA */
+const st=document.getElementById('sticky'),book=document.getElementById('book');
+const upd=()=>{const r=book.getBoundingClientRect();st.classList.toggle('off',scrollY<innerHeight*.75||r.top<innerHeight*.6)};addEventListener('scroll',upd,{passive:true});upd();
+
+/* booking -> WhatsApp */
+const PHONE='38760000000';
+const cnt={ad:2,ch:0};
+document.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{const k=b.dataset.s;cnt[k]=Math.max(k==='ad'?1:0,Math.min(20,cnt[k]+ +b.dataset.d));document.getElementById(k).textContent=cnt[k];build()});
+document.querySelectorAll('[data-tour]').forEach(a=>a.addEventListener('click',()=>{document.getElementById(a.dataset.tour==='trip'?'t2':'t1').checked=true;build()}));
+function build(){const tour=document.querySelector('[name=tour]:checked').value;const trip=tour.includes('Herzegovina');document.getElementById('hotelL').hidden=!trip;
+  const d=document.getElementById('date').value;const date=d?new Date(d+'T12:00').toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}):'';
+  const name=document.getElementById('name').value.trim(),note=document.getElementById('note').value.trim(),hotel=document.getElementById('hotel').value.trim();
+  const lines=[`Hi Mirna! I'd like to book:`,`• ${tour}`,`• ${date}, ${document.getElementById('time').value}`,`• ${cnt.ad} adult${cnt.ad>1?'s':''}${cnt.ch?`, ${cnt.ch} child${cnt.ch>1?'ren':''}`:''}`,`• Language: ${document.getElementById('lang').value}`];
+  if(trip&&hotel)lines.push(`• Pickup: ${hotel}`);if(note)lines.push(`• Note: ${note}`);if(name)lines.push('',`${name}`);
+  document.getElementById('wa').href=`https://wa.me/${PHONE}?text=${encodeURIComponent(lines.join('\n'))}`;}
+document.getElementById('form').addEventListener('input',build);build();
+</script>
+</body>
+</html>
