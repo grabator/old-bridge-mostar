@@ -227,16 +227,38 @@ function phead(c, h1, lead, extra = '') {
   return `<header class="phead"><div class="wrap">${crumbs(c)}<p class="eyebrow">${mini}${esc(c[c.length - 1][1])}</p><h1>${h1}</h1>${lead ? `<p class="lead">${lead}</p>` : ''}${extra}</div></header><div class="band weave" data-band="0" style="--bh:22px" aria-hidden="true"></div>`;
 }
 
+// straight-line distance x 1.3 for winding roads, rounded to 5 km: an honest "about" for the legs
+const hav = (a, b) => { const R = 6371, r1 = (a.lat * Math.PI) / 180, r2 = (b.lat * Math.PI) / 180, dl = ((b.lon - a.lon) * Math.PI) / 180, dp = r2 - r1; return 2 * R * Math.asin(Math.sqrt(Math.sin(dp / 2) ** 2 + Math.cos(r1) * Math.cos(r2) * Math.sin(dl / 2) ** 2)); };
+const roadKm = (a, b) => Math.max(5, Math.round((hav(a, b) * 1.3) / 5) * 5);
+const placeImg = (p) => p.image ? `<img src="/img/${esc(p.image)}" alt="${esc(p.name)}" loading="lazy">` : p.photo ? `<img src="/img/places/${esc(p.photo)}" alt="${esc(p.name)}" loading="lazy">` : '<span class="pc-art" aria-hidden="true"></span>';
+const shortName = (t) => { const [a, b] = t.name.split(' – '); return a === 'Mostar City Tour' && b ? b : a; };
+const tourLink = (slug) => { const x = TOURS.find((q) => q.slug === slug); return x ? `<a href="/tours/${slug}/">${esc(shortName(x))} ${I.arrow}</a>` : ''; };
+const fromMostar = (p) => p.km ? `≈ ${p.km} km · ${p.min >= 60 ? Math.floor(p.min / 60) + ' h' + (p.min % 60 ? ' ' + (p.min % 60) + ' min' : '') : p.min + ' min'} from Mostar` : '';
+
+/* Journey player: a map the camera flies across, stop by stop, with a card for every stop.
+   Everything a visitor reads is in the HTML; without JavaScript the cards are a plain list. */
+function journey({ cfg, stops, title, intro, hint, label, end, endText, endCta, card }) {
+  const N = stops.length;
+  return `<div class="jr" data-journey='${esc(JSON.stringify(cfg))}' data-title="${esc(title)}" data-end="${esc(end)}" data-label="${esc(label)}">
+  <div class="jr-stage">${cfg.globe ? '<canvas class="jr-globe" aria-hidden="true"></canvas>' : ''}</div>
+  <div class="jr-hud"><p class="jr-place"><small>${esc(cfg.mode === 'hub' ? 'From Mostar' : 'The route')}</small><b>${esc(title)}</b></p>
+    <div class="jr-line" role="group" aria-label="Stops"><i class="jr-fill"></i>${stops.map((p, i) => `<button type="button" class="jr-dot" data-go="${i}" aria-label="${i + 1}. ${esc(p.name)}"><span>${esc(p.name)}</span></button>`).join('')}</div></div>
+  <ol class="jr-cards">${stops.map((p, i) => `<li class="jr-st" data-id="${p.id}"><article class="jr-card">${card(p, i)}</article></li>`).join('')}</ol>
+  <div class="jr-start"><div class="jr-panel"><p class="eyebrow">${mini}${esc(N)} stops</p><h3>${title}</h3><p>${intro}</p>
+    <div class="jr-btns"><button type="button" class="btn mint" data-begin>Start the journey ${I.arrow}</button><button type="button" class="btn line" data-autoplay>Play it all</button></div><small>${esc(hint)}</small></div></div>
+  <div class="jr-end"><div class="jr-panel"><p class="eyebrow">${mini}${esc(end)}</p><h3>${endText}</h3><div class="jr-btns">${endCta}<button type="button" class="btn line" data-restart>Watch again</button></div></div></div>
+  <div class="jr-ctrl"><button type="button" class="jr-b" data-step="-1" aria-label="Previous stop">←</button><button type="button" class="jr-b jr-play" data-play aria-pressed="false"><i aria-hidden="true"></i><span>Play</span></button><span class="jr-count">0 / ${N}</span><button type="button" class="jr-b" data-step="1" aria-label="Next stop">→</button></div>
+  <p class="jr-live sr" role="status" aria-live="polite"></p>
+</div>`;
+}
+
 function routeBlock(t) {
-  const r = t.route, stops = r.stops.map(placeBy).filter(Boolean);
-  // straight-line distance x 1.3 for winding roads, rounded to 5 km: an honest "about" for the legs
-  const hav = (a, b) => { const R = 6371, r1 = (a.lat * Math.PI) / 180, r2 = (b.lat * Math.PI) / 180, dl = ((b.lon - a.lon) * Math.PI) / 180, dp = r2 - r1; return 2 * R * Math.asin(Math.sqrt(Math.sin(dp / 2) ** 2 + Math.cos(r1) * Math.cos(r2) * Math.sin(dl / 2) ** 2)); };
-  const leg = (a, b) => (r.mode === 'drive' ? `≈ ${Math.max(5, Math.round((hav(a, b) * 1.3) / 5) * 5)} km by car` : r.mode === 'walk' ? 'a short walk' : '');
-  const img = (p) => p.image ? `<img src="/img/${esc(p.image)}" alt="${esc(p.name)}" loading="lazy">` : p.photo ? `<img src="/img/places/${esc(p.photo)}" alt="${esc(p.name)}" loading="lazy">` : '<span class="pc-art" aria-hidden="true"></span>';
-  return `<section class="tsec route-sec" data-route='${esc(JSON.stringify(r))}'><h2>The route</h2>
-<p class="muted rt-mode">${r.mode === 'walk' ? 'On foot along the old kaldrma' : 'By car from Mostar'} · ${stops.length} stops · tap a stop</p>
-<div class="rt-stage"></div>
-<ol class="rt-steps">${stops.map((p, i) => `<li class="rt-step" data-id="${p.id}"><span class="rt-n">${i + 1}</span><div class="rt-img">${img(p)}</div><div class="rt-txt"><b>${esc(p.name)}</b>${p.kind === 'meet' ? '<em>Meeting point</em>' : ''}<p>${esc(p.text)}</p>${p.credit ? `<small class="pc-credit">Photo: ${esc(p.credit)}</small>` : ''}${i < stops.length - 1 ? `<span class="rt-leg">↓ ${leg(p, stops[i + 1])}</span>` : ''}</div></li>`).join('')}</ol>
+  const r = t.route, stops = r.stops.map(placeBy).filter(Boolean), N = stops.length, walk = r.mode === 'walk';
+  const leg = (i) => (i < N - 1 ? (walk ? 'Then a short walk to ' : `Then ≈ ${roadKm(stops[i], stops[i + 1])} km by car to `) + esc(stops[i + 1].name) : 'Last stop of the route');
+  const card = (p, i) => `<div class="jr-img">${placeImg(p)}<span class="jr-n">${i + 1}</span></div><div class="jr-body"><p class="jr-kick">Stop ${i + 1} of ${N}${p.kind === 'meet' ? ' · <b>Meeting point</b>' : ''}</p><h3>${esc(p.name)}</h3><p>${esc(p.text)}</p><p class="jr-leg">${leg(i)}</p>${p.credit ? `<small class="pc-credit">Photo: ${esc(p.credit)}</small>` : ''}</div>`;
+  return `<section class="tsec route-sec" id="route"><h2>The route</h2>
+<p class="muted rt-mode">${walk ? 'On foot along the old kaldrma' : 'By car from Mostar'} · ${N} stops</p>
+${journey({ cfg: { map: r.map, mode: r.mode, stops: r.stops }, stops, title: esc(shortName(t)), intro: walk ? 'Walk the route stop by stop: the stones of the kaldrma are laid down as you go.' : 'Follow the road from stop to stop and see what waits at each one.', hint: 'Buttons, arrow keys, swipe, or tap a pin on the map.', label: 'Route map of ' + t.name, end: 'End of the route', endText: 'Like this route?', endCta: `<a class="btn mint" href="#enquire">Enquire about this tour</a>`, card })}
 ${notes(r.map === 'oldtown' ? [PL.oldtownNote] : [PL.note].concat(stops.flatMap((p) => p.notes || [])))}</section>`;
 }
 
@@ -274,14 +296,12 @@ const emit = (url, html) => out.push([url, html]);
   <div class="cards four">${featured.map(card).join('')}</div>
 </div></section>
 
-<section class="sec explore" data-explore><div class="wrap">
+<section class="sec explore"><div class="wrap">
   <div class="head-row"><div><p class="eyebrow rv">${mini}Where we go</p><h2 class="rv d1">From Mostar <em>to all of Herzegovina</em></h2></div></div>
-  <p class="lead rv d2">Mostar is home. From here Mirna takes you to the Old Town, to Blagaj, Počitelj, the Kravice Waterfalls and beyond. Tap a place to see what is there and which tours go.</p>
-  <div class="ex-grid">
-    <div class="ex-stage rv"><canvas aria-hidden="true"></canvas><button type="button" class="ex-back btn sm" hidden>← Herzegovina</button></div>
-    <div class="ex-side"><div class="ex-card" aria-live="polite"></div><div class="ex-chips" role="group" aria-label="Places"></div></div>
-  </div>
-  ${notes([PL.note, PL.oldtownNote].concat(placeBy('zitomislic').notes || []))}
+  <p class="lead rv d2">Mostar is home. From here Mirna takes you to Blagaj, Počitelj, the Kravice Waterfalls and beyond. Take the journey: the globe dives into Herzegovina and the map flies from place to place.</p>
+  ${(() => { const stops = PLACES.filter((p) => p.area === 'region'); return journey({ cfg: { map: 'region', mode: 'hub', globe: true, stops: stops.map((p) => p.id) }, stops, title: 'Herzegovina', intro: 'From the whole world to Mostar, then out to every place Mirna takes you.', hint: 'Buttons, arrow keys, swipe, or tap a pin on the map.', label: 'Map of Herzegovina with the places Mirna visits', end: 'All the places', endText: 'Where would you like <em>to go?</em>', endCta: `<a class="btn mint" href="/tours/">See the tours</a>`,
+    card: (p, i) => `<div class="jr-img">${placeImg(p)}</div><div class="jr-body"><p class="jr-kick">${i ? esc(fromMostar(p)) : 'Home base · every tour starts here'}</p><h3>${esc(p.name)}</h3><p>${esc(p.text)}</p><p class="jr-links">${(p.tours || []).slice(0, 3).map(tourLink).join('') || `<a href="${wa('Hello Mirna, could we visit ' + p.name + '?')}">Ask Mirna about ${esc(p.name)} ${I.arrow}</a>`}</p>${p.credit ? `<small class="pc-credit">Photo: ${esc(p.credit)}</small>` : ''}</div>` }); })()}
+  ${notes([PL.note].concat(placeBy('zitomislic').notes || []))}
 </div></section>
 
 <section class="sec dark"><div class="wrap">

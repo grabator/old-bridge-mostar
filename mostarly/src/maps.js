@@ -1,6 +1,6 @@
-/* Mostarly Guide maps: a small globe that flies down to Bosnia and Herzegovina, a map of Herzegovina
-   with the places Mirna visits, and an illustrated map of Mostar's Old Town. Route lines depend on the
-   tour: river-stone "kaldrma" for walks, a dashed road with a moving car for drives. No libraries. */
+/* Mostarly Guide maps: a journey player. The camera flies from stop to stop, a card opens for every
+   stop and the route grows behind you: river-stone "kaldrma" for walks, a red road with a car for
+   drives, lines from Mostar on the home page (after a small globe dives into Herzegovina). No libraries. */
 (function () {
   'use strict';
   var D = {}; try { D = JSON.parse(document.getElementById('mly-data').textContent); } catch (e) {}
@@ -84,61 +84,6 @@
       s = po(17.8098, 43.3393); t2 = el('text', { x: s[0], y: s[1], class: 'rlabel small' }, g); t2.textContent = 'Radobolja';
     }
   };
-  MapView.prototype.pins = function (ids, numbered) {
-    var proj = this.view === 'oldtown' ? po : pr, self = this; this.gPins.innerHTML = '';
-    ids.forEach(function (id, i) {
-      var p = PLACES[id]; if (!p) return; var q = proj(p.lon, p.lat);
-      var g = el('g', { class: 'pin ' + (p.kind || '') + (numbered ? ' num' : ''), 'data-id': id, tabindex: 0, role: 'button', 'aria-label': p.name, transform: 'translate(' + q[0].toFixed(1) + ' ' + q[1].toFixed(1) + ')' }, self.gPins);
-      var inner = el('g', { class: 'pin-in', style: '--i:' + i }, g);
-      el('circle', { r: 14, class: 'halo' }, inner);
-      el('circle', { r: p.kind === 'hub' ? 7.5 : 6, class: 'dot' }, inner);
-      if (numbered) { var tn = el('text', { y: 3.2, class: 'n' }, inner); tn.textContent = i + 1; }
-      else if (p.kind === 'hub') el('circle', { r: 2.6, class: 'core' }, inner);
-      var lab = el('text', p.label === 'l' ? { x: -11, y: 4, class: 'plabel', 'text-anchor': 'end' } : { x: 11, y: 4, class: 'plabel' }, inner); lab.textContent = p.name;
-      g.addEventListener('click', function () { self.select(id, true); });
-      g.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); self.select(id, true); } });
-    });
-  };
-  MapView.prototype.select = function (id, user) {
-    this.sel = id; $$('.pin', this.svg).forEach(function (g) { g.classList.toggle('on', g.getAttribute('data-id') === id); });
-    if (this.opt.onSelect) this.opt.onSelect(id, user);
-  };
-  /* route: walk = river stones (kaldrma), drive = dashed road + car, hub = lines from Mostar to every place */
-  MapView.prototype.route = function (ids, mode, ms) {
-    var proj = this.view === 'oldtown' ? po : pr, g = this.gRoute, self = this; g.innerHTML = '';
-    var pts = ids.map(function (id) { var p = PLACES[id]; return proj(p.lon, p.lat); });
-    if (mode === 'hub') {
-      var hub = pts[0];
-      pts.slice(1).forEach(function (q, i) {
-        var mx = (hub[0] + q[0]) / 2, my = (hub[1] + q[1]) / 2, dx = q[0] - hub[0], dy = q[1] - hub[1], L = Math.hypot(dx, dy) || 1, bend = Math.min(L * .12, 30);
-        var path = el('path', { d: 'M' + hub[0] + ' ' + hub[1] + 'Q' + (mx - dy / L * bend) + ' ' + (my + dx / L * bend) + ' ' + q[0] + ' ' + q[1], class: 'spoke', pathLength: 1, style: '--i:' + i }, g);
-        path.setAttribute('data-to', ids[i + 1]);
-      });
-      return;
-    }
-    var d = smooth(pts);
-    if (mode === 'walk') {
-      var guide = el('path', { d: d, class: 'guide' }, g), L = guide.getTotalLength(), n = 0, greys = ['#9b958b', '#857f75', '#b4ada1', '#6f6a61', '#a8a196'];
-      var step = 9 * (this.k ? this.k() : 1), stones = [];
-      for (var l = 0; l < L; l += step) {
-        var a = guide.getPointAtLength(l), b = guide.getPointAtLength(Math.min(L, l + 1)), ang = Math.atan2(b.y - a.y, b.x - a.x) * 57.3 + (Math.sin(n * 7.1) * 18);
-        var rx = (3.4 + (n * 37 % 10) / 10 * 1.4) * (step / 9), ry = (2.4 + (n * 53 % 10) / 10 * .9) * (step / 9);
-        stones.push(el('ellipse', { cx: a.x.toFixed(1), cy: a.y.toFixed(1), rx: rx.toFixed(2), ry: ry.toFixed(2), transform: 'rotate(' + ang.toFixed(0) + ' ' + a.x.toFixed(1) + ' ' + a.y.toFixed(1) + ')', fill: greys[n % greys.length], class: 'stone' }, g)); n++;
-      }
-      guide.remove();
-      stones.forEach(function (s, i) { if (reduce) s.classList.add('on'); else setTimeout(function () { s.classList.add('on'); }, i * ((ms || 2400) / stones.length)); });
-    } else {
-      var road = el('path', { d: d, class: 'road', pathLength: 1 }, g);
-      var dash = el('path', { d: d, class: 'road-dash' }, g);
-      var car = el('g', { class: 'car' }, g); el('circle', { r: 6.5, class: 'car-halo' }, car); el('circle', { r: 3.8, class: 'car-dot' }, car);
-      var len = dash.getTotalLength();
-
-      tween(ms || 3200, function (t) {
-        road.style.strokeDashoffset = 1 - t;
-        var p = dash.getPointAtLength(len * t); car.setAttribute('transform', 'translate(' + p.x.toFixed(1) + ' ' + p.y.toFixed(1) + ')');
-      }, function () { car.classList.add('park'); });
-    }
-  };
 
   /* ---------- small orthographic globe on canvas ---------- */
   function Globe(canvas) {
@@ -148,7 +93,7 @@
     var c = this.c, dpr = Math.min(window.devicePixelRatio || 1, 2), w = c.clientWidth, h = c.clientHeight;
     if (c.width !== Math.round(w * dpr)) { c.width = Math.round(w * dpr); c.height = Math.round(h * dpr); }
     var g = this.ctx; g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, w, h);
-    var R = Math.min(w, h) * .42 * scale, cx = w / 2, cy = h / 2, l0 = lon0 * Math.PI / 180, p0 = lat0 * Math.PI / 180, sp0 = Math.sin(p0), cp0 = Math.cos(p0);
+    var bx = this.box ? this.box(w, h) : [0, 0, w, h], R = Math.min(bx[2], bx[3]) * .42 * scale, cx = bx[0] + bx[2] / 2, cy = bx[1] + bx[3] / 2, l0 = lon0 * Math.PI / 180, p0 = lat0 * Math.PI / 180, sp0 = Math.sin(p0), cp0 = Math.cos(p0);
     var nt = night(), col = nt ? { sea: '#1f2536', land: '#353449', edge: '#4b4a63', bih: '#48e5c2' } : { sea: '#d4ebe5', land: '#efe6d6', edge: '#cdbfa6', bih: '#48e5c2' };
     g.beginPath(); g.arc(cx, cy, R, 0, Math.PI * 2); g.fillStyle = col.sea; g.fill();
     function ring(flat, fill, stroke) {
@@ -167,84 +112,246 @@
     bih.forEach(function (r) { ring(r, col.bih, null); }); g.restore();
     g.beginPath(); g.arc(cx, cy, R, 0, Math.PI * 2); g.strokeStyle = col.edge; g.lineWidth = 1.2; g.stroke();
   };
-  Globe.prototype.fly = function (world, bih, ms, done) {
-    var self = this, from = [-25, 18, 1], to = [17.8, 43.6, 9];
-    tween(ms, function (t) { var z = Math.pow(to[2] / from[2], Math.max(0, (t - .45) / .55)); self.draw(world, bih, from[0] + (to[0] - from[0]) * Math.min(1, t * 1.4), from[1] + (to[1] - from[1]) * Math.min(1, t * 1.4), from[2] * z); }, done);
+  Globe.prototype.fly = function (world, bih, from, ms, done) {
+    var self = this, to = [17.8, 43.6, 9];
+    tween(ms, function (t) { var z = Math.pow(to[2] / from[2], Math.max(0, (t - .4) / .6)), m = Math.min(1, t * 1.5); self.draw(world, bih, from[0] + (to[0] - from[0]) * m, from[1] + (to[1] - from[1]) * m, from[2] * z); }, done);
   };
 
-  /* ---------- place card ---------- */
-  function placeImg(p) {
-    if (p.image) return '<img src="/img/' + esc(p.image) + '" alt="' + esc(p.name) + '" loading="lazy">';
-    if (p.photo) return '<img src="/img/places/' + esc(p.photo) + '" alt="' + esc(p.name) + '" loading="lazy">';
-    return '<span class="pc-art" aria-hidden="true"></span>';
-  }
-  function credit(p) { return p.credit ? '<small class="pc-credit">Photo: ' + esc(p.credit) + '</small>' : ''; }
-  function tourLinks(p) {
-    var t = (p.tours || []).map(function (s) { var x = (D.tours || []).filter(function (q) { return q.slug === s; })[0]; return x ? '<a href="/tours/' + s + '/">' + esc(x.name.split(' – ')[0]) + ' →</a>' : ''; }).join('');
-    return t || '<a href="https://wa.me/' + D.whatsapp + '?text=' + encodeURIComponent('Hello Mirna, could we visit ' + p.name + '?') + '">Ask Mirna about ' + esc(p.name) + ' →</a>';
-  }
-  function dist(p) { return p.km ? '<span class="pc-dist">≈ ' + p.km + ' km · ' + (p.min >= 60 ? Math.floor(p.min / 60) + ' h ' + (p.min % 60 ? p.min % 60 + ' min' : '') : p.min + ' min') + ' from Mostar</span>' : ''; }
+  /* ---------- pins ---------- */
+  MapView.prototype.pins = function (ids, numbered, onPick) {
+    var proj = this.view === 'oldtown' ? po : pr, self = this; this.gPins.innerHTML = '';
+    ids.forEach(function (id, i) {
+      var p = PLACES[id]; if (!p) return; var q = proj(p.lon, p.lat);
+      var g = el('g', { class: 'pin ' + (p.kind || '') + (numbered ? ' num' : ''), 'data-id': id, 'data-i': i, transform: 'translate(' + q[0].toFixed(1) + ' ' + q[1].toFixed(1) + ')' }, self.gPins);
+      var inner = el('g', { class: 'pin-in', style: '--i:' + i }, g);
+      el('circle', { r: 16, class: 'halo' }, inner);
+      el('circle', { r: 18, class: 'hit' }, inner);
+      el('circle', { r: p.kind === 'hub' && !numbered ? 7.5 : 6.5, class: 'dot' }, inner);
+      if (numbered) { var tn = el('text', { y: 3.2, class: 'n' }, inner); tn.textContent = i + 1; }
+      else if (p.kind === 'hub') el('circle', { r: 2.6, class: 'core' }, inner);
+      var lab = el('text', p.label === 'l' ? { x: -12, y: 4, class: 'plabel', 'text-anchor': 'end' } : { x: 12, y: 4, class: 'plabel' }, inner); lab.textContent = p.name;
+      g.addEventListener('click', function (e) { e.stopPropagation(); if (onPick) onPick(i); });
+    });
+  };
+  MapView.prototype.mark = function (i) { $$('.pin', this.svg).forEach(function (g) { var k = +g.getAttribute('data-i'); g.classList.toggle('on', k === i); g.classList.toggle('past', k < i); }); };
 
-  /* ---------- home: "Where we go" ---------- */
-  function initExplore(sec) {
-    var stage = $('.ex-stage', sec), canvas = $('canvas', sec), card = $('.ex-card', sec), chips = $('.ex-chips', sec), back = $('.ex-back', sec);
-    var regionIds = (D.places || []).filter(function (p) { return p.area === 'region'; }).map(function (p) { return p.id; });
-    var oldIds = ['hamam', 'kriva', 'stari-most', 'kujundziluk', 'koski'];
-    var mv = null, ov = null, started = false;
-    function showCard(id) {
-      var p = PLACES[id]; if (!p) return;
-      card.innerHTML = '<div class="pc-img">' + placeImg(p) + '</div><div class="pc-body"><b>' + esc(p.name) + '</b>' + dist(p) + '<p>' + esc(p.text) + '</p><div class="pc-links">' + (id === 'mostar' ? '<button type="button" class="pc-zoom">Zoom into the Old Town ↘</button>' : '') + tourLinks(p) + '</div>' + credit(p) + '</div>';
-      card.classList.remove('swap'); void card.offsetWidth; card.classList.add('swap');
-      $$('button', chips).forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-id') === id)); });
-      var z = $('.pc-zoom', card); if (z) z.addEventListener('click', toOld);
-      if (mv) { $$('.spoke', mv.svg).forEach(function (s) { s.classList.toggle('hot', s.getAttribute('data-to') === id); }); }
+  /* ---------- the route, one piece per leg ----------
+     walk = river stones (kaldrma) laid down as you go, drive = a red road with a car,
+     hub = a line from Mostar to the place you are looking at */
+  function legPaths(pts) { // the same Catmull-Rom curve as smooth(), cut at every stop
+    return pts.slice(0, -1).map(function (p1, i) {
+      var p0 = pts[i - 1] || p1, p2 = pts[i + 1], p3 = pts[i + 2] || p2;
+      return 'M' + p1[0].toFixed(1) + ' ' + p1[1].toFixed(1) + 'C' + (p1[0] + (p2[0] - p0[0]) / 6).toFixed(1) + ' ' + (p1[1] + (p2[1] - p0[1]) / 6).toFixed(1) + ',' + (p2[0] - (p3[0] - p1[0]) / 6).toFixed(1) + ' ' + (p2[1] - (p3[1] - p1[1]) / 6).toFixed(1) + ',' + p2[0].toFixed(1) + ' ' + p2[1].toFixed(1);
+    });
+  }
+  function Route(mv, ids, mode) {
+    var proj = mv.view === 'oldtown' ? po : pr, g = mv.gRoute, self = this; g.innerHTML = '';
+    this.mode = mode; this.legs = [];
+    var pts = ids.map(function (id) { var p = PLACES[id]; return proj(p.lon, p.lat); });
+    if (mode === 'hub') {
+      var hub = pts[0];
+      pts.forEach(function (q, i) {
+        if (!i) { self.legs.push(null); return; }
+        var mx = (hub[0] + q[0]) / 2, my = (hub[1] + q[1]) / 2, dx = q[0] - hub[0], dy = q[1] - hub[1], L = Math.hypot(dx, dy) || 1, bend = Math.min(L * .12, 30);
+        var d = 'M' + hub[0] + ' ' + hub[1] + 'Q' + (mx - dy / L * bend) + ' ' + (my + dx / L * bend) + ' ' + q[0] + ' ' + q[1];
+        el('path', { d: d, class: 'ghost hubline' }, g);
+        self.legs.push({ path: el('path', { d: d, class: 'spoke', pathLength: 1 }, g) });
+      });
+      return;
     }
-    chips.innerHTML = regionIds.map(function (id) { return '<button type="button" data-id="' + id + '">' + esc(PLACES[id].name) + '</button>'; }).join('');
-    $$('button', chips).forEach(function (b) { b.addEventListener('click', function () { var id = b.getAttribute('data-id'); if (ov && stage.classList.contains('old')) toRegion(); mv.select(id, true); }); });
-    function toOld() {
-      if (!ov) { ov = new MapView(stage, { view: 'oldtown', label: 'Map of the Old Town of Mostar', onSelect: function (id) { var p = PLACES[id]; card.innerHTML = '<div class="pc-img">' + placeImg(p) + '</div><div class="pc-body"><b>' + esc(p.name) + '</b><p>' + esc(p.text) + '</p><div class="pc-links"><a href="/tours/mostar-old-town-highlights/">Old Town Highlights →</a></div>' + credit(p) + '</div>'; } }); ov.svg.classList.add('layer'); ov.drawBase(); }
-      stage.classList.add('old'); back.hidden = false;
-      ov.setVB(ov.fit(oldIds, .35)); ov.pins(oldIds, true); ov.route(oldIds, 'walk', 2200); ov.select('hamam');
+    legPaths(pts).forEach(function (d) {
+      if (mode === 'walk') {
+        el('path', { d: d, class: 'ghost walkline' }, g);
+        var guide = el('path', { d: d }, g), L = guide.getTotalLength(), step = 7, stones = [], n = self.legs.length * 13;
+        var greys = ['#9b958b', '#857f75', '#b4ada1', '#6f6a61', '#a8a196'];
+        for (var l = step / 2; l < L; l += step) {
+          var a = guide.getPointAtLength(l), b = guide.getPointAtLength(Math.min(L, l + 1)), ang = Math.atan2(b.y - a.y, b.x - a.x) * 57.3 + Math.sin(n * 7.1) * 18;
+          stones.push(el('ellipse', { cx: a.x.toFixed(1), cy: a.y.toFixed(1), rx: (2.6 + (n * 37 % 10) / 10).toFixed(2), ry: (1.8 + (n * 53 % 10) / 14).toFixed(2), transform: 'rotate(' + ang.toFixed(0) + ' ' + a.x.toFixed(1) + ' ' + a.y.toFixed(1) + ')', fill: greys[n % 5], class: 'stone' }, g)); n++;
+        }
+        self.legs.push({ guide: guide, len: L, stones: stones }); guide.setAttribute('class', 'guide');
+      } else {
+        el('path', { d: d, class: 'ghost roadline' }, g);
+        var road = el('path', { d: d, class: 'road', pathLength: 1 }, g);
+        self.legs.push({ path: road, guide: road, len: road.getTotalLength() });
+      }
+    });
+    this.mover = el('g', { class: 'mover ' + mode }, g); el('circle', { r: 9, class: 'mv-halo' }, this.mover); el('circle', { r: 4.6, class: 'mv-dot' }, this.mover);
+  }
+  // x = how much of the route is done: 2.5 = legs 0 and 1 finished, leg 2 half way
+  Route.prototype.show = function (x, target) {
+    if (this.mode === 'hub') {
+      this.legs.forEach(function (lg, i) { if (!lg) return; var on = i === target; lg.path.style.strokeDashoffset = on ? (1 - Math.max(0, Math.min(1, x))) : 1; lg.path.classList.toggle('hot', on); });
+      return;
     }
-    function toRegion() { stage.classList.remove('old'); back.hidden = true; mv.select('mostar', true); }
-    back.addEventListener('click', toRegion);
-    function start() {
-      if (started) return; started = true;
-      Promise.all([geo('world'), geo('region')]).then(function (r) {
-        var world = r[0], region = r[1];
-        mv = new MapView(stage, { view: 'region', label: 'Map of Herzegovina with the places Mirna visits', onSelect: function (id) { showCard(id); } });
-        mv.drawBase(region);
-        var all = mv.fit(regionIds, .12), wide = mv.fit(['sarajevo', 'kravice', 'stolac', 'jablanica', 'mostar'], 1.1);
-        mv.setVB(wide);
-        showCard('mostar');
-        var g = new Globe(canvas);
-        stage.classList.add('globe');
-        g.fly(world, region.bih, 2600, function () {
-          stage.classList.remove('globe'); stage.classList.add('mapon');
-          mv.zoom(all, 1400, function () { mv.route(['mostar'].concat(regionIds.slice(1)), 'hub'); mv.pins(regionIds, false); stage.classList.add('drawn'); mv.select('mostar'); });
-        });
+    var mover = this.mover, placed = false;
+    this.legs.forEach(function (lg, i) {
+      var f = Math.max(0, Math.min(1, x - i));
+      if (lg.stones) { var k = Math.round(f * lg.stones.length); lg.stones.forEach(function (s, j) { s.classList.toggle('on', j < k); }); }
+      else lg.path.style.strokeDashoffset = 1 - f;
+      if (!placed && (f < 1 || i === this.legs.length - 1)) { var p = lg.guide.getPointAtLength(lg.len * f); mover.setAttribute('transform', 'translate(' + p.x.toFixed(1) + ' ' + p.y.toFixed(1) + ')'); placed = true; }
+    }, this);
+    mover.style.opacity = x <= 0 ? 0 : 1;
+  };
+
+  /* ---------- the journey player (home and every tour page) ---------- */
+  var DWELL = 5200;
+  function initJourney(root) {
+    var cfg = JSON.parse(root.getAttribute('data-journey')), ids = cfg.stops.filter(function (id) { return PLACES[id]; }), N = ids.length;
+    var stage = $('.jr-stage', root), canvas = $('.jr-globe', root), cards = $$('.jr-st', root), dots = $$('.jr-dot', root), fill = $('.jr-fill', root);
+    var placeEl = $('.jr-place b', root), countEl = $('.jr-count', root), playBtn = $('[data-play]', root), prev = $('[data-step="-1"]', root), next = $('[data-step="1"]', root), live = $('.jr-live', root);
+    var proj = cfg.map === 'oldtown' ? po : pr, P = ids.map(function (id) { var p = PLACES[id]; return proj(p.lon, p.lat); });
+    root.classList.add('js');
+    var mv = null, route = null, world = null, region = null, W = 0, H = 0, wide = false;
+    var idx = -1, mode = 'start', state = null, flying = null, rev = 0, playing = false, dwellT = 0, inView = false, spin = 0, spinRaf = 0, globe = null;
+
+    function overview() {
+      var vb = mv.fit(ids, cfg.map === 'oldtown' ? .3 : .16, W / H);
+      var a = wide ? [.4, .5] : [.5, .4]; // keep the route clear of the card
+      var w = vb[2] * (wide ? 1.45 : 1), h = w * H / W; if (!wide) { h = vb[3] * 1.7; w = Math.max(w, h * W / H); }
+      return { x: vb[0] + vb[2] / 2, y: vb[1] + vb[3] / 2, w: w, a: a };
+    }
+    function stationW(i) {
+      if (cfg.map === 'oldtown') return Math.max(380, overview().w * .62);
+      var near = 0; P.forEach(function (q, k) { if (k !== i && Math.abs(k - i) <= 1) near = Math.max(near, Math.hypot(q[0] - P[i][0], q[1] - P[i][1])); });
+      return Math.max(wide ? 210 : 170, Math.min(near * (wide ? 2.6 : 2.3), 420));
+    }
+    function target(i) {
+      if (i < 0 || i >= N) return overview();
+      return { x: P[i][0], y: P[i][1], w: stationW(i), a: wide ? [.36, .52] : [.5, .3] };
+    }
+    function apply(s) { var h = s.w * H / W; mv.setVB([s.x - s.a[0] * s.w, s.y - s.a[1] * h, s.w, h]); }
+    function lerp(a, b, t) { return a + (b - a) * t; }
+    function between(a, b, t) {
+      var d = Math.hypot(b.x - a.x, b.y - a.y), far = Math.max(a.w, b.w, d * 1.5), dip = Math.max(0, Math.log(far / Math.max(a.w, b.w))) * Math.sin(Math.PI * t);
+      return { x: lerp(a.x, b.x, t), y: lerp(a.y, b.y, t), w: Math.exp(lerp(Math.log(a.w), Math.log(b.w), t) + dip * .8), a: [lerp(a.a[0], b.a[0], t), lerp(a.a[1], b.a[1], t)] };
+    }
+
+    function setCard(i) {
+      cards.forEach(function (c, k) { c.classList.toggle('on', k === i); if (k === i) c.scrollTop = 0; });
+      dots.forEach(function (d, k) { d.classList.toggle('now', k === i); d.classList.toggle('past', k < i); d.setAttribute('aria-current', k === i ? 'step' : 'false'); });
+      var j = Math.max(0, Math.min(i, N - 1));
+      fill.style.transform = 'scaleX(' + (N > 1 ? Math.max(0, Math.min(1, i / (N - 1))) : 1) + ')';
+      placeEl.textContent = i >= N ? root.getAttribute('data-end') : i < 0 ? root.getAttribute('data-title') : PLACES[ids[j]].name;
+      countEl.textContent = (i < 0 ? 0 : Math.min(i + 1, N)) + ' / ' + N;
+      prev.disabled = i <= 0; next.disabled = i >= N;
+    }
+    function go(j) {
+      j = Math.max(0, Math.min(N, j));
+      if (j === idx && !flying) return;
+      if (mode === 'start' && globe) { fromGlobe(j); return; }
+      var from = state || target(idx), to = target(j), d = Math.hypot(to.x - from.x, to.y - from.y) / Math.max(from.w, to.w);
+      var ms = Math.max(1100, Math.min(2600, 900 + d * 1100)), r0 = rev, r1 = cfg.mode === 'hub' ? 1 : Math.min(j, N - 1), t0 = performance.now();
+      if (cfg.mode !== 'hub' && r1 < r0) r0 = r1; // going back: the route shrinks at once
+      clearTimeout(dwellT); playBtn.classList.remove('timing');
+      root.classList.remove('is-start', 'is-end', 'is-landed'); root.classList.add('is-flying');
+      mode = 'fly'; setCard(-2); setHud(j);
+      var tok = flying = {};
+      if (reduce) { state = to; apply(to); rev = r1; route.show(cfg.mode === 'hub' ? 1 : r1, j); return land(j); }
+      (function f(now) {
+        if (flying !== tok) return;
+        var t = Math.min(1, (now - t0) / ms), e = ease(t);
+        state = between(from, to, e); apply(state);
+        rev = lerp(r0, r1, Math.max(0, Math.min(1, (e - .1) / .8)));
+        route.show(cfg.mode === 'hub' ? Math.max(0, (e - .3) / .7) : rev, j);
+        if (t < 1) requestAnimationFrame(f); else land(j);
+      })(t0);
+    }
+    function setHud(j) { // the HUD shows where you are going while you fly
+      var i = Math.min(j, N - 1);
+      dots.forEach(function (d, k) { d.classList.toggle('now', k === j); d.classList.toggle('past', k < j); });
+      fill.style.transform = 'scaleX(' + (N > 1 ? Math.min(1, j / (N - 1)) : 1) + ')';
+      placeEl.textContent = j >= N ? root.getAttribute('data-end') : PLACES[ids[i]].name;
+      countEl.textContent = Math.min(j + 1, N) + ' / ' + N; prev.disabled = j <= 0; next.disabled = j >= N;
+    }
+    function land(j) {
+      flying = null; idx = j; state = target(j);
+      root.classList.remove('is-flying');
+      mv.mark(j < N ? j : -1);
+      if (j >= N) { mode = 'end'; root.classList.add('is-end'); setPlaying(false); setCard(N); live.textContent = root.getAttribute('data-end'); return; }
+      mode = 'station'; root.classList.add('is-landed'); setCard(j);
+      live.textContent = 'Stop ' + (j + 1) + ' of ' + N + ': ' + PLACES[ids[j]].name;
+      if (playing) dwell();
+    }
+    function dwell() {
+      clearTimeout(dwellT); playBtn.style.setProperty('--dwell', DWELL + 'ms');
+      playBtn.classList.remove('timing'); void playBtn.offsetWidth; playBtn.classList.add('timing');
+      dwellT = setTimeout(function () { if (playing) go(idx + 1); }, DWELL);
+    }
+    function setPlaying(on) {
+      playing = on; playBtn.setAttribute('aria-pressed', String(on)); $('span', playBtn).textContent = on ? 'Pause' : 'Play';
+      if (!on) { clearTimeout(dwellT); playBtn.classList.remove('timing'); }
+    }
+    function step(dir) { if (flying) { go(idx + dir < 0 ? 0 : (dir > 0 ? Math.max(idx, 0) + 1 : idx - 1)); return; } go(idx < 0 ? 0 : idx + dir); }
+
+    /* globe (home page only): spins behind the start card, then dives into Herzegovina */
+    function spinGlobe() {
+      if (!globe || mode !== 'start') return;
+      spin += .12; globe.draw(world, region.bih, -10 + spin, 22, 1);
+      if (inView && !reduce) spinRaf = requestAnimationFrame(spinGlobe);
+    }
+    function fromGlobe(j) {
+      mode = 'fly'; cancelAnimationFrame(spinRaf); root.classList.remove('is-start'); root.classList.add('is-flying');
+      setHud(0);
+      var g = globe; globe = null;
+      g.fly(world, region.bih, [-10 + spin, 22, 1], 2300, function () {
+        root.classList.remove('globe-on');
+        state = target(-1); var s = target(-1); s.w *= .55; s.x = P[0][0]; s.y = P[0][1]; state = s; apply(s);
+        mode = 'station'; idx = -1; go(j);
       });
     }
-    var io = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { start(); io.disconnect(); } }, { threshold: .35 });
-    io.observe(stage);
-  }
 
-  /* ---------- tour page: "The route" ---------- */
-  function initRoute(sec) {
-    var r = JSON.parse(sec.getAttribute('data-route')), stage = $('.rt-stage', sec), list = $$('.rt-step', sec), started = false;
-    function start() {
+    /* input */
+    root.addEventListener('click', function (e) {
+      var t = e.target, b;
+      if ((b = t.closest('[data-go]'))) { setPlaying(false); go(+b.getAttribute('data-go')); return; }
+      if (t.closest('[data-begin]')) { go(0); return; }
+      if (t.closest('[data-autoplay]')) { setPlaying(true); go(0); return; }
+      if (t.closest('[data-restart]')) { setPlaying(true); go(0); return; }
+      if (t.closest('[data-play]')) { if (playing) setPlaying(false); else { setPlaying(true); if (mode === 'start' || mode === 'end') go(0); else if (!flying) go(idx + 1); } return; }
+      if ((b = t.closest('[data-step]'))) { setPlaying(false); step(+b.getAttribute('data-step')); }
+    });
+    var down = null;
+    stage.addEventListener('pointerdown', function (e) { down = { x: e.clientX, y: e.clientY }; }, { passive: true });
+    stage.addEventListener('pointerup', function (e) {
+      if (!down) return; var dx = e.clientX - down.x, dy = e.clientY - down.y; down = null;
+      if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.3) { setPlaying(false); if (mode === 'start') { if (dx < 0) go(0); } else step(dx < 0 ? 1 : -1); }
+    }, { passive: true });
+    document.addEventListener('keydown', function (e) {
+      if (!inView || e.altKey || e.ctrlKey || e.metaKey || /input|textarea|select/i.test((document.activeElement || {}).tagName || '')) return;
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      var r = root.getBoundingClientRect(); if (r.top > innerHeight * .5 || r.bottom < innerHeight * .5) return;
+      e.preventDefault(); setPlaying(false); if (mode === 'start') { if (e.key === 'ArrowRight') go(0); } else step(e.key === 'ArrowRight' ? 1 : -1);
+    });
+
+    function measure() {
+      W = stage.clientWidth; H = stage.clientHeight; wide = root.clientWidth >= 900;
+      root.classList.toggle('is-wide', wide);
+      if (mv && !flying) { state = target(idx); apply(state); }
+      if (globe && mode === 'start') globe.draw(world, region.bih, -10 + spin, 22, 1);
+    }
+    var started = false;
+    function boot() {
       if (started) return; started = true;
-      (r.map === 'region' ? geo('region') : Promise.resolve(null)).then(function (region) {
-        var mv = new MapView(stage, { view: r.map, label: 'Route map', onSelect: function (id, user) { list.forEach(function (li) { li.classList.toggle('on', li.getAttribute('data-id') === id); }); if (user) { var li = $('.rt-step[data-id="' + id + '"]', sec); if (li && innerWidth < 1000) li.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' }); } } });
-        mv.drawBase(region); mv.setVB(mv.fit(r.stops, r.map === 'oldtown' ? .35 : .3));
-        mv.pins(r.stops, true); mv.route(r.stops, r.mode, r.map === 'oldtown' ? 2400 : 3200); mv.select(r.stops[0]);
-        list.forEach(function (li) { li.addEventListener('click', function () { mv.select(li.getAttribute('data-id'), false); }); });
+      Promise.all([cfg.map === 'region' ? geo('region') : Promise.resolve(null), cfg.globe ? geo('world') : Promise.resolve(null)]).then(function (r) {
+        region = r[0]; world = r[1];
+        mv = new MapView(stage, { view: cfg.map, label: root.getAttribute('data-label') || 'Route map' });
+        stage.insertBefore(mv.svg, stage.firstChild);
+        mv.drawBase(region); measure();
+        route = new Route(mv, ids, cfg.mode); route.show(0, -1);
+        mv.pins(ids, cfg.mode !== 'hub', function (i) { setPlaying(false); go(i); });
+        state = target(-1); apply(state); setCard(-1);
+        root.classList.add('is-start', 'ready');
+        if (cfg.globe && world && canvas) { globe = new Globe(canvas); var sp = $('.jr-start .jr-panel', root); globe.box = function (w, h) { return wide ? [0, 70, w * .64, h - 70] : [0, 96, w, Math.max(140, h - 96 - (sp ? sp.offsetHeight + 24 : h * .4))]; }; root.classList.add('globe-on'); spinGlobe(); }
       });
     }
-    var io = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { start(); io.disconnect(); } }, { threshold: .3 });
-    io.observe(stage);
+    var io = new IntersectionObserver(function (es) {
+      inView = es[0].isIntersecting;
+      if (inView) { boot(); if (globe && mode === 'start') spinGlobe(); }
+      else if (playing) setPlaying(false);
+    }, { threshold: .2 });
+    io.observe(root);
+    var rt = 0; addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(measure, 120); });
   }
 
-  $$('[data-explore]').forEach(initExplore);
-  $$('[data-route]').forEach(initRoute);
+  $$('[data-journey]').forEach(initJourney);
 })();
