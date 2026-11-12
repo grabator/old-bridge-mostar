@@ -238,6 +238,132 @@
     $$('button', box).forEach(function (b, i) { b.addEventListener('click', function () { show(i); }); }); show(0);
   })();
 
+
+  /* ---------- form widgets: dropdown, calendar ---------- */
+  function closeAllPops(except) { $$('.dd-pop:not([hidden]),.dp-pop:not([hidden])').forEach(function (p) { if (p !== except) { p.hidden = true; var b = p.parentNode.querySelector('.dd-btn'); if (b) b.setAttribute('aria-expanded', 'false'); p.parentNode.classList.remove('open'); } }); }
+  document.addEventListener('click', function (e) { if (e.target.isConnected && !e.target.closest('.dd,.dp')) closeAllPops(); }); // a re-drawn calendar button is no longer in the page: not an outside click
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { var o = $('.dd.open .dd-btn,.dp.open .dd-btn'); closeAllPops(); if (o) o.focus(); } });
+  $$('[data-dd]').forEach(function (dd) {
+    var sel = $('select', dd), btn = $('.dd-btn', dd), pop = $('.dd-pop', dd), label = $('span', btn);
+    function build() {
+      var html = '';
+      Array.prototype.forEach.call(sel.children, function (n) {
+        if (n.tagName === 'OPTGROUP') { html += '<div class="dd-g">' + n.label + '</div>'; Array.prototype.forEach.call(n.children, function (o) { html += opt(o); }); }
+        else html += opt(n);
+      });
+      pop.innerHTML = html;
+    }
+    function opt(o) { return '<div class="dd-o" role="option" tabindex="-1" data-v="' + o.value + '" aria-selected="' + (o.selected ? 'true' : 'false') + '">' + o.textContent + '</div>'; }
+    function sync() { var o = sel.options[sel.selectedIndex]; label.textContent = o ? o.textContent : ''; dd.classList.toggle('has', !!sel.value); $$('.dd-o', pop).forEach(function (x) { x.setAttribute('aria-selected', String(x.getAttribute('data-v') === sel.value)); }); }
+    function open() { closeAllPops(pop); build(); pop.hidden = false; dd.classList.add('open'); btn.setAttribute('aria-expanded', 'true'); var cur = $('.dd-o[aria-selected=true]', pop) || $('.dd-o', pop); if (cur) { cur.focus(); cur.scrollIntoView({ block: 'nearest' }); } }
+    function pick(v) { sel.value = v; sel.dispatchEvent(new Event('change', { bubbles: true })); closeAllPops(); btn.focus(); }
+    btn.addEventListener('click', function () { if (pop.hidden) open(); else closeAllPops(); });
+    btn.addEventListener('keydown', function (e) { if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
+    pop.addEventListener('click', function (e) { var o = e.target.closest('.dd-o'); if (o) pick(o.getAttribute('data-v')); });
+    pop.addEventListener('keydown', function (e) {
+      var list = $$('.dd-o', pop), i = list.indexOf(document.activeElement);
+      if (e.key === 'ArrowDown') { e.preventDefault(); (list[i + 1] || list[0]).focus(); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); (list[i - 1] || list[list.length - 1]).focus(); }
+      else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (list[i]) pick(list[i].getAttribute('data-v')); }
+      else if (e.key === 'Tab') closeAllPops();
+    });
+    sel.addEventListener('change', sync); sync();
+  });
+  var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  $$('[data-dp]').forEach(function (dp) {
+    var inp = $('input', dp), btn = $('.dd-btn', dp), pop = $('.dp-pop', dp), label = $('span', btn);
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+    var view = new Date(today.getFullYear(), today.getMonth(), 1);
+    function iso(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+    function render() {
+      var y = view.getFullYear(), m = view.getMonth(), first = (new Date(y, m, 1).getDay() + 6) % 7, days = new Date(y, m + 1, 0).getDate();
+      var canPrev = new Date(y, m, 1) > new Date(today.getFullYear(), today.getMonth(), 1);
+      var h = '<div class="dp-head"><button type="button" class="dp-nav" data-m="-1" aria-label="Previous month"' + (canPrev ? '' : ' disabled') + '>‹</button><b>' + MONTHS[m] + ' ' + y + '</b><button type="button" class="dp-nav" data-m="1" aria-label="Next month">›</button></div><div class="dp-grid" role="grid">';
+      ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].forEach(function (d) { h += '<span class="dp-dow">' + d + '</span>'; });
+      for (var i = 0; i < first; i++) h += '<span></span>';
+      for (var d = 1; d <= days; d++) {
+        var dt = new Date(y, m, d), v = iso(dt), past = dt < today;
+        h += '<button type="button" class="dp-day' + (v === iso(today) ? ' today' : '') + (v === inp.value ? ' on' : '') + '" data-d="' + v + '"' + (past ? ' disabled' : '') + ' aria-label="' + d + ' ' + MONTHS[m] + ' ' + y + '">' + d + '</button>';
+      }
+      h += '</div><div class="dp-foot"><button type="button" class="dp-flex">Flexible / not sure</button></div>';
+      pop.innerHTML = h;
+    }
+    function set(v) {
+      inp.value = v; dp.classList.toggle('has', !!v);
+      label.textContent = v ? new Date(v + 'T12:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' }) : 'Choose a date';
+    }
+    btn.addEventListener('click', function () {
+      if (!pop.hidden) { closeAllPops(); return; }
+      closeAllPops(pop); if (inp.value) { var c = new Date(inp.value + 'T12:00'); view = new Date(c.getFullYear(), c.getMonth(), 1); }
+      render(); pop.hidden = false; dp.classList.add('open'); btn.setAttribute('aria-expanded', 'true');
+      var f = $('.dp-day.on', pop) || $('.dp-day.today:not([disabled])', pop) || $('.dp-day:not([disabled])', pop); if (f) f.focus();
+    });
+    pop.addEventListener('click', function (e) {
+      var n = e.target.closest('[data-m]'), d = e.target.closest('[data-d]');
+      if (n) { view = new Date(view.getFullYear(), view.getMonth() + (+n.getAttribute('data-m')), 1); render(); return; }
+      if (d) { set(d.getAttribute('data-d')); closeAllPops(); btn.focus(); return; }
+      if (e.target.closest('.dp-flex')) { set(''); closeAllPops(); btn.focus(); }
+    });
+    pop.addEventListener('keydown', function (e) {
+      var days = $$('.dp-day:not([disabled])', pop), i = days.indexOf(document.activeElement), k = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: 7, ArrowUp: -7 }[e.key];
+      if (k && i > -1) { e.preventDefault(); var t = days[i + k]; if (t) t.focus(); }
+    });
+  });
+
+
+  /* ---------- reviews: a slow row that moves by itself, stops when you touch it ---------- */
+  $$('[data-revs]').forEach(function (box) {
+    var vp = $('.revs-vp', box), track = $('.revs-track', box), pauseBtn = $('[data-rv-pause]', box);
+    var orig = $$('.rev', track); if (!orig.length) return;
+    orig.forEach(function (c) { var k = c.cloneNode(true); k.setAttribute('aria-hidden', 'true'); k.classList.add('clone'); track.appendChild(k); });
+    var userPaused = reduce, hold = false, last = 0, inView = false, resume = 0, pos = 0;
+    function half() { return track.scrollWidth / 2; }
+    function setPaused(p) { userPaused = p; pauseBtn.setAttribute('aria-pressed', String(p)); $('span', pauseBtn).textContent = p ? 'Play' : 'Pause'; box.classList.toggle('paused', p); }
+    setPaused(reduce);
+    function tick(now) {
+      var dt = last ? Math.min(64, now - last) : 16; last = now;
+      if (!userPaused && !hold && inView) { pos = vp.scrollLeft + dt * 0.022; if (pos >= half()) pos -= half(); vp.scrollLeft = pos; }
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+    function holdFor(ms) { hold = true; clearTimeout(resume); resume = setTimeout(function () { hold = false; }, ms); }
+    ['pointerenter', 'focusin', 'touchstart', 'wheel'].forEach(function (ev) { vp.addEventListener(ev, function () { hold = true; clearTimeout(resume); }, { passive: true }); });
+    ['pointerleave', 'focusout', 'touchend'].forEach(function (ev) { vp.addEventListener(ev, function () { holdFor(2500); }, { passive: true }); });
+    vp.addEventListener('scroll', function () { if (vp.scrollLeft >= half()) vp.scrollLeft -= half(); }, { passive: true });
+    $$('[data-rv]', box).forEach(function (b) { b.addEventListener('click', function () { holdFor(4000); var w = orig[0].getBoundingClientRect().width + 20; vp.scrollBy({ left: w * (+b.getAttribute('data-rv')), behavior: reduce ? 'auto' : 'smooth' }); }); });
+    pauseBtn.addEventListener('click', function () { setPaused(!userPaused); });
+    new IntersectionObserver(function (es) { inView = es[0].isIntersecting; }).observe(box);
+  });
+
+  /* ---------- tours: the category bar lights up the section you are reading ---------- */
+  $$('[data-spy]').forEach(function (bar) {
+    var links = $$('a', bar), secs = links.map(function (a) { return document.getElementById(a.getAttribute('href').slice(1)); });
+    function onScroll() {
+      var y = innerHeight * .35, cur = -1;
+      secs.forEach(function (s, i) { if (s && s.getBoundingClientRect().top < y) cur = i; });
+      links.forEach(function (a, i) { var on = i === cur; if (on !== a.classList.contains('on')) { a.classList.toggle('on', on); if (on) a.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' }); } });
+      bar.parentNode.classList.toggle('stuck', bar.getBoundingClientRect().top <= 80);
+    }
+    addEventListener('scroll', onScroll, { passive: true }); onScroll();
+  });
+
+  /* ---------- carved copper beside "Featured tours": cut in as you scroll down, gone when you leave ---------- */
+  $$('[data-carve]').forEach(function (sec) {
+    var paths = $$('.carve .eg', sec), dots = $$('.carve .dot', sec), raf = 0;
+    var ys = paths.map(function (p) { try { var b = p.getBBox(); return (b.y + b.height / 2) / 820; } catch (e) { return .5; } });
+    function upd() {
+      raf = 0;
+      var r = sec.getBoundingClientRect(), vh = innerHeight;
+      var enter = Math.max(0, Math.min(1, (vh - r.top) / (vh * .85))), leave = Math.max(0, Math.min(1, r.bottom / (vh * .85)));
+      var a = reduce ? 1 : Math.min(enter, leave);
+      sec.style.setProperty('--carve', a.toFixed(3));
+      paths.forEach(function (p, i) { var k = Math.max(0, Math.min(1, (a - ys[i] * .45) / .55)); p.style.strokeDashoffset = (1 - k).toFixed(3); });
+      dots.forEach(function (d) { var y = +d.style.getPropertyValue('--y') || .5; d.style.opacity = a > y * .45 + .4 ? 1 : 0; });
+    }
+    addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(upd); }, { passive: true });
+    addEventListener('resize', upd); upd();
+  });
+
   /* ---------- enquiry form ---------- */
   var TOURS = D.tours || [], TICKETS = D.tickets || [];
   function tourBy(slug) { return TOURS.filter(function (t) { return t.slug === slug; })[0]; }
@@ -258,7 +384,7 @@
     function collect() {
       var t = tourBy(sel.value);
       var tickets = $$('[name=tickets]:checked', f).map(function (c) { var x = TICKETS.filter(function (k) { return k.id === c.value; })[0]; return x.label + ' (€' + x.price + ' pp)'; });
-      return { tour: t ? t.name : 'Not sure yet / custom request', tourSlug: sel.value, date: val('date'), adults: cnt.adults, children: cnt.children, ages: val('ages'), name: val('name'), email: val('email'), phone: val('phone'), message: val('message'), tickets: tickets, website: val('website') };
+      return { tour: t ? t.name : 'Not sure yet / custom request', tourSlug: sel.value, date: val('date'), time: val('time'), adults: cnt.adults, children: cnt.children, ages: val('ages'), name: val('name'), email: val('email'), phone: val('phone'), message: val('message'), tickets: tickets, website: val('website') };
     }
     function check(d) {
       $$('.err', f).forEach(function (e) { e.classList.remove('err'); });
@@ -272,7 +398,7 @@
     }
     function message(d) {
       var date = d.date ? new Date(d.date + 'T12:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : 'flexible';
-      var L = ['Hello Mirna, I would like to enquire about:', '• Tour: ' + d.tour, '• Preferred date: ' + date, '• Guests: ' + d.adults + ' adult' + (d.adults > 1 ? 's' : '') + (d.children ? ', ' + d.children + ' child' + (d.children > 1 ? 'ren' : '') + (d.ages ? ' (ages ' + d.ages + ')' : '') : '')];
+      var L = ['Hello Mirna, I would like to enquire about:', '• Tour: ' + d.tour, '• Preferred date: ' + date + (d.time ? ', ' + d.time.toLowerCase() : ''), '• Guests: ' + d.adults + ' adult' + (d.adults > 1 ? 's' : '') + (d.children ? ', ' + d.children + ' child' + (d.children > 1 ? 'ren' : '') + (d.ages ? ' (ages ' + d.ages + ')' : '') : '')];
       if (d.tickets.length) L.push('• Include tickets: ' + d.tickets.join(', '));
       if (d.message) L.push('• Message: ' + d.message);
       L.push('', d.name + (d.email ? ' · ' + d.email : '') + (d.phone ? ' · ' + d.phone : ''));

@@ -129,7 +129,7 @@ ${noindex || DRAFT ? '<meta name="robots" content="noindex">' : ''}
 <meta name="theme-color" content="#272838"><meta name="color-scheme" content="light dark"><link rel="icon" href="/img/favicon.png" type="image/png"><link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
 <script>${THEME_BOOT}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..500&family=Inter:wght@400..700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Inter:wght@400..700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/site.css?v=${V.css}">
 ${ld.map((o) => `<script type="application/ld+json">${JSON.stringify(o).replace(/</g, '\\u003c')}</script>`).join('\n')}
 </head>`;
@@ -184,8 +184,11 @@ function enquiryForm(selected = '') {
   const opts = S.categories.map((c) => `<optgroup label="${esc(c.name)}">${TOURS.filter((t) => t.category === c.id).map((t) => `<option value="${t.slug}"${t.slug === selected ? ' selected' : ''}>${esc(t.name)}</option>`).join('')}</optgroup>`).join('');
   return `<div class="enq-wrap" data-enq>
 <form class="form" novalidate>
-  <label>Tour<select name="tour"><option value="">Not sure yet / custom request</option>${opts}</select></label>
-  <label>Preferred date<input type="date" name="date"></label>
+  <div class="fld"><span class="flabel" id="tl-${selected || 'x'}">Tour</span><div class="dd" data-dd><select name="tour" class="native" tabindex="-1" aria-hidden="true"><option value="">Not sure yet / custom request</option>${opts}</select><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="tl-${selected || 'x'}"><span>Not sure yet / custom request</span><svg viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button><div class="dd-pop" role="listbox" hidden></div></div></div>
+  <div class="two">
+    <div class="fld"><span class="flabel">Preferred date</span><div class="dp" data-dp><input type="hidden" name="date"><button type="button" class="dd-btn dp-btn" aria-haspopup="dialog" aria-expanded="false">${I.cal}<span>Choose a date</span></button><div class="dp-pop" role="dialog" aria-label="Choose a date" hidden></div></div></div>
+    <div class="fld"><span class="flabel">Time of day</span><div class="dd" data-dd><select name="time" class="native" tabindex="-1" aria-hidden="true"><option value="">Flexible</option><option>Morning</option><option>Midday</option><option>Afternoon</option><option>Evening</option></select><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false">${I.clock}<span>Flexible</span><svg viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button><div class="dd-pop" role="listbox" hidden></div></div></div>
+  </div>
   <div class="two">
     <label>Adults<span class="step"><button type="button" data-s="adults" data-d="-1" aria-label="Fewer adults">−</button><b data-v="adults">2</b><button type="button" data-s="adults" data-d="1" aria-label="More adults">+</button></span><input type="hidden" name="adults" value="2"></label>
     <label>Children<span class="step"><button type="button" data-s="children" data-d="-1" aria-label="Fewer children">−</button><b data-v="children">0</b><button type="button" data-s="children" data-d="1" aria-label="More children">+</button></span><input type="hidden" name="children" value="0"></label>
@@ -218,9 +221,11 @@ const rozeta = `<svg class="rozeta" viewBox="0 0 120 120" aria-label="Licensed g
 const arch = `<div class="arch rv"><div class="arch-in"><div><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="currentColor"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8" fill="currentColor"/></svg>Mirna’s portrait</div></div>${rozeta}</div>`;
 function reviewsBlock() {
   const items = S.reviews.items || [];
-  const cards = items.length ? items.map((r) => `<figure class="rev rv">${'<span class="corner c1"></span><span class="corner c2"></span><span class="corner c3"></span><span class="corner c4"></span>'}${stars}<blockquote>“${esc(r.text)}”</blockquote><figcaption><span><b>${esc(r.name)}</b> · ${esc(r.country || '')}${r.date ? ' · ' + esc(r.date) : ''}</span><span class="ta"><i></i>${esc(r.source || 'Tripadvisor')}</span></figcaption></figure>`).join('')
-    : [1, 2, 3].map((i) => `<figure class="rev ph rv d${i - 1}"><span class="corner c1"></span><span class="corner c2"></span><span class="corner c3"></span><span class="corner c4"></span>${stars}<blockquote>${DRAFT ? 'A verified guest review goes here: the guest’s own words, unedited, from Tripadvisor or Google.' : ''}</blockquote><figcaption><span><b>Guest name</b> · Country · Month year</span><span class="ta"><i></i>Tripadvisor</span></figcaption></figure>`).join('');
-  return `<div class="rows">${cards}</div>${notes([S.reviews.note])}
+  const corners = '<span class="corner c1"></span><span class="corner c2"></span><span class="corner c3"></span><span class="corner c4"></span>';
+  const cards = items.length ? items.map((r) => `<figure class="rev">${corners}${stars}${r.title ? `<h3>${esc(r.title)}</h3>` : ''}<blockquote>“${esc(r.text)}”</blockquote><figcaption><span><b>${esc(r.name)}</b>${r.country ? ' · ' + esc(r.country) : ''}${r.date ? ' · ' + esc(r.date) : ''}</span>${r.source ? `<span class="ta"><i></i>${esc(r.source)}</span>` : ''}</figcaption></figure>`).join('')
+    : [1, 2, 3, 4, 5].map(() => `<figure class="rev ph">${corners}${stars}<blockquote>${DRAFT ? 'A verified guest review goes here: the guest’s own words, unedited, from Tripadvisor or Google.' : ''}</blockquote><figcaption><span><b>Guest name</b> · Country · Month year</span></figcaption></figure>`).join('');
+  return `<div class="revs" data-revs><div class="revs-vp" tabindex="0" role="region" aria-label="Guest reviews. Scroll sideways to read more."><div class="revs-track">${cards}</div></div>
+<div class="revs-ctl"><button type="button" class="jr-b" data-rv="-1" aria-label="Previous review">←</button><button type="button" class="revs-pause" data-rv-pause aria-pressed="false"><i aria-hidden="true"></i><span>Pause</span></button><button type="button" class="jr-b" data-rv="1" aria-label="Next review">→</button></div></div>${notes([S.reviews.note])}
 <p style="margin-top:1.2rem"><a class="link" href="${S.contact.tripadvisor}" rel="noopener">Read the reviews on Tripadvisor →</a></p>`;
 }
 const crumbs = (arr) => `<nav class="crumbs" aria-label="Breadcrumb">${arr.map(([h, l], i) => (i < arr.length - 1 ? `<a href="${h}">${esc(l)}</a><span aria-hidden="true">/</span>` : `<span aria-current="page">${esc(l)}</span>`)).join('')}</nav>`;
@@ -266,6 +271,52 @@ function journey({ cfg, stops, title, intro, hint, label, end, endText, endCta, 
   <div class="jr-view" hidden><div class="jr-view-pic"><img alt="" draggable="false"></div><div class="jr-view-top"><p><small>Look around</small><b></b></p><button type="button" class="jr-view-x" data-view-close aria-label="Close">×</button></div><div class="jr-view-bar"><div class="jr-view-tabs"></div><a class="jr-svbtn" target="_blank" rel="noopener"><b>360°</b><span>Street View</span></a></div><span class="jr-view-hint">Drag to look around</span></div>
   <p class="jr-live sr" role="status" aria-live="polite"></p>
 </div>`;
+}
+
+/* Carved copper panels beside "Featured tours", like the hammered patterns on a Bosnian džezva.
+   Every engraved line has pathLength 1, so site.js can cut it in as you scroll. */
+function carveSVG(side) {
+  const H = 820, W = 120, cx = 60, P = [];
+  const eg = (d, extra = '') => P.push(`<path class="eg" pathLength="1" d="${d}"${extra}/>`);
+  // border: double line and a row of punched dots
+  eg(`M14 26 V${H - 26}`); eg(`M106 26 V${H - 26}`); eg(`M22 34 V${H - 34}`); eg(`M98 34 V${H - 34}`);
+  for (let y = 44; y < H - 40; y += 14) P.push(`<circle class="dot" cx="18" cy="${y}" r="1.4" style="--y:${(y / H).toFixed(3)}"/><circle class="dot" cx="102" cy="${y}" r="1.4" style="--y:${(y / H).toFixed(3)}"/>`);
+  // scallops along the inner border
+  let sl = `M22 40`, sr = `M98 40`;
+  for (let y = 40; y < H - 46; y += 20) { sl += ` Q32 ${y + 10} 22 ${y + 20}`; sr += ` Q88 ${y + 10} 98 ${y + 20}`; }
+  eg(sl); eg(sr);
+  // the vine
+  let v = `M${cx} 70`;
+  for (let y = 70; y < H - 80; y += 60) v += ` C${cx + 26} ${y + 15} ${cx + 26} ${y + 45} ${cx} ${y + 60}`.replace(/(\d+) (\d+) (\d+) (\d+) /, '$1 $2 $3 $4 ');
+  eg(v);
+  let v2 = `M${cx} 70`;
+  for (let y = 70; y < H - 80; y += 60) v2 += ` C${cx - 26} ${y + 15} ${cx - 26} ${y + 45} ${cx} ${y + 60}`;
+  eg(v2);
+  // leaves with a midrib, alternating sides
+  for (let y = 100, k = 0; y < H - 90; y += 60, k++) {
+    if ([2, 6, 10].includes(k)) continue;
+    const s = k % 2 ? -1 : 1, x0 = cx + s * 20;
+    eg(`M${x0} ${y} q${s * 16} -18 ${s * 30} -6 q${-s * 12} 16 ${-s * 30} 6z`);
+    eg(`M${x0} ${y} l${s * 24} -4`);
+  }
+  // three rosettes, like the flower on the džezva
+  for (const y of [190, 430, 670]) {
+    P.push(`<circle class="eg" pathLength="1" cx="${cx}" cy="${y}" r="27"/>`);
+    for (let a = 0; a < 8; a++) {
+      const t = (a * Math.PI) / 4, x1 = cx + Math.cos(t) * 21, y1 = y + Math.sin(t) * 21, n = (a * 45).toFixed(0);
+      eg(`M${cx} ${y} Q${(cx + Math.cos(t - 0.42) * 15).toFixed(1)} ${(y + Math.sin(t - 0.42) * 15).toFixed(1)} ${x1.toFixed(1)} ${y1.toFixed(1)} Q${(cx + Math.cos(t + 0.42) * 15).toFixed(1)} ${(y + Math.sin(t + 0.42) * 15).toFixed(1)} ${cx} ${y}`);
+    }
+    P.push(`<circle class="eg" pathLength="1" cx="${cx}" cy="${y}" r="5"/>`);
+    for (let a = 0; a < 16; a++) { const t = (a * Math.PI) / 8; P.push(`<circle class="dot" cx="${(cx + Math.cos(t) * 33).toFixed(1)}" cy="${(y + Math.sin(t) * 33).toFixed(1)}" r="1.3" style="--y:${(y / H).toFixed(3)}"/>`); }
+  }
+  // crowns at the top and bottom
+  eg(`M30 60 Q${cx} 20 90 60`); eg(`M38 60 Q${cx} 34 82 60`); eg(`M30 ${H - 60} Q${cx} ${H - 20} 90 ${H - 60}`); eg(`M38 ${H - 60} Q${cx} ${H - 34} 82 ${H - 60}`);
+  const id = 'cu' + side;
+  return `<svg class="carve ${side}" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><defs>
+<linearGradient id="${id}" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6e3517"/><stop offset=".22" stop-color="#c47647"/><stop offset=".5" stop-color="#f1bf92"/><stop offset=".72" stop-color="#b8693c"/><stop offset="1" stop-color="#5e2c12"/></linearGradient>
+<linearGradient id="${id}s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".0"/><stop offset=".5" stop-color="#fff" stop-opacity=".22"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>
+<g class="plate"><rect x="6" y="6" width="${W - 12}" height="${H - 12}" rx="${(W - 12) / 2}" fill="url(#${id})"/><rect class="sheen" x="6" y="6" width="${W - 12}" height="${H - 12}" rx="${(W - 12) / 2}" fill="url(#${id}s)"/></g>
+<g class="lines lo">${P.join('')}</g><g class="lines hi">${P.join('')}</g></svg>`;
 }
 
 function routeBlock(t) {
@@ -329,7 +380,7 @@ const emit = (url, html) => out.push([url, html]);
   <p class="lead rv d2" style="font-family:var(--sans);font-size:1.05rem;margin-top:1rem">Walks through the Old Town, Bosnian coffee, food, and day trips to Blagaj, Počitelj and Kravice. Every tour is planned personally, at your pace.</p></div>
 </div></section>
 
-<section class="sec alt"><div class="wrap">
+<section class="sec alt carved" data-carve>${carveSVG('l')}${carveSVG('r')}<div class="wrap">
   <div class="head-row"><div><p class="eyebrow rv">${mini}Featured tours</p><h2 class="rv d1">Start <em>here</em></h2></div><a class="btn line sm rv" href="/tours/">All tours ${I.arrow}</a></div>
   <div class="cards four">${featured.map(card).join('')}</div>
 </div></section>
@@ -379,11 +430,13 @@ const emit = (url, html) => out.push([url, html]);
 }
 
 // TOURS CATALOGUE
+const CATC = { city: '#0a8a71', food: '#c47647', daytrip: '#c8271c', experience: '#c9961a' };
 {
   const c = [['/', 'Home'], ['/tours/', 'Tours & Experiences']];
   const body = phead(c, 'Tours <em>&amp; experiences</em>', 'Private walks in Mostar, food and culture, and day trips around Herzegovina. Every tour can be adjusted to your time, pace and interests.') + `
-<div class="wrap"><nav class="filters" aria-label="Tour categories">${S.categories.map((x) => `<a href="#${x.id}">${esc(x.name)}</a>`).join('')}<a href="#on-request">On request</a></nav>
-${S.categories.map((x) => `<section class="cat" id="${x.id}"><h2 class="rv">${esc(x.name)}</h2><p class="rv d1">${esc(x.intro)}</p><div class="cards three">${TOURS.filter((t) => t.category === x.id).map(card).join('')}</div></section>`).join('')}
+<div class="filters-wrap"><nav class="filters" aria-label="Tour categories" data-spy>${S.categories.map((x) => `<a href="#${x.id}" style="--c:${CATC[x.id] || '#272838'}"><i aria-hidden="true"></i>${esc(x.name)}<span>${TOURS.filter((t) => t.category === x.id).length}</span></a>`).join('')}<a href="#on-request" style="--c:#272838"><i aria-hidden="true"></i>On request<span>${S.onRequest.length}</span></a></nav></div>
+<div class="wrap">
+${S.categories.map((x) => { const list = TOURS.filter((t) => t.category === x.id); return `<section class="cat" id="${x.id}" style="--c:${CATC[x.id] || '#272838'}"><h2 class="rv"><i class="cdot" aria-hidden="true"></i>${esc(x.name)}</h2><p class="rv d1">${esc(x.intro)}</p><div class="cards ${list.length === 4 ? 'four' : list.length === 2 ? 'two' : 'three'}">${list.map(card).join('')}</div></section>`; }).join('')}
 <section class="cat" id="on-request"><h2 class="rv">More on request</h2><p class="rv d1">Ask about these if they fit your plans. Details and prices are confirmed personally.</p>
 <ul class="onreq">${S.onRequest.map((n) => `<li class="rv"><b>${esc(n)}</b><a class="btn sm line" href="${wa('Hello Mirna, I would like to ask about: ' + n)}" data-tour="${esc(n)}">Ask</a></li>`).join('')}</ul>${notes(['These products have titles only in the brief. Send descriptions, prices and photos to turn them into full tour pages.'])}</section>
 <section class="cat"><h2 class="rv">Private and tailor-made</h2><p class="rv d1">Want a different route, more time at one stop or a combination of tours? Tell us what you would like to see.</p><a class="btn" href="/contact/">Plan a custom tour</a></section>

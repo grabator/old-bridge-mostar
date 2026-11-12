@@ -20,6 +20,7 @@ export async function onRequestPost({ request, env }) {
   const rows = [
     ['Tour', clean(d.tour, 200)],
     ['Preferred date', clean(d.date, 20) || 'flexible'],
+    ['Time of day', clean(d.time, 20) || 'flexible'],
     ['Adults', clean(d.adults, 3)],
     ['Children', clean(d.children, 3) + (d.ages ? ' (ages ' + clean(d.ages, 60) + ')' : '')],
     ['Tickets', (Array.isArray(d.tickets) ? d.tickets.map((t) => clean(t, 80)).join(', ') : '') || 'none'],

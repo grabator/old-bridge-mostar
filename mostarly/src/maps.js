@@ -55,7 +55,11 @@
     this.gBase = el('g', { class: 'base' }, this.svg); this.gRoute = el('g', { class: 'route' }, this.svg); this.gPins = el('g', { class: 'pins' }, this.svg);
   }
   MapView.prototype.k = function () { var vb = this.vb || [0, 0, 1000, 700]; return vb[2] / 600; }; // pin scale follows zoom
-  MapView.prototype.setVB = function (vb) { this.vb = vb; this.svg.setAttribute('viewBox', vb.map(function (n) { return n.toFixed(1); }).join(' ')); this.svg.style.setProperty('--k', this.k()); };
+  MapView.prototype.setVB = function (vb) {
+    this.vb = vb; this.svg.setAttribute('viewBox', vb.map(function (n) { return n.toFixed(1); }).join(' '));
+    var k = this.k(); if (Math.abs(k - (this.lastK || 0)) > .004) { this.svg.style.setProperty('--k', k.toFixed(4)); this.lastK = k; }
+    if (this.sat) { var sc = this.host.clientWidth / vb[2]; this.sat.forEach(function (t) { t.el.style.transform = 'translate3d(' + ((t.x - vb[0]) * sc).toFixed(2) + 'px,' + ((t.y - vb[1]) * sc).toFixed(2) + 'px,0) scale(' + sc.toFixed(5) + ')'; }); }
+  };
   MapView.prototype.fit = function (ids, pad, aspect) {
     var proj = this.view === 'oldtown' ? po : pr, xs = [], ys = [];
     ids.forEach(function (id) { var p = PLACES[id]; if (!p) return; var q = proj(p.lon, p.lat); xs.push(q[0]); ys.push(q[1]); });
@@ -73,14 +77,15 @@
       region.land.forEach(function (r) { el('path', { d: pathFrom(r, pr, true), class: 'land' }, g); });
       region.bih.forEach(function (r) { el('path', { d: pathFrom(r, pr, true), class: 'bih' }, g); });
       region.borders.forEach(function (r) { el('path', { d: pathFrom(r, pr, false), class: 'border' }, g); });
-      if (SAT) {
-        var gs = el('g', { class: 'sat' }, g);
+      if (SAT) { // satellite photos as plain <img> layers moved by the GPU: nothing is redrawn while the camera flies
+        var layer = document.createElement('div'), self = this; layer.className = 'jr-satlayer'; layer.setAttribute('aria-hidden', 'true');
+        this.host.insertBefore(layer, this.svg); this.sat = [];
         SAT.layers.forEach(function (L, i) {
-          var a = pr(L.bbox[0], L.bbox[3]), b = pr(L.bbox[2], L.bbox[1]);
-          var im = el('image', { x: a[0].toFixed(2), y: a[1].toFixed(2), width: (b[0] - a[0]).toFixed(2), height: (b[1] - a[1]).toFixed(2), preserveAspectRatio: 'none', 'data-src': '/geo/' + L.file }, gs);
-          if (!i) im.setAttribute('href', '/geo/' + L.file);
+          var a = pr(L.bbox[0], L.bbox[3]), b = pr(L.bbox[2], L.bbox[1]), im = new Image();
+          im.alt = ''; im.decoding = 'async'; im.draggable = false; im.style.width = (b[0] - a[0]).toFixed(2) + 'px'; im.style.height = (b[1] - a[1]).toFixed(2) + 'px';
+          if (!i) im.src = '/geo/' + L.file; else setTimeout(function () { im.src = '/geo/' + L.file; }, 1200); // sharper layers after the first view
+          layer.appendChild(im); self.sat.push({ el: im, x: a[0], y: a[1] });
         });
-        setTimeout(function () { $$('image[data-src]', gs).forEach(function (im) { if (!im.getAttribute('href')) im.setAttribute('href', im.getAttribute('data-src')); }); }, 1200); // sharper layers after the first view
       }
       region.bih.forEach(function (r) { el('path', { d: pathFrom(r, pr, true), class: 'bih-line' }, g); });
       [[NERETVA, 'river big'], [BUNA, 'river'], [TREBIZAT, 'river']].forEach(function (r) { el('path', { d: smooth(r[0].map(function (p) { return pr(p[0], p[1]); })), class: r[1] }, g); });
