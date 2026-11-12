@@ -43,7 +43,7 @@
   })();
 
   /* ---------- kilim engine: pixel grids -> svg rects ---------- */
-  var C = { n: '#2b2a3c', c: '#f6f0e6', m: '#1de9b6', k: '#d08a55', r: '#c8423a', y: '#f2cf3a', e: '#0a8a71' };
+  var C = { n: '#272838', c: '#f6f0e6', m: '#48e5c2', k: '#d08a55', r: '#c8423a', y: '#fcec52', e: '#0a8a71' };
   function rects(grid, map, ox, oy) {
     ox = ox || 0; oy = oy || 0; var s = '';
     grid.forEach(function (row, y) { var x = 0; while (x < row.length) { var ch = row[x]; if (ch === '.' || !map[ch]) { x++; continue; } var e = x; while (e < row.length && row[e] === ch) e++; s += '<rect x="' + (x + ox) + '" y="' + (y + oy) + '" width="' + (e - x) + '" height="1" fill="' + map[ch] + '"/>'; x = e; } });
@@ -120,7 +120,7 @@
       var root = document.documentElement;
       if (user) { root.classList.add('theme-anim'); setTimeout(function () { root.classList.remove('theme-anim'); }, 700); }
       root.classList.toggle('is-night', n);
-      if (meta) meta.setAttribute('content', n ? '#14131d' : '#2b2a3c');
+      if (meta) meta.setAttribute('content', n ? '#14131d' : '#272838');
       $$('.tswitch button').forEach(function (b) { b.setAttribute('aria-pressed', String((b.getAttribute('data-t') === 'night') === n)); });
       if (now) {
         $('i', now).textContent = n ? '☾' : '☀';
@@ -189,7 +189,7 @@
   (function () {
     var rail = $('#rail'); if (!rail) return;
     var svg = $('svg', rail), N = 34, s = '', gr = ['#9b958b', '#857f75', '#b4ada1', '#6f6a61'];
-    for (var i = 0; i < N; i++) s += '<ellipse cx="50%" cy="' + ((i + .5) / N * 100) + '%" rx="' + (3.2 + ((i * 37) % 10) / 10 * 1.4) + '" ry="' + (2 + ((i * 53) % 10) / 10 * .9) + '" fill="' + (i % 9 === 8 ? '#1de9b6' : gr[i % 4]) + '" stroke="#f6f0e6" stroke-width=".8"/>';
+    for (var i = 0; i < N; i++) s += '<ellipse cx="50%" cy="' + ((i + .5) / N * 100) + '%" rx="' + (3.2 + ((i * 37) % 10) / 10 * 1.4) + '" ry="' + (2 + ((i * 53) % 10) / 10 * .9) + '" fill="' + (i % 9 === 8 ? '#48e5c2' : gr[i % 4]) + '" stroke="#f6f0e6" stroke-width=".8"/>';
     svg.innerHTML = s; var st = $$('ellipse', svg);
     function upd() { var max = document.documentElement.scrollHeight - innerHeight, p = max > 0 ? scrollY / max : 0, k = Math.round(p * N); st.forEach(function (e, i) { e.classList.toggle('on', i < k); }); rail.classList.toggle('show', scrollY > innerHeight * .6); }
     addEventListener('scroll', upd, { passive: true }); upd();

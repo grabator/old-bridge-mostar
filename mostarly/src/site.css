@@ -1,8 +1,8 @@
 /* Mostarly Guide — editorial, warm neutrals, restrained type. Kilim, kaldrma and copper as quiet details. */
 :root{
-  --navy:#2b2a3c;--navy2:#22212f;--ink:#26252f;--ink2:#4a4642;--mut:#6f6a66;
+  --navy:#272838;--navy2:#1f2030;--ink:#26252f;--ink2:#4a4642;--mut:#6f6a66;
   --cream:#f6f0e6;--paper:#fffaf2;--stone:#ece3d4;--line:#ddd2bf;
-  --mint:#1de9b6;--emer:#0a8a71;--copper:#a85f36;--copper2:#e2a272;--red:#b93a32;--yellow:#f2cf3a;
+  --mint:#48e5c2;--emer:#0a8a71;--copper:#a85f36;--copper2:#e2a272;--red:#b93a32;--yellow:#fcec52;
   --cu:linear-gradient(135deg,#8f4a26 0%,#c97b4b 35%,#f0b98d 50%,#c47647 65%,#8f4a26 100%);
   --g:1.25rem;--r:24px;--max:1200px;
   --serif:Fraunces,Georgia,'Times New Roman',serif;--sans:Inter,system-ui,-apple-system,'Segoe UI',sans-serif;
@@ -110,7 +110,7 @@ html.is-night .cbox .ci:not([style]){background:#3a3950}
 .sheet .sheet-foot a{color:#cfc9dc;text-decoration:none}
 
 /* draft notes (only while site.draft = true) */
-.draftbar{position:fixed;top:calc(.55rem + env(safe-area-inset-top));left:50%;transform:translateX(-50%);z-index:95;background:var(--yellow);color:var(--navy);font:700 .62rem/1 var(--sans);letter-spacing:.12em;text-transform:uppercase;padding:.4rem .6rem;border-radius:99px;box-shadow:0 4px 12px rgba(0,0,0,.2);pointer-events:none;white-space:nowrap}
+.draftbar{position:fixed;bottom:calc(5.2rem + env(safe-area-inset-bottom));right:.7rem;z-index:95;background:var(--yellow);color:var(--navy);font:700 .62rem/1 var(--sans);letter-spacing:.12em;text-transform:uppercase;padding:.4rem .6rem;border-radius:99px;box-shadow:0 4px 12px rgba(0,0,0,.2);pointer-events:none;white-space:nowrap}
 .note{display:flex;gap:.6rem;background:#fff6c9;border:1px dashed #d8b400;color:#5b4a00;border-radius:14px;padding:.75rem .9rem;font-size:.85rem;line-height:1.45;margin:.8rem 0}
 .note b{white-space:nowrap}
 .note ul{padding-left:1rem}
@@ -279,7 +279,7 @@ body:not(.ready) .hero *{animation-play-state:paused!important}
 /* catalogue */
 .filters{display:flex;gap:.5rem;overflow-x:auto;padding:0 var(--g) .4rem;margin:0 calc(var(--g)*-1) 1.4rem;scrollbar-width:none;position:sticky;top:69px;z-index:30;background:linear-gradient(var(--cream) 80%,transparent)}
 .filters::-webkit-scrollbar{display:none}
-.filters a{flex:none;font:600 .88rem var(--sans);text-decoration:none;color:var(--navy);background:var(--paper);border:1px solid var(--line);border-radius:99px;padding:.55rem 1rem}
+.filters a{flex:none;font:600 .88rem var(--sans);text-decoration:none;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:99px;padding:.55rem 1rem}
 .filters a:hover{border-color:var(--navy)}
 .cat{padding-top:1.4rem;margin-bottom:2.6rem}
 .cat>h2{font-size:clamp(1.6rem,5vw,2.3rem);margin-bottom:.4rem}
@@ -411,10 +411,10 @@ body:not(.ready) .hero *{animation-play-state:paused!important}
 .coffee.in .steam path:nth-child(1){animation-delay:4.2s}.coffee.in .steam path:nth-child(2){animation-delay:4.9s}.coffee.in .steam path:nth-child(3){animation-delay:5.6s}
 @keyframes steam{0%{opacity:0;transform:translateY(6px)}40%{opacity:.75}100%{opacity:0;transform:translateY(-16px)}}
 .words{display:flex;flex-wrap:wrap;gap:.5rem;margin:1.1rem 0}
-.words button{font:600 .95rem var(--sans);color:var(--navy);background:var(--paper);border:1px solid var(--line);border-radius:99px;padding:.55rem 1rem;cursor:pointer;min-height:44px}
+.words button{font:600 .95rem var(--sans);color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:99px;padding:.55rem 1rem;cursor:pointer;min-height:44px}
 .words button[aria-pressed=true]{background:var(--navy);color:#fff;border-color:var(--navy)}
 .word{position:relative;background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:1.3rem 1.3rem 1.2rem;min-height:150px}
-.word .w{font:italic 400 2.3rem/1 var(--serif);color:var(--navy)}
+.word .w{font:italic 400 2.3rem/1 var(--serif);color:var(--ink)}
 .word .say{font-size:.8rem;color:var(--copper);letter-spacing:.06em;margin:.4rem 0 .7rem;display:block}
 .word p{color:var(--ink2)}
 .word.swap{animation:swap .45s ease}
@@ -432,7 +432,7 @@ body:not(.ready) .hero *{animation-play-state:paused!important}
 .foot .legal{grid-column:1/-1;border-top:1px solid rgba(255,255,255,.08);padding-top:1.2rem;font-size:.78rem;display:flex;flex-wrap:wrap;gap:.4rem 1.2rem;justify-content:space-between}
 
 /* sticky mobile action */
-.sticky{position:fixed;left:.7rem;right:.7rem;bottom:calc(.7rem + env(safe-area-inset-bottom));z-index:35;display:flex;align-items:center;gap:.6rem;padding:.5rem .5rem .5rem 1rem;border-radius:999px;background:rgba(43,42,60,.95);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:#fff;box-shadow:0 14px 34px -10px rgba(0,0,0,.45);transition:transform .45s cubic-bezier(.2,.8,.2,1),opacity .3s}
+.sticky{position:fixed;left:.7rem;right:.7rem;bottom:calc(.7rem + env(safe-area-inset-bottom));z-index:35;display:flex;align-items:center;gap:.6rem;padding:.5rem .5rem .5rem 1rem;border-radius:999px;background:rgba(39,40,56,.95);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:#fff;box-shadow:0 14px 34px -10px rgba(0,0,0,.45);transition:transform .45s cubic-bezier(.2,.8,.2,1),opacity .3s}
 .sticky.off{transform:translateY(150%);opacity:0}
 .sticky div{font-size:.76rem;line-height:1.25;min-width:0}
 .sticky div b{display:block;font-size:.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -492,7 +492,7 @@ body:not(.ready) .hero *{animation-play-state:paused!important}
   .foot .wrap{grid-template-columns:1.3fr 1fr 1fr 1fr;padding-bottom:2.5rem}
   .rail{right:12px}
   .filters{top:76px}
-  .draftbar{top:auto;bottom:1rem;left:1rem;transform:none}
+  .draftbar{bottom:1rem;right:1rem}
   .tlayout .rows{display:flex;overflow-x:auto;margin:0;padding:0 0 1rem}
   .tlayout .rev{flex:0 0 68%}
 }
@@ -502,3 +502,11 @@ body:not(.ready) .hero *{animation-play-state:paused!important}
   .weave{clip-path:none}.loader{display:none}.sigsvg text{fill-opacity:1;stroke-dashoffset:0}.lvl{transform:none}
 }
 @media (min-width:1000px){.cards.four .crow{flex-wrap:wrap;gap:.4rem}}
+/* official logo (horizontal): light version over the hero and at night, dark version on light pages */
+.nav .home img{height:34px;width:auto}
+.nav .lg-light{display:none}
+.nav:not(.solid) .lg-dark,html.is-night .nav .lg-dark{display:none}
+.nav:not(.solid) .lg-light,html.is-night .nav .lg-light{display:block}
+.foot .flogo{height:40px;width:auto;margin-bottom:.9rem}
+.loom .lg{object-fit:contain;width:calc(100% - 54px);height:calc(100% - 54px)}
+@media (min-width:1000px){.nav .home img{height:38px}}

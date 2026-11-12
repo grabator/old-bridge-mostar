@@ -43,11 +43,11 @@ const I = {
   ig: '<svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="17.3" cy="6.7" r="1.2" fill="currentColor"/></svg>',
   menu: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16M4 16h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
   close: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
-  check: '<svg viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="27" fill="#1de9b6" opacity=".2"/><path d="M17 29l7 7 15-16" fill="none" stroke="#0a8a71" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  check: '<svg viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="27" fill="#48e5c2" opacity=".2"/><path d="M17 29l7 7 15-16" fill="none" stroke="#0a8a71" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   sun: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.5" fill="currentColor"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></g></svg>',
   moon: '<svg viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z" fill="currentColor"/></svg>'
 };
-const LOGO = (fill = '#2b2a3c', ring = '') => `<svg class="logo" viewBox="0 0 448 448" role="img" aria-label="Mostarly Guide logo"><circle cx="224" cy="224" r="${ring ? 219 : 224}" fill="${fill}"${ring ? ` stroke="${ring}" stroke-width="10"` : ''}/><g fill="none" stroke="#fff" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"><path d="M120 262V88l152 134"/><path d="M272 88v134"/><path d="M240 300v56M240 356a62 62 0 1 1 78-4"/></g><circle cx="282" cy="268" r="19" fill="#f2cf3a"/><path d="M92 282h54l-27 26z" fill="#1de9b6"/></svg>`;
+const HLOGO = '<img class="lg-dark" src="/img/logo-dark.png" alt="Mostarly Guide" width="167" height="34"><img class="lg-light" src="/img/logo-light.png" alt="Mostarly Guide" width="167" height="34">';
 const mini = '<svg data-mini aria-hidden="true"></svg>';
 const stars = '<span class="stars" aria-label="5 out of 5"><i>★</i><i>★</i><i>★</i><i>★</i><i>★</i></span>';
 const tbc = (txt = 'to confirm') => (DRAFT ? `<span class="tbc">${esc(txt)}</span>` : '');
@@ -60,14 +60,16 @@ function rects(grid, map, ox = 0, oy = 0) {
   grid.forEach((row, y) => { let x = 0; while (x < row.length) { const ch = row[x]; if (ch === '.' || !map[ch]) { x++; continue; } let e = x; while (e < row.length && row[e] === ch) e++; s += `<rect x="${x + ox}" y="${y + oy}" width="${e - x}" height="1" fill="${map[ch]}"/>`; x = e; } });
   return s;
 }
-const ART = { city: ['#2b2a3c', '#f6f0e6', '#c8423a', '#d08a55', '#1de9b6'], food: ['#5b2d22', '#f6f0e6', '#d08a55', '#f2cf3a', '#1de9b6'], daytrip: ['#0f4f45', '#f6f0e6', '#1de9b6', '#d08a55', '#f2cf3a'], experience: ['#3a3256', '#f6f0e6', '#d08a55', '#1de9b6', '#c8423a'] };
+const ART = { city: ['#272838', '#f6f0e6', '#c8423a', '#d08a55', '#48e5c2'], food: ['#5b2d22', '#f6f0e6', '#d08a55', '#fcec52', '#48e5c2'], daytrip: ['#0f4f45', '#f6f0e6', '#48e5c2', '#d08a55', '#fcec52'], experience: ['#3a3256', '#f6f0e6', '#d08a55', '#48e5c2', '#c8423a'] };
+let ARTN = 0;
 function art(t, label = true) {
+  const fid = 'fd' + (++ARTN);
   const [bg, a, b, c, d] = ART[t.category] || ART.city; let s = ''; const o = t.order || 0, sx = (o * 7) % 17, sy = (o * 5) % 17;
   for (let gy = -1; gy < 6; gy++) for (let gx = -1; gx < 8; gx++) {
     const k = (gx + gy + o + 9) % 3; const map = k === 0 ? { A: a, B: b, C: c, D: d } : k === 1 ? { A: c, B: a, C: d, D: b } : { A: d, B: c, C: a, D: b };
     s += `<g transform="translate(${gx * 17 + (gy % 2 ? 8.5 : 0) - sx} ${gy * 17 - sy})" opacity=".9">${rects(RH, map)}</g>`;
   }
-  return `<svg viewBox="0 0 100 75" preserveAspectRatio="xMidYMid slice" shape-rendering="crispEdges" role="img" aria-label="${esc(t.name)}"><rect width="100" height="75" fill="${bg}"/>${s}<rect width="100" height="75" fill="url(#fd)"/><defs><linearGradient id="fd" x1="0" y1="0" x2="0" y2="1"><stop offset=".35" stop-color="${bg}" stop-opacity=".15"/><stop offset="1" stop-color="${bg}" stop-opacity=".9"/></linearGradient></defs></svg>${label && DRAFT ? '<span class="ph">Photo coming</span>' : ''}`;
+  return `<svg viewBox="0 0 100 75" preserveAspectRatio="xMidYMid slice" shape-rendering="crispEdges" role="img" aria-label="${esc(t.name)}"><rect width="100" height="75" fill="${bg}"/>${s}<rect width="100" height="75" fill="url(#${fid})"/><defs><linearGradient id="${fid}" x1="0" y1="0" x2="0" y2="1"><stop offset=".35" stop-color="${bg}" stop-opacity=".15"/><stop offset="1" stop-color="${bg}" stop-opacity=".9"/></linearGradient></defs></svg>${label && DRAFT ? '<span class="ph">Photo coming</span>' : ''}`;
 }
 const tourImg = (t, cls = '', eager = false) => (t.image
   ? `<img src="/img/${esc(t.image)}" alt="${esc(t.imageAlt || t.name)}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async"${cls}>`
@@ -89,7 +91,7 @@ function head({ title, desc, url, image = '/img/hero-d.jpg', ld = [], noindex = 
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}"><link rel="canonical" href="${full}">
 ${noindex || DRAFT ? '<meta name="robots" content="noindex">' : ''}
 <meta property="og:type" content="website"><meta property="og:site_name" content="Mostarly Guide"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${full}"><meta property="og:image" content="${BASE + image}"><meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#2b2a3c"><meta name="color-scheme" content="light dark"><link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#272838"><meta name="color-scheme" content="light dark"><link rel="icon" href="/img/favicon.png" type="image/png"><link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
 <script>${THEME_BOOT}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..500&family=Inter:wght@400..700&display=swap" rel="stylesheet">
@@ -99,19 +101,19 @@ ${ld.map((o) => `<script type="application/ld+json">${JSON.stringify(o).replace(
 }
 function nav(current, overHero) {
   return `<header class="nav${overHero ? '' : ' solid'}">
-  <a class="home" href="/" aria-label="Mostarly Guide home">${LOGO()}<span class="brand">Mostarly<small>Guide · Mostar</small></span></a>
+  <a class="home" href="/" aria-label="Mostarly Guide home">${HLOGO}</a>
   <nav class="links" aria-label="Main">${NAV.map(([h, l]) => `<a href="${h}"${current === h ? ' aria-current="page"' : ''}>${l}</a>`).join('')}</nav>
   <div class="nav-tools"><div class="tswitch" role="group" aria-label="Day or night theme"><button type="button" data-t="day" aria-label="Day theme" aria-pressed="true">${I.sun}</button><button type="button" data-t="night" aria-label="Night theme" aria-pressed="false">${I.moon}</button></div>
   <a class="btn sm ${overHero ? 'mint' : ''} enq" href="/contact/">Enquire</a>
   <button class="menu-btn" type="button" data-menu aria-expanded="false" aria-controls="sheet" aria-label="Open menu">${I.menu}</button></div>
 </header>
-<div class="sheet" id="sheet" aria-label="Menu"><div class="sheet-top"><a class="home" href="/" style="display:flex;align-items:center;gap:.6rem;text-decoration:none">${LOGO('#38374b')}<span class="brand">Mostarly<small>Guide · Mostar</small></span></a><button class="menu-btn" type="button" data-menu aria-label="Close menu">${I.close}</button></div>
+<div class="sheet" id="sheet" aria-label="Menu"><div class="sheet-top"><a class="home" href="/" aria-label="Mostarly Guide home"><img src="/img/logo-light.png" alt="Mostarly Guide" width="167" height="34" style="height:34px;width:auto"></a><button class="menu-btn" type="button" data-menu aria-label="Close menu">${I.close}</button></div>
 <nav aria-label="Mobile">${[['/', 'Home']].concat(NAV).map(([h, l]) => `<a href="${h}">${l}</a>`).join('')}</nav>
 <div class="sheet-foot"><a class="btn wa block" href="${wa('Hello Mirna, I would like to ask about a tour in Mostar.')}">${I.wa} WhatsApp Mirna</a><a href="${tel}">${esc(S.contact.phone)}</a><a href="mailto:${S.contact.email}">${S.contact.email}</a></div></div>`;
 }
 function foot() {
   return `<footer class="foot"><div class="band" data-band="0" style="--bh:28px" aria-hidden="true"></div><div class="wrap">
-<div>${LOGO('#38374b')}<b style="margin-top:.8rem">Mostarly Guide</b><p>Licensed local guide in Mostar,<br>Bosnia and Herzegovina.</p></div>
+<div><img class="flogo" src="/img/logo-light.png" alt="Mostarly Guide" width="196" height="40" loading="lazy"><p>Licensed local guide in Mostar,<br>Bosnia and Herzegovina.</p></div>
 <div><h4>Tours</h4><ul>${S.categories.map((c) => `<li><a href="/tours/#${c.id}">${esc(c.name)}</a></li>`).join('')}</ul></div>
 <div><h4>Plan</h4><ul><li><a href="/mostar-herzegovina/">Mostar &amp; Herzegovina</a></li><li><a href="/faq/">Practical information</a></li><li><a href="/travel-professionals/">For travel professionals</a></li><li><a href="/about/">About Mirna</a></li></ul></div>
 <div><h4>Contact</h4><ul><li><a href="${tel}">${esc(S.contact.phone)}</a></li><li><a href="${wa('Hello Mirna, I would like to ask about a tour in Mostar.')}">WhatsApp</a></li><li><a href="mailto:${S.contact.email}">${S.contact.email}</a></li><li><a href="https://instagram.com/${S.contact.instagram}">Instagram @${S.contact.instagram}</a></li></ul></div>
@@ -169,15 +171,15 @@ function enquiryForm(selected = '') {
 const coffeeSVG = `<svg viewBox="0 0 320 260" aria-hidden="true"><defs><linearGradient id="cu2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8f4a26"/><stop offset=".45" stop-color="#eab087"/><stop offset=".62" stop-color="#c47647"/><stop offset="1" stop-color="#7d3f1f"/></linearGradient><clipPath id="cupIn"><path d="M196 168 h52 l-6 40 q-20 8-40 0z"/></clipPath></defs>
 <ellipse cx="190" cy="226" rx="128" ry="22" fill="url(#cu2)"/><ellipse cx="190" cy="222" rx="118" ry="17" fill="none" stroke="#fbe1c8" stroke-width="1" opacity=".55"/>
 <g class="steam" fill="none" stroke="#b9ab97" stroke-width="2.2" stroke-linecap="round"><path d="M212 150 c-6-10 6-16 0-28"/><path d="M224 152 c-6-10 6-16 0-28"/><path d="M236 150 c-6-10 6-16 0-28"/></g>
-<path d="M190 166 h64 l-8 46 q-24 10-48 0z" fill="#fffaf2" stroke="#2b2a3c" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="M190 166 h64 l-8 46 q-24 10-48 0z" fill="#fffaf2" stroke="#272838" stroke-width="2.5" stroke-linejoin="round"/>
 <g clip-path="url(#cupIn)"><rect class="lvl" x="190" y="186" width="66" height="40" fill="#5a3420"/><rect class="lvl" x="190" y="186" width="66" height="3" fill="#a8744f"/></g>
-<path d="M194 178 h56" stroke="#1de9b6" stroke-width="2.5"/><path d="M196 190 l4 4 4-4 4 4 4-4 4 4 4-4 4 4 4-4 4 4 4-4 4 4" fill="none" stroke="#a85f36" stroke-width="1.6"/>
+<path d="M194 178 h56" stroke="#48e5c2" stroke-width="2.5"/><path d="M196 190 l4 4 4-4 4 4 4-4 4 4 4-4 4 4 4-4 4 4 4-4 4 4" fill="none" stroke="#a85f36" stroke-width="1.6"/>
 <path class="stream" d="M178 112 C 186 122, 210 140, 220 176" fill="none" stroke="#5a3420" stroke-width="4" stroke-linecap="round"/>
 <g class="dz"><path d="M96 92 h70 l6 8 -14 6 6 60 q-38 14-70 0 l8-60 -12-6z" fill="url(#cu2)" stroke="#6e3517" stroke-width="2" stroke-linejoin="round"/><path d="M100 124 q32 10 62 0 M98 140 q34 10 66 0" fill="none" stroke="#fbe1c8" stroke-width="1.2" opacity=".7"/><path d="M108 150 c6-8 14-8 20 0 c6 8 14 8 20 0" fill="none" stroke="#6e3517" stroke-width="1.4"/><path d="M96 100 L 22 128" stroke="#c9a24b" stroke-width="7" stroke-linecap="round"/><path d="M60 114 l4 10 M46 119 l4 10 M74 108 l4 10" stroke="#8a6a24" stroke-width="2"/></g></svg>`;
 const rozeta = `<svg class="rozeta" viewBox="0 0 120 120" aria-label="Licensed guide, Mostar"><defs><linearGradient id="cuG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8f4a26"/><stop offset=".45" stop-color="#e7aa7c"/><stop offset=".6" stop-color="#c47647"/><stop offset="1" stop-color="#7d3f1f"/></linearGradient><path id="circ" d="M60 60m-43 0a43 43 0 1 1 86 0a43 43 0 1 1-86 0"/><radialGradient id="glG"><stop offset="0" stop-color="#fff" stop-opacity=".85"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
 <circle cx="60" cy="60" r="58" fill="url(#cuG)"/><circle cx="60" cy="60" r="52" fill="none" stroke="#fbe1c8" stroke-width=".8" opacity=".8"/>
 <g class="spin"><text font-family="Inter" font-size="8.2" font-weight="700" letter-spacing="2.2" fill="#fff4e8"><textPath href="#circ">LICENSED GUIDE · MOSTAR · BORN HERE ·</textPath></text></g>
-<circle cx="60" cy="60" r="31" fill="#2b2a3c"/><g fill="none" stroke="url(#cuG)" stroke-width="1.6" data-petals></g><circle cx="60" cy="60" r="4" fill="#f2cf3a"/><circle class="gl" id="glint" cx="40" cy="36" r="34" fill="url(#glG)"/></svg>`;
+<circle cx="60" cy="60" r="31" fill="#272838"/><g fill="none" stroke="url(#cuG)" stroke-width="1.6" data-petals></g><circle cx="60" cy="60" r="4" fill="#fcec52"/><circle class="gl" id="glint" cx="40" cy="36" r="34" fill="url(#glG)"/></svg>`;
 const arch = `<div class="arch rv"><div class="arch-in"><div><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="currentColor"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8" fill="currentColor"/></svg>Mirna’s portrait</div></div>${rozeta}</div>`;
 function reviewsBlock() {
   const items = S.reviews.items || [];
@@ -188,7 +190,7 @@ function reviewsBlock() {
 }
 const crumbs = (arr) => `<nav class="crumbs" aria-label="Breadcrumb">${arr.map(([h, l], i) => (i < arr.length - 1 ? `<a href="${h}">${esc(l)}</a><span aria-hidden="true">/</span>` : `<span aria-current="page">${esc(l)}</span>`)).join('')}</nav>`;
 const crumbLd = (arr) => ({ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: arr.map(([h, l], i) => ({ '@type': 'ListItem', position: i + 1, name: l, item: BASE + h })) });
-const orgLd = { '@context': 'https://schema.org', '@type': 'LocalBusiness', '@id': BASE + '/#business', name: 'Mostarly Guide', description: S.description, url: BASE + '/', telephone: S.contact.phone, email: S.contact.email, image: BASE + '/img/hero-d.jpg', address: { '@type': 'PostalAddress', addressLocality: 'Mostar', addressCountry: 'BA' }, areaServed: ['Mostar', 'Herzegovina'], sameAs: ['https://instagram.com/' + S.contact.instagram, S.contact.tripadvisor] };
+const orgLd = { '@context': 'https://schema.org', '@type': 'LocalBusiness', '@id': BASE + '/#business', name: 'Mostarly Guide', description: S.description, url: BASE + '/', telephone: S.contact.phone, email: S.contact.email, logo: BASE + '/img/mark-dark.png', image: BASE + '/img/hero-d.jpg', address: { '@type': 'PostalAddress', addressLocality: 'Mostar', addressCountry: 'BA' }, areaServed: ['Mostar', 'Herzegovina'], sameAs: ['https://instagram.com/' + S.contact.instagram, S.contact.tripadvisor] };
 function phead(c, h1, lead, extra = '') {
   return `<header class="phead"><div class="wrap">${crumbs(c)}<p class="eyebrow">${mini}${esc(c[c.length - 1][1])}</p><h1>${h1}</h1>${lead ? `<p class="lead">${lead}</p>` : ''}${extra}</div></header><div class="band weave" data-band="0" style="--bh:22px" aria-hidden="true"></div>`;
 }
@@ -206,7 +208,7 @@ const emit = (url, html) => out.push([url, html]);
   <picture class="night"><source media="(min-width:900px)" srcset="/img/sumrak.jpg"><img src="/img/night-m.jpg" alt="" loading="lazy"></picture>
   <div class="sky" id="sky"></div>
   <div class="hero-in">
-    <p class="kick"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M0 2h12L6 11z" fill="#1de9b6"/></svg>Licensed local guide · Mostar</p>
+    <p class="kick"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M0 2h12L6 11z" fill="#48e5c2"/></svg>Licensed local guide · Mostar</p>
     <h1><span class="ln"><span>Mostar</span></span><span class="ln"><span>through the eyes</span></span><span class="ln"><span><em>of a local.</em></span></span></h1>
     <div class="hero-row"><div>
       <p class="sub">Discover Mostar and Herzegovina with a licensed local guide. Book a private tour through the Old Town, taste Bosnian coffee, learn the stories behind the landmarks or plan a day outside the city.</p>
@@ -251,7 +253,7 @@ const emit = (url, html) => out.push([url, html]);
     <a class="tile rv" href="/mostar-herzegovina/#stari-most"><span class="ti" style="background:#d9efe8"><svg data-sign="water" data-ink="dark"></svg></span><span><b>Mostar & the Old Bridge</b><span>What to know about the city</span></span></a>
     <a class="tile rv d1" href="/mostar-herzegovina/#herzegovina"><span class="ti" style="background:#efe0cb"><svg data-sign="star" data-ink="dark"></svg></span><span><b>Around Herzegovina</b><span>Blagaj, Počitelj, Kravice</span></span></a>
     <a class="tile rv d2" href="/faq/"><span class="ti" style="background:#e3e6f2"><svg data-sign="amulet" data-ink="dark"></svg></span><span><b>Practical information</b><span>Meeting points, clothing, children</span></span></a>
-    <a class="tile rv d3" href="/mostar-herzegovina/#words"><span class="ti" style="background:#f3e3d9"><svg data-sign="eye" data-ink="dark"></svg></span><span><b>Speak a little Mostar</b><span>Ćejf, merak, polahko</span></span></a>
+    <a class="tile rv d3" href="/mostar-herzegovina/#speak"><span class="ti" style="background:#f3e3d9"><svg data-sign="eye" data-ink="dark"></svg></span><span><b>Speak a little Mostar</b><span>Ćejf, merak, polahko</span></span></a>
   </div>
 </div></section>
 
@@ -260,7 +262,7 @@ const emit = (url, html) => out.push([url, html]);
   <p class="rv d2">Send the tour you are interested in, your preferred date and how many of you are coming. You will get a personal reply with availability and the final price.</p>
   <div class="contact-row rv d3"><a class="btn mint" href="/contact/">Send an enquiry</a><a class="btn wa" href="${wa('Hello Mirna, I would like to ask about a tour in Mostar.')}">${I.wa} WhatsApp</a><a class="btn ghost" href="${tel}">${I.phone} Call</a></div>
 </div></section>`;
-  const loader = `<div class="loader" id="loader" aria-hidden="true"><div class="loom"><svg class="rh" data-rhomb viewBox="0 0 15 15"></svg>${LOGO('#2b2a3c', '#f6f0e6').replace('class="logo"', 'class="lg"')}</div></div>`;
+  const loader = `<div class="loader" id="loader" aria-hidden="true"><div class="loom"><svg class="rh" data-rhomb viewBox="0 0 15 15"></svg><img class="lg" src="/img/mark-light.png" alt=""></div></div>`;
   emit('/', head({ title: 'Mostarly Guide · Private Tours in Mostar with a Licensed Local Guide', desc: S.description, url: '/', ld: [orgLd] }) + page({ current: '/', hero: true, body, extraTop: loader, stickyArgs: ['Tours in Mostar', 'With a licensed local guide', '/contact/', 'Hello Mirna, I would like to ask about a tour in Mostar.'] }));
 }
 
@@ -355,7 +357,7 @@ ${notes(['Destination texts use facts we verified (Old Bridge dates, UNESCO). Kr
 <div class="prose"><p class="rv">Mostar is about 130 km by road from Sarajevo, about 140 km from Dubrovnik and about 170 km from Split. Many visitors come for a day from the Croatian coast; staying a night lets you see the Old Town in the quiet of the early morning and in the evening, when the bridge is lit.</p>${notes(['Distances are approximate road distances: confirm or adjust, and add your own advice on buses, trains, parking and border crossings.'])}</div>
 </div></section>
 
-<section class="sec alt" id="words"><div class="wrap speak-grid">
+<section class="sec alt" id="speak"><div class="wrap speak-grid">
   <div class="coffee rv">${coffeeSVG}</div>
   <div><p class="eyebrow rv">${mini}Speak a little Mostar</p><h2 class="rv d1">A few words <em>before you come</em></h2><p class="lead rv d2">Locals will smile when you use them, and you will hear them on every tour.</p><div class="words" id="words"></div><div class="word" id="word" aria-live="polite"></div></div>
 </div></section>
@@ -434,7 +436,6 @@ fs.writeFileSync(path.join(DIST, 'site.css'), CSS);
 fs.writeFileSync(path.join(DIST, 'site.js'), JS);
 fs.cpSync(path.join(ROOT, 'src/img'), path.join(DIST, 'img'), { recursive: true });
 fs.cpSync(path.join(ROOT, 'admin'), path.join(DIST, 'admin'), { recursive: true });
-fs.writeFileSync(path.join(DIST, 'favicon.svg'), LOGO().replace('class="logo" ', 'xmlns="http://www.w3.org/2000/svg" '));
 const urls = out.map(([u]) => u).filter((u) => u !== '/404' && !['/privacy/', '/terms/', '/cancellation-policy/'].includes(u));
 fs.writeFileSync(path.join(DIST, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((u) => `<url><loc>${BASE}${u}</loc></url>`).join('\n')}\n</urlset>\n`);
 fs.writeFileSync(path.join(DIST, 'robots.txt'), DRAFT ? 'User-agent: *\nDisallow: /\n' : `User-agent: *\nAllow: /\nDisallow: /admin/\nSitemap: ${BASE}/sitemap.xml\n`);
