@@ -206,14 +206,95 @@ function enquiryForm(selected = '') {
 <div class="done" role="status" aria-live="polite">${I.check}<h3>Thank you</h3><p class="done-how"></p><p style="margin-top:.6rem"><b>Your tour is not confirmed yet.</b> Mirna will reply personally to confirm availability, the final price and arrangements.</p><p style="margin-top:1rem"><button type="button" class="btn sm line" data-again>Send another enquiry</button></p></div>
 </div>`;
 }
-const coffeeSVG = `<svg viewBox="0 0 320 260" aria-hidden="true"><defs><linearGradient id="cu2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8f4a26"/><stop offset=".45" stop-color="#eab087"/><stop offset=".62" stop-color="#c47647"/><stop offset="1" stop-color="#7d3f1f"/></linearGradient><clipPath id="cupIn"><path d="M196 168 h52 l-6 40 q-20 8-40 0z"/></clipPath></defs>
-<ellipse cx="190" cy="226" rx="128" ry="22" fill="url(#cu2)"/><ellipse cx="190" cy="222" rx="118" ry="17" fill="none" stroke="#fbe1c8" stroke-width="1" opacity=".55"/>
-<g class="steam" fill="none" stroke="#b9ab97" stroke-width="2.2" stroke-linecap="round"><path d="M212 150 c-6-10 6-16 0-28"/><path d="M224 152 c-6-10 6-16 0-28"/><path d="M236 150 c-6-10 6-16 0-28"/></g>
-<path d="M190 166 h64 l-8 46 q-24 10-48 0z" fill="#fffaf2" stroke="#272838" stroke-width="2.5" stroke-linejoin="round"/>
-<g clip-path="url(#cupIn)"><rect class="lvl" x="190" y="186" width="66" height="40" fill="#5a3420"/><rect class="lvl" x="190" y="186" width="66" height="3" fill="#a8744f"/></g>
-<path d="M194 178 h56" stroke="#48e5c2" stroke-width="2.5"/><path d="M196 190 l4 4 4-4 4 4 4-4 4 4 4-4 4 4 4-4 4 4 4-4 4 4" fill="none" stroke="#a85f36" stroke-width="1.6"/>
-<path class="stream" d="M178 112 C 186 122, 210 140, 220 176" fill="none" stroke="#5a3420" stroke-width="4" stroke-linecap="round"/>
-<g class="dz"><path d="M96 92 h70 l6 8 -14 6 6 60 q-38 14-70 0 l8-60 -12-6z" fill="url(#cu2)" stroke="#6e3517" stroke-width="2" stroke-linejoin="round"/><path d="M100 124 q32 10 62 0 M98 140 q34 10 66 0" fill="none" stroke="#fbe1c8" stroke-width="1.2" opacity=".7"/><path d="M108 150 c6-8 14-8 20 0 c6 8 14 8 20 0" fill="none" stroke="#6e3517" stroke-width="1.4"/><path d="M96 100 L 22 128" stroke="#c9a24b" stroke-width="7" stroke-linecap="round"/><path d="M60 114 l4 10 M46 119 l4 10 M74 108 l4 10" stroke="#8a6a24" stroke-width="2"/></g></svg>`;
+/* A Bosnian coffee set on an engraved copper tray. site.js animates the pour (data-coffee). */
+function coffeeScene() {
+  const f = (n) => +n.toFixed(1);
+  // engraved tray: rings, punched dots and a garland of small arcs, all following the ellipse
+  const TX = 210, TY = 288, RX = 196, RY = 36;
+  const ell = (rx, ry, n, fn) => Array.from({ length: n }, (_, i) => { const t = (i / n) * Math.PI * 2; return fn(TX + Math.cos(t) * rx, TY + Math.sin(t) * ry, t, i); }).join('');
+  const dots = ell(RX - 12, RY - 4, 64, (x, y) => `<circle cx="${f(x)}" cy="${f(y)}" r="1.2"/>`);
+  const arcs = ell(RX - 30, RY - 8, 36, (x, y, t) => { const x2 = TX + Math.cos(t + 0.17) * (RX - 30), y2 = TY + Math.sin(t + 0.17) * (RY - 8), mx = (x + x2) / 2, my = (y + y2) / 2 + 3.5; return `<path d="M${f(x)} ${f(y)} Q${f(mx)} ${f(my)} ${f(x2)} ${f(y2)}"/>`; });
+  const petals = ell(RX - 58, RY - 15, 18, (x, y, t) => `<path d="M${f(x)} ${f(y)} q4 -3.5 8 0 q-4 3.5 -8 0z"/>`);
+  // the džezva, drawn around its base centre (0,0); the spout is on the right
+  const dzBody = 'M-34 0 C-41 -16 -39 -38 -25 -60 C-22 -67 -24 -80 -29 -90 L27 -90 C33 -93 38 -96 43 -99 C38 -92 32 -87 28 -85 C24 -78 22 -67 25 -60 C39 -38 41 -16 34 0 Q0 7 -34 0Z';
+  return `<div class="coffee-scene" data-coffee>
+<svg class="cf-svg" viewBox="0 0 420 330" role="img" aria-label="A Bosnian coffee set: a copper džezva, a fildžan cup in a copper holder and sugar on an engraved tray">
+<defs>
+<linearGradient id="cfCu" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5e2c12"/><stop offset=".18" stop-color="#9c552c"/><stop offset=".42" stop-color="#e9b386"/><stop offset=".55" stop-color="#f6cfa7"/><stop offset=".75" stop-color="#b8693c"/><stop offset="1" stop-color="#5a2a10"/></linearGradient>
+<linearGradient id="cfCuD" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#4b220d"/><stop offset=".45" stop-color="#b8703f"/><stop offset=".6" stop-color="#d79a6b"/><stop offset="1" stop-color="#4a210c"/></linearGradient>
+<linearGradient id="cfBrass" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f1d58a"/><stop offset=".5" stop-color="#b98f35"/><stop offset="1" stop-color="#6f5216"/></linearGradient>
+<radialGradient id="cfTray" cx=".42" cy=".35" r=".75"><stop offset="0" stop-color="#e7ad7f"/><stop offset=".45" stop-color="#c17a4a"/><stop offset=".85" stop-color="#8e4a24"/><stop offset="1" stop-color="#6b3416"/></radialGradient>
+<linearGradient id="cfRim" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f0c39b"/><stop offset=".5" stop-color="#a65d31"/><stop offset="1" stop-color="#5c2b11"/></linearGradient>
+<linearGradient id="cfPorc" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#d9cfc0"/><stop offset=".4" stop-color="#fffdf8"/><stop offset="1" stop-color="#cfc4b4"/></linearGradient>
+<linearGradient id="cfCof" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a2814"/><stop offset="1" stop-color="#1f0f06"/></linearGradient>
+<radialGradient id="cfFoam" cx=".45" cy=".4" r=".6"><stop offset="0" stop-color="#d7ab7c"/><stop offset=".7" stop-color="#a97448"/><stop offset="1" stop-color="#6e4122"/></radialGradient>
+<linearGradient id="cfStream" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2a1409"/><stop offset=".5" stop-color="#6a3a1d"/><stop offset="1" stop-color="#2a1409"/></linearGradient>
+<clipPath id="cfCupIn"><ellipse cx="305" cy="224.7" rx="21.5" ry="4.6"/></clipPath>
+<filter id="cfSoft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="3"/></filter>
+</defs>
+<ellipse cx="${TX}" cy="${TY + 14}" rx="${RX - 6}" ry="${RY - 6}" fill="#000" opacity=".18" filter="url(#cfSoft)"/>
+<ellipse cx="${TX}" cy="${TY + 5}" rx="${RX}" ry="${RY}" fill="#5c2b11"/>
+<ellipse cx="${TX}" cy="${TY}" rx="${RX}" ry="${RY}" fill="url(#cfRim)"/>
+<ellipse cx="${TX}" cy="${TY + 1}" rx="${RX - 8}" ry="${RY - 3}" fill="url(#cfTray)"/>
+<g class="cf-engr" fill="none" stroke="#5a2a10" stroke-width="1" opacity=".75"><ellipse cx="${TX}" cy="${TY + 1}" rx="${RX - 20}" ry="${RY - 6}"/><ellipse cx="${TX}" cy="${TY + 1}" rx="${RX - 44}" ry="${RY - 12}"/>${arcs}${petals}</g>
+<g fill="#5a2a10" opacity=".7">${dots}</g>
+<ellipse cx="${TX - 40}" cy="${TY - 8}" rx="70" ry="8" fill="#fff" opacity=".12"/>
+<!-- sugar bowl (šećerluk) -->
+<g class="cf-sugarbowl" transform="translate(58 270)">
+<ellipse cx="0" cy="4" rx="26" ry="5" fill="#000" opacity=".2"/>
+<path d="M-24 -2 C-26 -22 -20 -32 -16 -34 L16 -34 C20 -32 26 -22 24 -2 Q0 6 -24 -2Z" fill="url(#cfCu)"/>
+<path d="M-22 -14 Q0 -8 22 -14 M-20 -24 Q0 -18 20 -24" fill="none" stroke="#5a2a10" stroke-width=".9" opacity=".7"/>
+<path d="M-10 -20 q4 -5 8 0 q4 5 8 0" fill="none" stroke="#fbe1c8" stroke-width=".8" opacity=".6"/>
+<ellipse cx="0" cy="-34" rx="18" ry="4.5" fill="url(#cfCuD)"/>
+<path d="M-15 -36 C-14 -46 14 -46 15 -36Z" fill="url(#cfCu)"/>
+<circle cx="0" cy="-47" r="3.6" fill="url(#cfBrass)"/><path d="M0 -50 l0 -4" stroke="#b98f35" stroke-width="2"/>
+</g>
+<!-- sugar cubes and a spoon -->
+<g class="cf-sugar"><path d="M226 284 l12 -4 12 4 -12 4z" fill="#fffdf8"/><path d="M226 284 v9 l12 4 v-9z" fill="#ece5da"/><path d="M238 288 v9 l12 -4 v-9z" fill="#d9d0c3"/>
+<path d="M246 296 l10 -3 10 3 -10 3z" fill="#fffdf8"/><path d="M246 296 v7 l10 3 v-7z" fill="#ece5da"/><path d="M256 299 v7 l10 -3 v-7z" fill="#d9d0c3"/></g>
+<g class="cf-spoon"><path d="M338 300 L392 286" stroke="url(#cfBrass)" stroke-width="3" stroke-linecap="round"/><ellipse cx="333" cy="301.5" rx="8" ry="4" transform="rotate(-15 333 301.5)" fill="url(#cfBrass)"/></g>
+<!-- fildžan in a copper holder (zarf) -->
+<g class="cf-cup">
+<ellipse cx="305" cy="275" rx="30" ry="5.5" fill="#000" opacity=".16" filter="url(#cfSoft)"/>
+<path d="M296 257 L293 267 Q305 271 317 267 L314 257Z" fill="url(#cfCuD)"/>
+<ellipse cx="305" cy="268.5" rx="15.5" ry="3.6" fill="url(#cfCu)"/>
+<path d="M281 224 Q305 230 329 224 C327 240 322 251 305 253 C288 251 283 240 281 224Z" fill="url(#cfPorc)"/>
+<path d="M283.5 232 Q305 238 326.5 232 C325 246 320 256 305 258 C290 256 285 246 283.5 232Z" fill="url(#cfCu)" stroke="#4b220d" stroke-width=".6"/>
+<path d="M285 238 Q305 244 325 238" fill="none" stroke="#5a2a10" stroke-width=".8" opacity=".75"/>
+<path d="M289 244 l4 -3 4 3 4 -3 4 3 4 -3 4 3 4 -3 4 3 4 -3 4 3" fill="none" stroke="#fbe1c8" stroke-width=".7" opacity=".7"/>
+<g fill="#5a2a10" opacity=".65"><circle cx="293" cy="250" r=".9"/><circle cx="299" cy="252" r=".9"/><circle cx="305" cy="252.6" r=".9"/><circle cx="311" cy="252" r=".9"/><circle cx="317" cy="250" r=".9"/></g>
+<path d="M288 236 C288 244 292 251 298 254" fill="none" stroke="#fff" stroke-width="1.6" opacity=".25" stroke-linecap="round"/>
+<ellipse cx="305" cy="224" rx="24" ry="5.8" fill="#f6f1e8"/>
+<ellipse cx="305" cy="224.7" rx="21.5" ry="4.6" fill="#a8998a"/>
+<ellipse cx="305" cy="225.6" rx="19" ry="3.4" fill="#8d7d6d" opacity=".6"/>
+<g clip-path="url(#cfCupIn)"><g class="cf-lvl"><ellipse cx="305" cy="224.7" rx="21.5" ry="4.6" fill="url(#cfCof)"/><ellipse class="cf-surf" cx="304" cy="224.9" rx="17.5" ry="3.4" fill="url(#cfFoam)"/>
+<g class="cf-bub" fill="#ecd1ae"><circle cx="297" cy="224.4" r="1"/><circle cx="309" cy="225.6" r=".8"/><circle cx="314" cy="224.2" r="1.1"/><circle cx="302" cy="226" r=".7"/><circle cx="293" cy="225.3" r=".6"/></g></g></g>
+<path d="M282 223.6 Q305 230 328 223.6" fill="none" stroke="#fff" stroke-width="1" opacity=".8"/>
+</g>
+<!-- the pour -->
+<path class="cf-stream" d="M0 0" fill="none" stroke="url(#cfStream)" stroke-linecap="round"/>
+<g class="cf-steam" fill="none" stroke="#c9bba6" stroke-width="2" stroke-linecap="round"><path d="M297 214 c-6 -9 6 -15 0 -26"/><path d="M306 212 c-6 -9 6 -15 0 -28"/><path d="M315 214 c-6 -9 6 -15 0 -26"/></g>
+<!-- džezva -->
+<g class="cf-dz" transform="translate(150 276)">
+<ellipse class="cf-dzsh" cx="0" cy="3" rx="38" ry="6" fill="#000" opacity=".16" filter="url(#cfSoft)"/>
+<path d="M-27 -60 L-100 -78" stroke="#6f5216" stroke-width="8" stroke-linecap="round"/>
+<path d="M-27 -60 L-100 -78" stroke="url(#cfBrass)" stroke-width="6" stroke-linecap="round"/>
+<path d="M-48 -69 l-1 -7 M-62 -72.5 l-1 -7 M-76 -76 l-1 -7" stroke="#6f5216" stroke-width="2.2" stroke-linecap="round"/>
+<circle cx="-102" cy="-78.5" r="5.5" fill="url(#cfBrass)"/>
+<path d="${dzBody}" fill="url(#cfCu)" stroke="#4b220d" stroke-width="1"/><path d="M-34 0 Q0 7 34 0" fill="none" stroke="#3b1a08" stroke-width="2" opacity=".5"/>
+<path d="M-28 -84 L26 -84" stroke="#4b220d" stroke-width="1" opacity=".6"/>
+<ellipse cx="-1" cy="-90" rx="28" ry="4.4" fill="#3b1a08"/>
+<ellipse cx="-1" cy="-89.4" rx="25" ry="3.2" fill="#2a1409"/>
+<g fill="none" stroke="#4b220d" stroke-width=".9" opacity=".8"><path d="M-36 -10 Q0 -3 36 -10"/><path d="M-37 -16 Q0 -9 37 -16"/><path d="M-27 -56 Q0 -51 27 -56"/></g>
+<g fill="none" stroke="#fbe1c8" stroke-width=".8" opacity=".55"><path d="M-30 -24 c6 -10 12 -10 18 0 c6 10 12 10 18 0 c6 -10 12 -10 18 0"/><path d="M-20 -40 q6 -8 12 0 q6 8 12 0 q6 -8 12 0"/></g>
+<g fill="#4b220d" opacity=".7"><circle cx="-24" cy="-32" r="1"/><circle cx="-12" cy="-30" r="1"/><circle cx="0" cy="-29.5" r="1"/><circle cx="12" cy="-30" r="1"/><circle cx="24" cy="-32" r="1"/></g>
+<path d="M-18 -8 C-22 -26 -18 -44 -10 -58" fill="none" stroke="#fff" stroke-width="3" opacity=".22" stroke-linecap="round"/>
+<g class="cf-dzsteam" fill="none" stroke="#c9bba6" stroke-width="1.8" stroke-linecap="round"><path d="M-8 -96 c-5 -8 5 -12 0 -22"/><path d="M6 -97 c-5 -8 5 -12 0 -22"/></g>
+</g>
+</svg>
+<button type="button" class="cf-btn" data-pour><span class="cf-ico" aria-hidden="true"></span><span class="cf-lbl">Pour the coffee</span></button>
+</div>`;
+}
 const rozeta = `<svg class="rozeta" viewBox="0 0 120 120" aria-label="Licensed guide, Mostar"><defs><linearGradient id="cuG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8f4a26"/><stop offset=".45" stop-color="#e7aa7c"/><stop offset=".6" stop-color="#c47647"/><stop offset="1" stop-color="#7d3f1f"/></linearGradient><path id="circ" d="M60 60m-43 0a43 43 0 1 1 86 0a43 43 0 1 1-86 0"/><radialGradient id="glG"><stop offset="0" stop-color="#fff" stop-opacity=".85"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
 <circle cx="60" cy="60" r="58" fill="url(#cuG)"/><circle cx="60" cy="60" r="52" fill="none" stroke="#fbe1c8" stroke-width=".8" opacity=".8"/>
 <g class="spin"><text font-family="Inter" font-size="8.2" font-weight="700" letter-spacing="2.2" fill="#fff4e8"><textPath href="#circ">LICENSED GUIDE · MOSTAR · BORN HERE ·</textPath></text></g>
@@ -313,10 +394,9 @@ function carveSVG(side) {
   eg(`M30 60 Q${cx} 20 90 60`); eg(`M38 60 Q${cx} 34 82 60`); eg(`M30 ${H - 60} Q${cx} ${H - 20} 90 ${H - 60}`); eg(`M38 ${H - 60} Q${cx} ${H - 34} 82 ${H - 60}`);
   const id = 'cu' + side;
   return `<svg class="carve ${side}" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><defs>
-<linearGradient id="${id}" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6e3517"/><stop offset=".22" stop-color="#c47647"/><stop offset=".5" stop-color="#f1bf92"/><stop offset=".72" stop-color="#b8693c"/><stop offset="1" stop-color="#5e2c12"/></linearGradient>
+<linearGradient id="${id}" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="${W}" y2="${H / 3}" spreadMethod="reflect"><stop class="g1" offset="0"/><stop class="g2" offset=".3"/><stop class="g3" offset=".5"/><stop class="g2" offset=".7"/><stop class="g1" offset="1"/></linearGradient>
 <linearGradient id="${id}s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".0"/><stop offset=".5" stop-color="#fff" stop-opacity=".22"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>
-<g class="plate"><rect x="6" y="6" width="${W - 12}" height="${H - 12}" rx="${(W - 12) / 2}" fill="url(#${id})"/><rect class="sheen" x="6" y="6" width="${W - 12}" height="${H - 12}" rx="${(W - 12) / 2}" fill="url(#${id}s)"/></g>
-<g class="lines lo">${P.join('')}</g><g class="lines hi">${P.join('')}</g></svg>`;
+<g class="lines lo">${P.join('')}</g><g class="lines hi" stroke="url(#${id})">${P.join('')}</g></svg>`;
 }
 
 function routeBlock(t) {
@@ -524,7 +604,7 @@ ${notes(['Destination texts use facts we verified (Old Bridge dates, UNESCO). Kr
 </div></section>
 
 <section class="sec alt" id="speak"><div class="wrap speak-grid">
-  <div class="coffee rv">${coffeeSVG}</div>
+  <div class="coffee rv">${coffeeScene()}</div>
   <div><p class="eyebrow rv">${mini}Speak a little Mostar</p><h2 class="rv d1">A few words <em>before you come</em></h2><p class="lead rv d2">Locals will smile when you use them, and you will hear them on every tour.</p><div class="words" id="words"></div><div class="word" id="word" aria-live="polite"></div></div>
 </div></section>
 

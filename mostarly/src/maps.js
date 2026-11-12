@@ -58,7 +58,15 @@
   MapView.prototype.setVB = function (vb) {
     this.vb = vb; this.svg.setAttribute('viewBox', vb.map(function (n) { return n.toFixed(1); }).join(' '));
     var k = this.k(); if (Math.abs(k - (this.lastK || 0)) > .004) { this.svg.style.setProperty('--k', k.toFixed(4)); this.lastK = k; }
-    if (this.sat) { var sc = this.host.clientWidth / vb[2]; this.sat.forEach(function (t) { t.el.style.transform = 'translate3d(' + ((t.x - vb[0]) * sc).toFixed(2) + 'px,' + ((t.y - vb[1]) * sc).toFixed(2) + 'px,0) scale(' + sc.toFixed(5) + ')'; }); }
+    if (this.sat) {
+      // only the layers that are on screen and sharper than what is already shown get drawn
+      var sc = this.host.clientWidth / vb[2], need = sc * Math.min(devicePixelRatio || 1, 2), base = this.sat[0];
+      this.sat.forEach(function (t, i) {
+        var on = t.x < vb[0] + vb[2] && t.x + t.w > vb[0] && t.y < vb[1] + vb[3] && t.y + t.h > vb[1] && (i === 0 || need > base.ppu * 1.25);
+        if (on !== t.vis) { t.vis = on; t.el.style.visibility = on ? 'visible' : 'hidden'; }
+        if (on) t.el.style.transform = 'translate3d(' + ((t.x - vb[0]) * sc).toFixed(2) + 'px,' + ((t.y - vb[1]) * sc).toFixed(2) + 'px,0) scale(' + sc.toFixed(5) + ')';
+      });
+    }
   };
   MapView.prototype.fit = function (ids, pad, aspect) {
     var proj = this.view === 'oldtown' ? po : pr, xs = [], ys = [];
@@ -84,7 +92,7 @@
           var a = pr(L.bbox[0], L.bbox[3]), b = pr(L.bbox[2], L.bbox[1]), im = new Image();
           im.alt = ''; im.decoding = 'async'; im.draggable = false; im.style.width = (b[0] - a[0]).toFixed(2) + 'px'; im.style.height = (b[1] - a[1]).toFixed(2) + 'px';
           if (!i) im.src = '/geo/' + L.file; else setTimeout(function () { im.src = '/geo/' + L.file; }, 1200); // sharper layers after the first view
-          layer.appendChild(im); self.sat.push({ el: im, x: a[0], y: a[1] });
+          layer.appendChild(im); self.sat.push({ el: im, x: a[0], y: a[1], w: b[0] - a[0], h: b[1] - a[1], ppu: L.px[0] / (b[0] - a[0]), vis: true });
         });
       }
       region.bih.forEach(function (r) { el('path', { d: pathFrom(r, pr, true), class: 'bih-line' }, g); });
@@ -270,7 +278,7 @@
       var ms = Math.max(1100, Math.min(2600, 900 + d * 1100)), r0 = rev, r1 = cfg.mode === 'hub' ? 1 : Math.min(j, N - 1), t0 = performance.now();
       if (cfg.mode !== 'hub' && r1 < r0) r0 = r1; // going back: the route shrinks at once
       clearTimeout(dwellT); playBtn.classList.remove('timing');
-      root.classList.remove('is-start', 'is-end', 'is-landed', 'tilt'); root.classList.add('is-flying'); closeView();
+      root.classList.remove('is-start', 'is-end', 'is-landed'); root.classList.add('is-flying'); closeView();
       mode = 'fly'; setCard(-2); setHud(j);
       var tok = flying = {};
       if (reduce) { state = to; apply(to); rev = r1; route.show(cfg.mode === 'hub' ? 1 : r1, j); return land(j); }
@@ -296,9 +304,6 @@
       mv.mark(j < N ? j : -1);
       if (j >= N) { mode = 'end'; root.classList.add('is-end'); setPlaying(false); setCard(N); live.textContent = root.getAttribute('data-end'); return; }
       mode = 'station'; root.classList.add('is-landed'); setCard(j);
-      // the camera tips forward over the place, like looking out of a plane
-      var an = state.a; root.style.setProperty('--ox', (an[0] * 100).toFixed(1) + '%'); root.style.setProperty('--oy', (an[1] * 100).toFixed(1) + '%');
-      if (!reduce) requestAnimationFrame(function () { root.classList.add('tilt'); });
       if (wide && hasView(j)) setTimeout(function () { if (idx === j && mode === 'station') openView(j); }, 650);
       live.textContent = 'Stop ' + (j + 1) + ' of ' + N + ': ' + PLACES[ids[j]].name;
       if (playing) dwell();

@@ -187,11 +187,11 @@
 
   /* ---------- reveal on scroll ---------- */
   var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }); }, { threshold: .15, rootMargin: '0px 0px -5% 0px' });
-  $$('.rv,.shine,.sigsvg,.coffee,.rows,.bridge.signature').forEach(function (el) { io.observe(el); });
+  $$('.rv,.shine,.sigsvg,.rows,.bridge.signature').forEach(function (el) { io.observe(el); });
   var proxy = new Map();
   var io2 = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { proxy.get(e.target).classList.add('in'); io2.unobserve(e.target); } }); }, { threshold: .01 });
   $$('.weave').forEach(function (el) { var w = document.createElement('div'); w.style.position = 'relative'; w.style.zIndex = 3; el.parentNode.insertBefore(w, el); w.appendChild(el); proxy.set(w, el); io2.observe(w); });
-  if (reduce) $$('.rv,.weave,.sigsvg,.coffee').forEach(function (el) { el.classList.add('in'); });
+  if (reduce) $$('.rv,.weave,.sigsvg').forEach(function (el) { el.classList.add('in'); });
 
   /* ---------- mobile menu ---------- */
   (function () {
@@ -362,6 +362,55 @@
     }
     addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(upd); }, { passive: true });
     addEventListener('resize', upd); upd();
+  });
+
+
+  /* ---------- Bosnian coffee: tap and the džezva tips forward and pours into the fildžan ---------- */
+  $$('[data-coffee]').forEach(function (box) {
+    var dz = $('.cf-dz', box), sh = $('.cf-dzsh', box), stream = $('.cf-stream', box), lvl = $('.cf-lvl', box), surf = $('.cf-surf', box), bub = $('.cf-bub', box), btn = $('[data-pour]', box), lbl = $('.cf-lbl', btn);
+    var TIP = [43, -99], CUP = 303, REST = { x: 150, y: 276, a: 0 }, LIFT = { x: 172, y: 214, a: 8 }, busy = false, level = 0;
+    function rot(p, a) { var r = a * Math.PI / 180, c = Math.cos(r), s = Math.sin(r); return [p[0] * c - p[1] * s, p[0] * s + p[1] * c]; }
+    var POUR = (function () { var a = 58, t = rot(TIP, a); return { x: 297 - t[0], y: 158 - t[1], a: a }; })();
+    function mix(A, B, t) { return { x: A.x + (B.x - A.x) * t, y: A.y + (B.y - A.y) * t, a: A.a + (B.a - A.a) * t }; }
+    function ez(t) { t = Math.max(0, Math.min(1, t)); return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+    function place(s, lift) { dz.setAttribute('transform', 'translate(' + s.x.toFixed(2) + ' ' + s.y.toFixed(2) + ') rotate(' + s.a.toFixed(2) + ')'); sh.style.opacity = Math.max(0, 1 - lift * 3); }
+    function setLevel(v) { level = v; lvl.setAttribute('transform', 'translate(0 ' + (5.5 * (1 - v)).toFixed(2) + ')'); lvl.style.opacity = Math.min(1, v * 5); surf.style.opacity = Math.max(0, Math.min(1, (v - .35) * 2)); bub.style.opacity = Math.max(0, Math.min(1, (v - .6) * 2.5)); }
+    function drawStream(s, head, tail, now) {
+      if (head <= tail) { stream.style.opacity = 0; return; }
+      var t = rot(TIP, s.a), x0 = s.x + t[0], y0 = s.y + t[1], y1 = 230 - level * 5;
+      stream.setAttribute('d', 'M' + x0.toFixed(1) + ' ' + y0.toFixed(1) + ' Q' + (x0 + 15).toFixed(1) + ' ' + (y0 + 5).toFixed(1) + ' ' + (CUP - 1) + ' ' + y1.toFixed(1));
+      var L = stream.getTotalLength();
+      stream.style.strokeDasharray = ((head - tail) * L).toFixed(1) + ' ' + (L * 2).toFixed(1);
+      stream.style.strokeDashoffset = (-tail * L).toFixed(1);
+      stream.style.strokeWidth = (3.8 + Math.sin(now / 70) * .45).toFixed(2);
+      stream.style.opacity = 1;
+    }
+    place(REST, 0); setLevel(0);
+    function pour() {
+      if (busy) return; busy = true; btn.disabled = true; lbl.textContent = 'Pouring…'; box.classList.remove('full'); box.classList.add('pouring');
+      if (reduce) { setLevel(1); done(); return; }
+      var start = level, t0 = performance.now();
+      // the last cup is drunk first
+      if (start > 0) { var e0 = performance.now(); (function drain(now) { var k = Math.min(1, (now - e0) / 500); setLevel(start * (1 - k)); if (k < 1) requestAnimationFrame(drain); else { t0 = performance.now(); requestAnimationFrame(frame); } })(e0); }
+      else requestAnimationFrame(frame);
+      function frame(now) {
+        var t = now - t0, s, lift;
+        if (t < 800) { s = mix(REST, LIFT, ez(t / 800)); lift = t / 800; }
+        else if (t < 1500) { s = mix(LIFT, POUR, ez((t - 800) / 700)); lift = 1; }
+        else if (t < 3900) { s = { x: POUR.x, y: POUR.y, a: POUR.a + 8 * ez((t - 1500) / 2400) }; lift = 1; }
+        else if (t < 4450) { var k = ez((t - 3900) / 550); s = mix({ x: POUR.x, y: POUR.y, a: POUR.a + 8 }, LIFT, k); lift = 1; }
+        else { s = mix(LIFT, REST, ez((t - 4450) / 900)); lift = 1 - Math.min(1, (t - 4450) / 900); }
+        place(s, lift);
+        // the stream: the head runs down from the spout, the tail follows when the džezva lifts back
+        var head = Math.max(0, Math.min(1, (t - 1250) / 260)), tail = Math.max(0, Math.min(1, (t - 3930) / 320));
+        if (t > 1400) setLevel(Math.min(1, ez((t - 1400) / 2550)));
+        drawStream(s, head, tail, now);
+        if (t < 5350) requestAnimationFrame(frame); else done();
+      }
+    }
+    function done() { busy = false; btn.disabled = false; lbl.textContent = 'Pour another'; box.classList.remove('pouring'); box.classList.add('full'); stream.style.opacity = 0; place(REST, 0); }
+    btn.addEventListener('click', pour);
+    $('svg', box).addEventListener('click', pour);
   });
 
   /* ---------- enquiry form ---------- */
