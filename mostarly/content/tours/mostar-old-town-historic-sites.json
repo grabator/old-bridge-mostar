@@ -1,0 +1,72 @@
+{
+  "slug": "mostar-old-town-historic-sites",
+  "order": 3,
+  "featured": false,
+  "category": "city",
+  "name": "Mostar City Tour – Old Town & Historic Sites",
+  "tagline": "A longer guided introduction to Mostar’s historic centre, its architecture and its layered past.",
+  "image": "hero-d.jpg",
+  "imageAlt": "Stari Most over the emerald Neretva on a sunny day",
+  "price": {
+    "basis": "request",
+    "confirmed": false
+  },
+  "duration": "About 3 hours",
+  "location": "Old Town and city centre, Mostar",
+  "groupSize": "2–30 people",
+  "level": "Easy: uneven cobblestones and some steps",
+  "languages": "English",
+  "meetingPoint": "Parking area next to the Franciscan Church",
+  "availability": "By prior arrangement",
+  "description": "This extended city walk gives you more time to understand Mostar beyond the postcard view. Along the route, the guide explains the town’s Ottoman and later development, its religious and civic landmarks, the Old Bridge and the way the city changed during the 20th century and after the war.",
+  "itinerary": [
+    {
+      "text": "Franciscan Church and the Old Town.",
+      "optional": false
+    },
+    {
+      "text": "Crooked Bridge and the historic riverside area.",
+      "optional": false
+    },
+    {
+      "text": "Hamam, Tabačica Mosque area and the former leather factory quarter.",
+      "optional": false
+    },
+    {
+      "text": "Old Bridge, its towers and the divers’ club.",
+      "optional": false
+    },
+    {
+      "text": "Kujundžiluk and selected historic interiors, depending on opening hours and your interest.",
+      "optional": true
+    },
+    {
+      "text": "Modern-era landmarks such as Marshal Tito Street, the National Theatre, Musala Square, the City Bath and Spanish Square on the extended route.",
+      "optional": true
+    }
+  ],
+  "included": [
+    "Licensed local guide",
+    "Guided walking tour"
+  ],
+  "notIncluded": [
+    "Entrance tickets",
+    "Boat ride",
+    "Food and drinks, unless stated in the confirmed offer"
+  ],
+  "practical": [
+    "Comfortable shoes and water in summer: the walk is longer and mostly outdoors."
+  ],
+  "tickets": [
+    "koski",
+    "bosnaseum",
+    "kajtaz",
+    "boat"
+  ],
+  "notes": [
+    "Clarify how this differs from the one-hour Highlights walk and the two-hour Coffee Tour, or whether it is replaced by the Coffee Tour.",
+    "Current price needed. Group size 2–30 comes from the old document."
+  ],
+  "seoTitle": "Mostar Old Town & Historic Sites: 3-Hour Guided Walk",
+  "seoDescription": "Extended Mostar walking tour: Franciscan Church, Crooked Bridge, Hamam, Old Bridge, Kujundžiluk and the 20th-century city, with a licensed local guide."
+}

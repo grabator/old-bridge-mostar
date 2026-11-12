@@ -1,0 +1,74 @@
+{
+  "slug": "mostar-city-tour-bosnian-coffee",
+  "order": 2,
+  "featured": true,
+  "category": "city",
+  "name": "Mostar City Tour with Bosnian Coffee Tasting",
+  "tagline": "The main landmarks of Mostar with a local guide, followed by a Bosnian coffee tasting where you learn how coffee is made, served and enjoyed.",
+  "image": "kriva.jpg",
+  "imageAlt": "The Crooked Bridge over the Radobolja in Mostar",
+  "price": {
+    "amount": 80,
+    "basis": "group",
+    "from": false,
+    "confirmed": false
+  },
+  "duration": "About 2 hours",
+  "location": "Old Town, Mostar",
+  "groupSize": "By arrangement",
+  "level": "Easy: uneven cobblestones and some steps",
+  "languages": "English",
+  "meetingPoint": "Hamam area, Old Town",
+  "availability": "By prior arrangement",
+  "description": "See the main landmarks of Mostar with a local guide, then take time to learn about Bosnian coffee and the customs around serving and drinking it. The coffee stop is part of the experience, not just a refreshment break: you hear about the džezva, the fildžan, the serving ritual and the place coffee holds in everyday life.",
+  "itinerary": [
+    {
+      "text": "Meet near the Hamam.",
+      "optional": false
+    },
+    {
+      "text": "Walk through the Old Town and the historic area around the Crooked Bridge.",
+      "optional": false
+    },
+    {
+      "text": "Learn about Mostar’s bridges, the Old Bridge, its towers and the diving tradition.",
+      "optional": false
+    },
+    {
+      "text": "Continue through Kujundžiluk and the bazaar streets.",
+      "optional": false
+    },
+    {
+      "text": "Stop for a Bosnian coffee tasting and an explanation of the tradition.",
+      "optional": false
+    }
+  ],
+  "included": [
+    "Licensed local guide",
+    "Guided walking tour",
+    "Bosnian coffee tasting"
+  ],
+  "notIncluded": [
+    "Other entrance tickets",
+    "Meals",
+    "Optional boat ride"
+  ],
+  "practical": [
+    "Comfortable shoes for the cobblestones.",
+    "Tell us if anyone in your group does not drink coffee: we can suggest an alternative."
+  ],
+  "tickets": [
+    "koski",
+    "bosnaseum",
+    "kajtaz",
+    "boat"
+  ],
+  "notes": [
+    "Price conflict: product table says €50 per person, recent pricing table says €80 per tour. Confirm basis and group size.",
+    "Confirm whether a sweet or treat is included with the coffee, the coffee venue and group limits.",
+    "Can a Turkish House or mosque visit be added?",
+    "The tour-ending line about alternatives to coffee is our suggestion: confirm or remove."
+  ],
+  "seoTitle": "Mostar City Tour with Bosnian Coffee Tasting",
+  "seoDescription": "Two-hour Mostar walking tour with a licensed local guide and a traditional Bosnian coffee tasting: džezva, fildžan and the serving ritual explained."
+}

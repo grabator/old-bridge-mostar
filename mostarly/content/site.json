@@ -1,0 +1,212 @@
+{
+  "draft": true,
+  "name": "Mostarly Guide",
+  "url": "https://mostarlyguide.com",
+  "tagline": "Mostar through the eyes of a local.",
+  "description": "Private tours in Mostar and Herzegovina with Mirna, a licensed local guide born and raised in Mostar. Old Town walks, Bosnian coffee, food, Blagaj, Počitelj and Kravice.",
+  "languages": {
+    "live": [
+      "en"
+    ],
+    "planned": [
+      "bs",
+      "de",
+      "es",
+      "tr"
+    ]
+  },
+  "contact": {
+    "phone": "+387 63 905 245",
+    "whatsapp": "38763905245",
+    "email": "mostarlyguide@gmail.com",
+    "instagram": "mostarly.guide",
+    "tripadvisor": "https://www.tripadvisor.com/Attraction_Review-g295388-d27180517-Reviews-Mostarly_Guide-Mostar_Herzegovina_Neretva_Canton_Federation_of_Bosnia_and_Herzeg.html",
+    "meetingPoint": "Parking area next to the Hamam, Old Town, Mostar",
+    "mapUrl": "https://www.openstreetmap.org/search?query=Hamam%20Mostar",
+    "notes": [
+      "Brief lists Instagram as @mostarlyguide; the live profile we found is instagram.com/mostarly.guide. Confirm which one is correct."
+    ]
+  },
+  "analytics": {
+    "ga4": "",
+    "note": "Add the GA4 measurement ID (G-XXXXXXX) to enable analytics and the cookie notice."
+  },
+  "tickets": [
+    {
+      "id": "koski",
+      "label": "Koski Mehmed Pasha Mosque",
+      "price": 5
+    },
+    {
+      "id": "tekke",
+      "label": "Dervish Tekke, Blagaj",
+      "price": 5
+    },
+    {
+      "id": "bosnaseum",
+      "label": "Bosnaseum museum",
+      "price": 5
+    },
+    {
+      "id": "kajtaz",
+      "label": "Kajtaz House",
+      "price": 5
+    },
+    {
+      "id": "boat",
+      "label": "Boat tour",
+      "price": 10
+    },
+    {
+      "id": "kravice",
+      "label": "Kravice Waterfalls",
+      "price": 10
+    }
+  ],
+  "ticketsNote": "Ticket prices per person, paid in addition to the tour. Current prices to be confirmed.",
+  "categories": [
+    {
+      "id": "city",
+      "name": "Mostar city tours",
+      "intro": "Walks through the Old Town and the modern city, from a one-hour introduction to a half day with coffee and history."
+    },
+    {
+      "id": "food",
+      "name": "Food and culture",
+      "intro": "Bosnian coffee, local food and wine, explained by people who grew up with it."
+    },
+    {
+      "id": "daytrip",
+      "name": "Herzegovina day trips",
+      "intro": "Blagaj, Počitelj, Kravice and the landscapes around Mostar, at a pace that suits your group."
+    },
+    {
+      "id": "experience",
+      "name": "Local experiences",
+      "intro": "Time outside the city: the river, the viewpoint above Mostar and a day with a village family."
+    }
+  ],
+  "onRequest": [
+    "Rafting on the Neretva River",
+    "Kayaking",
+    "Chasing the Waterfalls",
+    "Stolac and Radimlja Necropolis",
+    "Sarajevo Day Trip",
+    "Boat tour on Jablanica Lake"
+  ],
+  "why": [
+    {
+      "t": "Local knowledge",
+      "d": "Born and raised in Mostar. The stories come from the city itself, not from a script."
+    },
+    {
+      "t": "Licensed guiding",
+      "d": "Tours are led by a licensed tour guide with years of experience in Mostar and Herzegovina."
+    },
+    {
+      "t": "Your pace",
+      "d": "Short or long, slow or busy. The walk adjusts to your group, your time and your energy."
+    },
+    {
+      "t": "Personal communication",
+      "d": "You talk directly to your guide before the tour, from the first message to the meeting point."
+    },
+    {
+      "t": "Tailored routes",
+      "d": "Add a coffee stop, a museum or a day outside the city. Routes are planned around what you want to see."
+    }
+  ],
+  "about": {
+    "short": "Mostarly Guide is based in Mostar and led by Mirna, a licensed local guide born and raised in Mostar.",
+    "paragraphs": [
+      "I was born and raised in Mostar and grew up around tourism. I started working with visitors while I was still young, and guiding became my profession.",
+      "Mostar is my home. I know its complicated history as well as its everyday life: where people meet, what they eat, how the city changed and how it lives today.",
+      "I want my guests to understand more than the familiar view of the Old Bridge. That is why every tour is personal, at your pace, with time for your questions."
+    ],
+    "experience": "Licensed tour guide with around 15 years of guiding experience",
+    "notes": [
+      "Confirm the exact wording of experience (around 15 years) and the licence or association details before publication.",
+      "A real portrait and a photo guiding guests are needed."
+    ]
+  },
+  "reviews": {
+    "note": "Placeholder cards. Replace with verified reviews (name, country, date, text) from Tripadvisor or Google.",
+    "items": []
+  },
+  "faq": [
+    {
+      "q": "Where is the meeting point?",
+      "a": "Most standard city walks meet at the parking area next to the Hamam in the Old Town. The exact location is shared in your confirmation message. Some tours start at the parking area next to the Franciscan Church or at your accommodation, as stated on each tour page."
+    },
+    {
+      "q": "Can the tour start at my hotel?",
+      "a": "Possible by prior arrangement. Tell us where you are staying and we will confirm the location and any additional cost."
+    },
+    {
+      "q": "Are the tours private?",
+      "a": "Each tour page states whether the tour runs privately, as a shared group or in either format. If you are not sure, ask in your enquiry.",
+      "note": "Confirm private/shared format for each product."
+    },
+    {
+      "q": "Are entrance tickets included?",
+      "a": "Only when the tour page says so. Extra tickets are listed separately with their current price, and you can tick the ones you want in the enquiry form."
+    },
+    {
+      "q": "Are the tours wheelchair accessible?",
+      "a": "The Old Town has uneven cobblestones, steps and slopes, so the standard walking routes are not wheelchair accessible. Please tell us about any individual needs before we confirm, and we will look at what is possible."
+    },
+    {
+      "q": "Are children welcome?",
+      "a": "Tell us the ages of the children in your group. We confirm suitability and any age limits for each tour or activity before booking."
+    },
+    {
+      "q": "What should I wear?",
+      "a": "Comfortable walking shoes: the cobblestones are smooth and can be slippery. For visits to mosques and other religious sites, wear modest clothing that covers shoulders and knees, and follow the rules of each site."
+    },
+    {
+      "q": "What happens in bad weather?",
+      "a": "If the weather makes a tour uncomfortable or unsafe, we will suggest adjusting the route, changing the time or rescheduling.",
+      "note": "Confirm the bad-weather policy."
+    },
+    {
+      "q": "How do I pay?",
+      "a": "Payment details are confirmed personally together with your booking. No online payment is needed to send an enquiry.",
+      "note": "Add accepted payment methods after confirming them."
+    },
+    {
+      "q": "What is the cancellation policy?",
+      "a": "The cancellation policy is confirmed with your booking.",
+      "note": "Publish a clear cancellation policy approved by the business before taking bookings."
+    }
+  ],
+  "services": [
+    {
+      "t": "Private and tailor-made tours",
+      "d": "Route, pace and stops adjusted to the guest’s interests, available time and mobility."
+    },
+    {
+      "t": "Herzegovina day trips",
+      "d": "Blagaj, Počitelj, Kravice and other destinations combined according to your schedule."
+    },
+    {
+      "t": "Transfers",
+      "d": "Point-to-point and airport or regional transfers where legally and operationally available. Vehicle capacity and prices are confirmed per request."
+    },
+    {
+      "t": "Custom itineraries",
+      "d": "Planning support for guests staying in Mostar and exploring the wider region."
+    },
+    {
+      "t": "Accommodation assistance",
+      "d": "Recommendations and help finding accommodation in Mostar."
+    },
+    {
+      "t": "Workshops and group programmes",
+      "d": "Cooking, coffee and traditional culture programmes for private groups and agencies."
+    },
+    {
+      "t": "Teambuilding events",
+      "d": "Programmes for companies and groups, planned around your dates and group size."
+    }
+  ]
+}

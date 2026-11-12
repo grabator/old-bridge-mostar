@@ -1,0 +1,59 @@
+{
+  "slug": "herzegovina-wine-tasting",
+  "order": 11,
+  "featured": false,
+  "category": "food",
+  "name": "Herzegovina Wine Tasting",
+  "tagline": "A guided tasting of regional wines and an introduction to Herzegovina’s wine culture.",
+  "image": "",
+  "imageAlt": "",
+  "price": {
+    "amount": 50,
+    "basis": "person",
+    "from": false,
+    "confirmed": false
+  },
+  "duration": "About 1 hour",
+  "location": "Agreed winery or venue",
+  "groupSize": "2–20 people",
+  "level": "Easy",
+  "languages": "English",
+  "meetingPoint": "Pickup in Mostar or at the agreed winery",
+  "availability": "By prior arrangement",
+  "description": "Discover the wines of Herzegovina through a tasting hosted at an agreed local venue. Learn about the region’s wine-growing conditions and the grape varieties associated with Herzegovina. The winery, tasting selection and food pairing are confirmed when you enquire.",
+  "itinerary": [
+    {
+      "text": "Meet at the agreed venue or arrange transport from Mostar.",
+      "optional": true
+    },
+    {
+      "text": "Introduction to the winery and local wine production.",
+      "optional": false
+    },
+    {
+      "text": "Guided tasting of the selected wines.",
+      "optional": false
+    },
+    {
+      "text": "Food pairing, if arranged in advance.",
+      "optional": true
+    }
+  ],
+  "included": [
+    "Wine tasting as specified by the host venue"
+  ],
+  "notIncluded": [
+    "Additional wine",
+    "Food pairing",
+    "Purchases, unless stated"
+  ],
+  "practical": [
+    "Guests must be of legal drinking age."
+  ],
+  "tickets": [],
+  "notes": [
+    "Confirm €50 per person and the winery/partner."
+  ],
+  "seoTitle": "Herzegovina Wine Tasting near Mostar",
+  "seoDescription": "Guided wine tasting near Mostar: Herzegovina’s wine-growing conditions, local grape varieties and optional food pairing."
+}

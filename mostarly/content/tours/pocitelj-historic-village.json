@@ -1,0 +1,60 @@
+{
+  "slug": "pocitelj-historic-village",
+  "order": 7,
+  "featured": false,
+  "category": "daytrip",
+  "name": "Počitelj – Historic Village & Open-Air Heritage Site",
+  "tagline": "A guided walk through the stone streets, historic buildings and viewpoints of Počitelj above the Neretva.",
+  "image": "",
+  "imageAlt": "",
+  "price": {
+    "amount": 40,
+    "basis": "person",
+    "from": false,
+    "confirmed": false
+  },
+  "duration": "About 2–3 hours",
+  "location": "Počitelj",
+  "groupSize": "2–15 people",
+  "level": "Moderate: steep stone paths and steps",
+  "languages": "English",
+  "meetingPoint": "By arrangement; transport from Mostar to be confirmed",
+  "availability": "By prior arrangement",
+  "description": "Explore Počitelj, a historic stone settlement rising above the Neretva River. The walk introduces its architecture, fortifications and houses and the history of the village, with time to enjoy views over the river valley. The route includes uphill walking on stone paths.",
+  "itinerary": [
+    {
+      "text": "Walk through the lower village streets.",
+      "optional": false
+    },
+    {
+      "text": "Visit selected historic buildings and viewpoints.",
+      "optional": false
+    },
+    {
+      "text": "Climb towards the upper fortification if conditions and your mobility allow.",
+      "optional": true
+    },
+    {
+      "text": "Hear about the village’s history, architecture and present-day life.",
+      "optional": false
+    }
+  ],
+  "included": [
+    "Guided visit"
+  ],
+  "notIncluded": [
+    "Transport",
+    "Entrance fees",
+    "Food and drinks, unless stated in the offer"
+  ],
+  "practical": [
+    "Good shoes: the stone paths are steep and polished.",
+    "Water and sun protection in summer."
+  ],
+  "tickets": [],
+  "notes": [
+    "Confirm €40 per person and transport from Mostar."
+  ],
+  "seoTitle": "Počitelj Tour: Historic Stone Village near Mostar",
+  "seoDescription": "Guided walk through Počitelj, the historic stone village above the Neretva: architecture, fortification and views over the river valley."
+}

@@ -24,4 +24,4 @@ Made by [Ahmed Grabus (Graba)](https://graba-portofolio.grabafaceit.workers.dev)
 
 ## Mostarly Guide draft
 
-A draft website for Mostarly Guide, a licensed local guide in Mostar, lives in `mostarly/`. Run `node serve.mjs` and open http://localhost:8080/mostarly/.
+The website for Mostarly Guide, a licensed local guide in Mostar, lives in `mostarly/`. Run `node mostarly/dev.mjs` and open http://localhost:8090. Details in `mostarly/README.md`.

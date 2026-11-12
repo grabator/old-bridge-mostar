@@ -1,0 +1,61 @@
+{
+  "slug": "modern-mostar",
+  "order": 4,
+  "featured": true,
+  "category": "city",
+  "name": "Modern Mostar – Architecture, Street Art & Recent History",
+  "tagline": "Mostar beyond the Old Town: 20th-century architecture, street art and a city that keeps rebuilding itself.",
+  "image": "sumrak.jpg",
+  "imageAlt": "Mostar at dusk with the Old Bridge lit",
+  "price": {
+    "amount": 100,
+    "basis": "group",
+    "from": false,
+    "confirmed": false
+  },
+  "duration": "About 3 hours",
+  "location": "City centre, Mostar",
+  "groupSize": "2–20 people",
+  "level": "Easy to moderate, depending on the route",
+  "languages": "English",
+  "meetingPoint": "Franciscan Church or another agreed location",
+  "availability": "By prior arrangement",
+  "description": "Mostar is more than its Old Town. This tour focuses on the city’s 20th-century development, public spaces, architecture and the street art created by artists who took part in Mostar’s Street Art Festival. It also looks at the visible marks of the recent past and the ways the city has been rebuilt and continues to change.",
+  "itinerary": [
+    {
+      "text": "Walk through selected streets and squares outside the Old Town.",
+      "optional": false
+    },
+    {
+      "text": "Look at examples of 20th-century architecture and public buildings.",
+      "optional": false
+    },
+    {
+      "text": "Visit selected street-art locations and hear about the festival and the artists.",
+      "optional": false
+    },
+    {
+      "text": "Talk about reconstruction and the city’s contemporary identity.",
+      "optional": false
+    }
+  ],
+  "included": [
+    "Licensed local guide",
+    "Guided walking tour"
+  ],
+  "notIncluded": [
+    "Transport",
+    "Food and drinks",
+    "Entrance tickets, unless agreed in advance"
+  ],
+  "practical": [
+    "Some streets are busy with traffic: the guide chooses the safest route."
+  ],
+  "tickets": [],
+  "notes": [
+    "Confirm whether €100 is per group, the route and whether the tour is always three hours.",
+    "The line about traffic in practical notes is our suggestion: confirm or remove."
+  ],
+  "seoTitle": "Modern Mostar Tour: Architecture, Street Art & Recent History",
+  "seoDescription": "Three-hour walk through modern Mostar with a local guide: 20th-century architecture, Street Art Festival murals and the city’s reconstruction."
+}

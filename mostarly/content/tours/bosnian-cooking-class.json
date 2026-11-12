@@ -1,0 +1,60 @@
+{
+  "slug": "bosnian-cooking-class",
+  "order": 10,
+  "featured": false,
+  "category": "food",
+  "name": "Bosnian Cooking Class",
+  "tagline": "Prepare traditional Bosnian food with a local host and learn the stories and techniques behind it.",
+  "image": "",
+  "imageAlt": "",
+  "price": {
+    "amount": 70,
+    "basis": "person",
+    "from": false,
+    "confirmed": false
+  },
+  "duration": "About 3 hours",
+  "location": "Mostar, venue confirmed after enquiry",
+  "groupSize": "2–10 people",
+  "level": "Easy: standing during food preparation",
+  "languages": "English",
+  "meetingPoint": "Venue confirmed after your enquiry",
+  "availability": "By prior arrangement",
+  "description": "Learn to prepare traditional Bosnian food in a relaxed, hands-on cooking session. You take part in preparing a local dish, learn practical techniques and hear how food, family life and hospitality are connected in Bosnia and Herzegovina. Depending on the menu, the class may include learning to prepare pita (pie) and other traditional dishes.",
+  "itinerary": [
+    {
+      "text": "Meet the host and hear about the menu and ingredients.",
+      "optional": false
+    },
+    {
+      "text": "Prepare the selected dish step by step with guidance.",
+      "optional": false
+    },
+    {
+      "text": "Learn useful techniques and local kitchen customs.",
+      "optional": false
+    },
+    {
+      "text": "Sit down to enjoy the food prepared during the class.",
+      "optional": false
+    }
+  ],
+  "included": [
+    "Cooking instruction",
+    "Ingredients for the agreed menu",
+    "The meal made during the class"
+  ],
+  "notIncluded": [
+    "Alcoholic drinks",
+    "Additional menu items, unless stated"
+  ],
+  "practical": [
+    "Tell us about allergies and dietary needs when you enquire."
+  ],
+  "tickets": [],
+  "notes": [
+    "Confirm €70 per person, the venue/partner and whether the meal is included."
+  ],
+  "seoTitle": "Bosnian Cooking Class in Mostar",
+  "seoDescription": "Hands-on Bosnian cooking class in Mostar with a local host: prepare pita and traditional dishes, then sit down to eat what you made."
+}

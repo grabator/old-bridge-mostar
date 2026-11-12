@@ -1,0 +1,63 @@
+{
+  "slug": "herzegovina-village-experience",
+  "order": 13,
+  "featured": false,
+  "category": "experience",
+  "name": "Herzegovina Village Experience – A Day with Local Hosts",
+  "tagline": "A full day in a Herzegovinian village with local food, countryside and time with a host family.",
+  "image": "",
+  "imageAlt": "",
+  "price": {
+    "amount": 150,
+    "basis": "person",
+    "from": false,
+    "confirmed": false
+  },
+  "duration": "About 8 hours",
+  "location": "Village about 60 km southeast of Mostar",
+  "groupSize": "2–16 people",
+  "level": "Easy; outdoor terrain may be uneven",
+  "languages": "English",
+  "meetingPoint": "Pickup in Mostar or an agreed location",
+  "availability": "Depends on season and the hosts",
+  "description": "Spend a day in a Herzegovinian village around 60 km southeast of Mostar, hosted in a family-style setting. The day can include time outdoors, a look at village life and the local surroundings, and a meal prepared around a barbecue and seasonal produce. The experience is arranged with local hosts and depends on the season and availability.",
+  "itinerary": [
+    {
+      "text": "Travel from Mostar to the village.",
+      "optional": false
+    },
+    {
+      "text": "Meet the local hosts and see the home, garden and surrounding countryside.",
+      "optional": false
+    },
+    {
+      "text": "Spend time outdoors and learn about village life and local food.",
+      "optional": false
+    },
+    {
+      "text": "Enjoy a barbecue or traditional meal in the agreed setting.",
+      "optional": false
+    },
+    {
+      "text": "Return to Mostar.",
+      "optional": false
+    }
+  ],
+  "included": [
+    "Host experience",
+    "Meal as detailed in the confirmed offer"
+  ],
+  "notIncluded": [
+    "Alcoholic drinks",
+    "Extras not included in the written offer"
+  ],
+  "practical": [
+    "Wear clothes and shoes you are comfortable in outdoors."
+  ],
+  "tickets": [],
+  "notes": [
+    "Confirm €150 per person, hosts and transport."
+  ],
+  "seoTitle": "Herzegovina Village Day Trip with Local Hosts",
+  "seoDescription": "A day with a host family in a Herzegovinian village: countryside, village life and a barbecue or traditional meal. Pickup from Mostar."
+}

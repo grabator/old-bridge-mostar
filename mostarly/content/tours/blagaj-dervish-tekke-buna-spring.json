@@ -1,0 +1,62 @@
+{
+  "slug": "blagaj-dervish-tekke-buna-spring",
+  "order": 6,
+  "featured": false,
+  "category": "daytrip",
+  "name": "Blagaj – Dervish Tekke & Buna River Spring",
+  "tagline": "A half-day visit to the place where the Buna River rises from beneath a high rock face.",
+  "image": "",
+  "imageAlt": "",
+  "price": {
+    "amount": 40,
+    "basis": "person",
+    "from": false,
+    "confirmed": false
+  },
+  "duration": "About 2 hours at the destination",
+  "location": "Blagaj, about 12 km from Mostar",
+  "groupSize": "2–30 people",
+  "level": "Easy: steps and uneven surfaces in places",
+  "languages": "English",
+  "meetingPoint": "Pickup in Mostar by arrangement",
+  "availability": "By prior arrangement",
+  "description": "Visit Blagaj, where the Buna River emerges from a powerful karst spring beneath a high rock face. The visit can include the historic Dervish Tekke, the riverside setting and an explanation of the area’s religious, cultural and natural significance.",
+  "itinerary": [
+    {
+      "text": "Travel from Mostar to Blagaj, if transport is arranged.",
+      "optional": true
+    },
+    {
+      "text": "Visit the Buna River spring viewpoint.",
+      "optional": false
+    },
+    {
+      "text": "Visit the Dervish Tekke, if you wish and opening conditions allow.",
+      "optional": true
+    },
+    {
+      "text": "Time for photographs or a riverside break.",
+      "optional": false
+    }
+  ],
+  "included": [
+    "Guiding service"
+  ],
+  "notIncluded": [
+    "Tekke entrance",
+    "Food and drinks",
+    "Transport, unless stated in the confirmed price"
+  ],
+  "practical": [
+    "Modest clothing for the Tekke: shoulders and knees covered."
+  ],
+  "tickets": [
+    "tekke"
+  ],
+  "notes": [
+    "Brief lists €40 per person and also asks whether \"the €30 rate\" includes transport: confirm price, transport and Tekke entrance.",
+    "Confirm the actual time including driving. Distance \"about 12 km\" is our addition: confirm."
+  ],
+  "seoTitle": "Blagaj Tour from Mostar: Dervish Tekke & Buna Spring",
+  "seoDescription": "Half-day visit to Blagaj with a local guide from Mostar: the Buna River spring, the Dervish Tekke and the riverside setting."
+}

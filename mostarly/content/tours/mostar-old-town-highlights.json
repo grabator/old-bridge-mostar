@@ -1,0 +1,77 @@
+{
+  "slug": "mostar-old-town-highlights",
+  "order": 1,
+  "featured": true,
+  "category": "city",
+  "name": "Mostar City Tour – Highlights of the Old Town",
+  "tagline": "A one-hour guided walk through the historic centre: the clearest introduction to Mostar’s Old Town and its best-known landmarks.",
+  "image": "panorama.jpg",
+  "imageAlt": "Stari Most and the Old Town of Mostar below Hum hill",
+  "price": {
+    "amount": 60,
+    "basis": "group",
+    "from": false,
+    "confirmed": false
+  },
+  "duration": "About 1 hour",
+  "location": "Old Town, Mostar",
+  "groupSize": "Flexible",
+  "level": "Easy: uneven cobblestones and some steps",
+  "languages": "English",
+  "meetingPoint": "In front of the Hamam, Old Town",
+  "availability": "Daily, by prior arrangement",
+  "description": "This shorter city tour is for visitors who want a clear introduction to Mostar’s Old Town and its most recognisable landmarks. Walk through the historic streets, hear how the town developed and learn about the Old Bridge, the river and the buildings that shaped life in the centre. The guide connects the monuments with local stories and the realities of the city today.",
+  "itinerary": [
+    {
+      "text": "Meet in front of the Hamam.",
+      "optional": false
+    },
+    {
+      "text": "Learn how Mostar developed.",
+      "optional": false
+    },
+    {
+      "text": "Walk through the Old Town towards the Crooked Bridge.",
+      "optional": false
+    },
+    {
+      "text": "Continue to the Old Bridge, its towers and the local diving tradition.",
+      "optional": false
+    },
+    {
+      "text": "Finish along Kujundžiluk, the old bazaar street.",
+      "optional": false
+    },
+    {
+      "text": "Visit the Koski Mehmed Pasha Mosque.",
+      "optional": false
+    }
+  ],
+  "included": [
+    "Licensed local guide",
+    "Guided walking tour"
+  ],
+  "notIncluded": [
+    "Entrance tickets",
+    "Food and drinks",
+    "Boat ride",
+    "Optional museum or house visits"
+  ],
+  "practical": [
+    "Comfortable shoes: the old cobblestones are uneven and can be slippery.",
+    "For the mosque visit, shoulders and knees should be covered."
+  ],
+  "tickets": [
+    "koski",
+    "bosnaseum",
+    "kajtaz",
+    "boat"
+  ],
+  "notes": [
+    "Price conflict in the brief: product table says €30 per person, the recent pricing table says €60 per tour. Confirm which one and for how many people.",
+    "Confirm minimum and maximum group size.",
+    "Brief also mentions a 2–2.5 hour City Tour: decide whether it stays separate from Highlights and the Coffee Tour."
+  ],
+  "seoTitle": "Mostar City Tour: Old Town Highlights with a Local Guide",
+  "seoDescription": "One-hour walk through Mostar’s Old Town with a licensed local guide: Crooked Bridge, Old Bridge, Kujundžiluk and Koski Mehmed Pasha Mosque."
+}

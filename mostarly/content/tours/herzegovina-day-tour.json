@@ -1,0 +1,67 @@
+{
+  "slug": "herzegovina-day-tour",
+  "order": 5,
+  "featured": true,
+  "category": "daytrip",
+  "name": "Herzegovina Day Tour",
+  "tagline": "A full day from Mostar to Blagaj, Počitelj and the Kravice Waterfalls, with a local guide at every stop.",
+  "image": "",
+  "imageAlt": "",
+  "price": {
+    "basis": "request",
+    "confirmed": false
+  },
+  "duration": "About 6–7 hours",
+  "location": "Blagaj, Počitelj, Kravice",
+  "groupSize": "1–20 people",
+  "level": "Moderate: uneven paths and steps at some stops",
+  "languages": "English",
+  "meetingPoint": "Mostar, pickup point agreed with you",
+  "availability": "By prior arrangement; route adjusted to the season",
+  "description": "Spend a day outside Mostar visiting places that show the variety of Herzegovina: the Buna River spring at Blagaj, historic Počitelj and the Kravice Waterfalls. The route can be adjusted to the season, opening hours, your interests and the time you have. A local guide gives context at each stop and keeps the day at a comfortable pace.",
+  "itinerary": [
+    {
+      "text": "Blagaj and the Buna River spring, with time to see the Dervish Tekke area if included.",
+      "optional": false
+    },
+    {
+      "text": "Počitelj, the historic hillside village and open-air heritage site.",
+      "optional": false
+    },
+    {
+      "text": "Kravice Waterfalls, with time to walk around the falls.",
+      "optional": false
+    },
+    {
+      "text": "Mogorjelo, when the route and timing allow.",
+      "optional": true
+    },
+    {
+      "text": "Fortica Skywalk, subject to timing and your preference.",
+      "optional": true
+    }
+  ],
+  "included": [
+    "Guiding services"
+  ],
+  "notIncluded": [
+    "Kravice entrance ticket",
+    "Other entrance tickets",
+    "Meals and drinks, unless the written quote says otherwise"
+  ],
+  "practical": [
+    "Transport and entrance fees are itemised in your written offer.",
+    "Bring comfortable shoes; in summer, swimwear if you plan to spend time at Kravice."
+  ],
+  "tickets": [
+    "tekke",
+    "kravice"
+  ],
+  "notes": [
+    "Decide the standard route: the old document lists Blagaj, Počitelj, Mogorjelo and Kravice with Fortica optional, which may make a long day.",
+    "Confirm transport inclusion, ticket prices, lunch arrangements and the current per-person or private-group price. Old reference: €50 per person guiding, Kravice €10 per person.",
+    "The swimwear line is our suggestion: confirm swimming rules at Kravice or remove."
+  ],
+  "seoTitle": "Herzegovina Day Tour from Mostar: Blagaj, Počitelj, Kravice",
+  "seoDescription": "Full-day tour from Mostar with a licensed local guide: Blagaj and the Buna spring, Počitelj and the Kravice Waterfalls. Route adjusted to the season."
+}
