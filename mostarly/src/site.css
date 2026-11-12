@@ -510,3 +510,10 @@ body:not(.ready) .hero *{animation-play-state:paused!important}
 .foot .flogo{height:40px;width:auto;margin-bottom:.9rem}
 .loom .lg{object-fit:contain;width:calc(100% - 54px);height:calc(100% - 54px)}
 @media (min-width:1000px){.nav .home img{height:38px}}
+/* round kilim medallion */
+.medal{width:150px;aspect-ratio:1;margin-top:1.2rem;filter:drop-shadow(0 14px 24px rgba(60,20,10,.25))}
+.medal svg{width:100%;height:100%;display:block;animation:spin 180s linear infinite}
+.kilim-sec{position:relative;overflow:hidden}
+.kilim-sec .medal.big{position:absolute;right:-90px;top:-60px;width:300px;opacity:.22;filter:none;margin:0}
+.kilim-sec .wrap{position:relative}
+@media (min-width:1000px){.medal{width:240px;margin-top:2rem}.kilim-sec .medal.big{width:520px;right:-140px;top:-120px;opacity:.18}}

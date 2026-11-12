@@ -54,22 +54,29 @@ const tbc = (txt = 'to confirm') => (DRAFT ? `<span class="tbc">${esc(txt)}</spa
 const notes = (arr) => (DRAFT && arr && arr.length ? `<div class="note" role="note"><b>For Mirna:</b><ul>${arr.map((n) => `<li>${esc(n)}</li>`).join('')}</ul></div>` : '');
 
 /* ---------- kilim art for tours without photos yet ---------- */
-const RH = ['.......A.......', '......AAA......', '.....AA.AA.....', '....AA.B.AA....', '...AA.BBB.AA...', '..AA.BBCBB.AA..', '.AA.BBC.CBB.AA.', 'AA.BBC.D.CBB.AA', '.AA.BBC.CBB.AA.', '..AA.BBCBB.AA..', '...AA.BBB.AA...', '....AA.B.AA....', '.....AA.AA.....', '......AAA......', '.......A.......'];
+const KIL = { red: '#c8271c', cream: '#f3e7cf', black: '#1b1411', gold: '#efaa2f', green: '#2f5b2c', white: '#fffaf0', maroon: '#7c1d1b' };
+const STAR = ['...A...', '..WAW..', '.WAYAW.', 'AAYGYAA', '.WAYAW.', '..WAW..', '...A...'];
 function rects(grid, map, ox = 0, oy = 0) {
   let s = '';
   grid.forEach((row, y) => { let x = 0; while (x < row.length) { const ch = row[x]; if (ch === '.' || !map[ch]) { x++; continue; } let e = x; while (e < row.length && row[e] === ch) e++; s += `<rect x="${x + ox}" y="${y + oy}" width="${e - x}" height="1" fill="${map[ch]}"/>`; x = e; } });
   return s;
 }
-const ART = { city: ['#272838', '#f6f0e6', '#c8423a', '#d08a55', '#48e5c2'], food: ['#5b2d22', '#f6f0e6', '#d08a55', '#fcec52', '#48e5c2'], daytrip: ['#0f4f45', '#f6f0e6', '#48e5c2', '#d08a55', '#fcec52'], experience: ['#3a3256', '#f6f0e6', '#d08a55', '#48e5c2', '#c8423a'] };
+// field colours per category, like the red, deep red, green and black fields of Bosnian kilims
+const FIELD = { city: KIL.red, food: KIL.maroon, daytrip: '#24452a', experience: KIL.black };
 let ARTN = 0;
 function art(t, label = true) {
-  const fid = 'fd' + (++ARTN);
-  const [bg, a, b, c, d] = ART[t.category] || ART.city; let s = ''; const o = t.order || 0, sx = (o * 7) % 17, sy = (o * 5) % 17;
-  for (let gy = -1; gy < 6; gy++) for (let gx = -1; gx < 8; gx++) {
-    const k = (gx + gy + o + 9) % 3; const map = k === 0 ? { A: a, B: b, C: c, D: d } : k === 1 ? { A: c, B: a, C: d, D: b } : { A: d, B: c, C: a, D: b };
-    s += `<g transform="translate(${gx * 17 + (gy % 2 ? 8.5 : 0) - sx} ${gy * 17 - sy})" opacity=".9">${rects(RH, map)}</g>`;
-  }
-  return `<svg viewBox="0 0 100 75" preserveAspectRatio="xMidYMid slice" shape-rendering="crispEdges" role="img" aria-label="${esc(t.name)}"><rect width="100" height="75" fill="${bg}"/>${s}<rect width="100" height="75" fill="url(#${fid})"/><defs><linearGradient id="${fid}" x1="0" y1="0" x2="0" y2="1"><stop offset=".35" stop-color="${bg}" stop-opacity=".15"/><stop offset="1" stop-color="${bg}" stop-opacity=".9"/></linearGradient></defs></svg>${label && DRAFT ? '<span class="ph">Photo coming</span>' : ''}`;
+  const id = 'k' + (++ARTN), bg = FIELD[t.category] || KIL.red, o = t.order || 0;
+  const starMap = { A: t.category === 'experience' ? KIL.red : KIL.black, W: KIL.white, Y: KIL.gold, G: KIL.green };
+  const cx = 50 + ((o * 13) % 21) - 10, cy = 37;
+  const dia = (r) => `M${cx} ${cy - r}L${cx + r} ${cy}L${cx} ${cy + r}L${cx - r} ${cy}Z`;
+  return `<svg viewBox="0 0 100 75" preserveAspectRatio="xMidYMid slice" role="img" aria-label="${esc(t.name)}"><defs>
+<pattern id="${id}s" width="10" height="10" patternUnits="userSpaceOnUse" x="${o % 10}" y="${(o * 3) % 10}"><rect width="10" height="10" fill="${bg}"/><g shape-rendering="crispEdges">${rects(STAR, starMap, 1, 1)}${rects(STAR, starMap, 6, 6)}</g></pattern>
+<linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="1"><stop offset=".5" stop-color="${bg}" stop-opacity="0"/><stop offset="1" stop-color="${bg}" stop-opacity=".85"/></linearGradient></defs>
+<rect width="100" height="75" fill="url(#${id}s)"/>
+<path d="${dia(26)} ${dia(16)} M${cx} ${cy - 26}V${cy + 26}" fill="none" stroke="${t.category === 'experience' ? KIL.gold : KIL.black}" stroke-width="1.1" opacity=".9"/>
+<g transform="translate(${cx - 5.25} ${cy - 5.25}) scale(1.5)" shape-rendering="crispEdges">${rects(STAR, { A: KIL.black, W: KIL.cream, Y: KIL.gold, G: KIL.green })}</g>
+<rect y="0" width="100" height="3" fill="${KIL.cream}"/><rect y="3" width="100" height="1" fill="${KIL.black}"/>
+<rect width="100" height="75" fill="url(#${id}g)"/></svg>${label && DRAFT ? '<span class="ph">Photo coming</span>' : ''}`;
 }
 const tourImg = (t, cls = '', eager = false) => (t.image
   ? `<img src="/img/${esc(t.image)}" alt="${esc(t.imageAlt || t.name)}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async"${cls}>`
@@ -215,11 +222,11 @@ const emit = (url, html) => out.push([url, html]);
       <div class="cta"><a class="btn mint" href="/tours/">Explore the tours</a><a class="btn ghost" href="/mostar-herzegovina/">Plan your visit</a></div>
     </div><p class="now" id="now"><i>☀</i><span>In Mostar</span></p></div>
   </div>
-  <div class="band weave" data-band="1" style="--bh:46px" aria-hidden="true"></div>
+  <div class="band weave" data-band="1" style="--bh:56px" aria-hidden="true"></div>
 </section>
 
 <section class="sec tight"><div class="wrap intro">
-  <p class="eyebrow rv">${mini}Mostarly Guide</p>
+  <div><p class="eyebrow rv">${mini}Mostarly Guide</p><div class="medal rv d1"><svg data-medallion aria-hidden="true"></svg></div></div>
   <div><p class="rv d1">Based in Mostar and led by <em>Mirna</em>, a licensed local guide born and raised in Mostar.</p>
   <p class="lead rv d2" style="font-family:var(--sans);font-size:1.05rem;margin-top:1rem">Walks through the Old Town, Bosnian coffee, food, and day trips to Blagaj, Počitelj and Kravice. Every tour is planned personally, at your pace.</p></div>
 </div></section>
@@ -362,7 +369,7 @@ ${notes(['Destination texts use facts we verified (Old Bridge dates, UNESCO). Kr
   <div><p class="eyebrow rv">${mini}Speak a little Mostar</p><h2 class="rv d1">A few words <em>before you come</em></h2><p class="lead rv d2">Locals will smile when you use them, and you will hear them on every tour.</p><div class="words" id="words"></div><div class="word" id="word" aria-live="polite"></div></div>
 </div></section>
 
-<section class="sec dark"><div class="wrap"><p class="eyebrow">${mini}Woven into Bosnia</p><h2>Every ćilim <em>tells a story</em></h2><p class="lead">Bosnian kilims (ćilimi) are read like a language. These are some of the signs you will see in the old shops of Mostar.</p>
+<section class="sec dark kilim-sec"><div class="medal big" aria-hidden="true"><svg data-medallion></svg></div><div class="wrap"><p class="eyebrow">${mini}Woven into Bosnia</p><h2>Every ćilim <em>tells a story</em></h2><p class="lead">Bosnian kilims (ćilimi) are read like a language. These are some of the signs you will see in the old shops of Mostar.</p>
 <div class="signs">
 <div class="sign rv"><svg data-sign="eye" aria-hidden="true"></svg><b>Eye</b><i>oko</i><p>Protection against the evil eye.</p></div>
 <div class="sign rv d1"><svg data-sign="amulet" aria-hidden="true"></svg><b>Amulet</b><i>hamajlija</i><p>A wish for protection and good luck.</p></div>

@@ -49,9 +49,6 @@
     grid.forEach(function (row, y) { var x = 0; while (x < row.length) { var ch = row[x]; if (ch === '.' || !map[ch]) { x++; continue; } var e = x; while (e < row.length && row[e] === ch) e++; s += '<rect x="' + (x + ox) + '" y="' + (y + oy) + '" width="' + (e - x) + '" height="1" fill="' + map[ch] + '"/>'; x = e; } });
     return s;
   }
-  var HORN = ['.AA...........AA.', 'A..A.........A..A', 'A.AAA.......AAA.A', '.AAAAA.....AAAAA.', '....AAA.B.AAA....', '.....AABBBAA.....', '....AAABCBAAA....', '.....AABBBAA.....', '....AAA.B.AAA....', '.AAAAA.....AAAAA.', 'A.AAA.......AAA.A', 'A..A.........A..A', '.AA...........AA.'];
-  var RHOMB = ['.......A.......', '......AAA......', '.....AA.AA.....', '....AA.B.AA....', '...AA.BBB.AA...', '..AA.BBCBB.AA..', '.AA.BBC.CBB.AA.', 'AA.BBC.D.CBB.AA', '.AA.BBC.CBB.AA.', '..AA.BBCBB.AA..', '...AA.BBB.AA...', '....AA.B.AA....', '.....AA.AA.....', '......AAA......', '.......A.......'];
-  var MINI = ['...A...', '..AAA..', '.AA.AA.', 'AA.B.AA', '.AA.AA.', '..AAA..', '...A...'];
   var SIGNS = {
     eye: ['....A....', '...AAA...', '..AA.AA..', '.AA.B.AA.', 'AA.BBB.AA', '.AA.B.AA.', '..AA.AA..', '...AAA...', '....A....'],
     amulet: ['....A....', '...AAA...', '..AA.AA..', '.AA.B.AA.', 'AAAAAAAAA', '.........', 'A.A.A.A.A', 'A.A.A.A.A', '.........'],
@@ -63,29 +60,29 @@
     el.setAttribute('viewBox', (-pad) + ' ' + (-pad) + ' ' + (w + pad * 2) + ' ' + (h + pad * 2));
     el.setAttribute('shape-rendering', 'crispEdges'); el.innerHTML = rects(grid, map);
   }
-  function bandTile(kind) {
-    var H = 21, motW = 17, gap = 5, count = 5, W = (motW + gap) * count;
-    var pal = [['c', 'r', 'y'], ['m', 'n', 'c'], ['k', 'c', 'r'], ['r', 'y', 'n'], ['y', 'r', 'c']];
-    var s = '<rect width="' + W + '" height="' + H + '" fill="' + C.n + '"/>';
-    for (var x = 0; x < W; x++) {
-      s += '<rect x="' + x + '" y="0" width="1" height="1" fill="' + C.r + '"/><rect x="' + x + '" y="' + (H - 1) + '" width="1" height="1" fill="' + C.r + '"/>';
-      var p = x % 4;
-      if (p < 3) s += '<rect x="' + x + '" y="1" width="1" height="1" fill="' + C.r + '"/><rect x="' + x + '" y="' + (H - 2) + '" width="1" height="1" fill="' + C.r + '"/>';
-      if (p === 1) s += '<rect x="' + x + '" y="2" width="1" height="1" fill="' + C.r + '"/><rect x="' + x + '" y="' + (H - 3) + '" width="1" height="1" fill="' + C.r + '"/>';
-    }
-    for (var i = 0; i < count; i++) {
-      var c = pal[(i + kind) % pal.length], ox = i * (motW + gap) + 2;
-      s += rects(HORN, { A: C[c[0]], B: C[c[1]], C: C[c[2]] }, ox, 4);
-      var fx = ox + motW + 1;
-      s += '<rect x="' + fx + '" y="6" width="1" height="1" fill="' + C.c + '"/><rect x="' + (fx - 1) + '" y="10" width="3" height="1" fill="' + C.c + '"/><rect x="' + fx + '" y="14" width="1" height="1" fill="' + C.c + '"/>';
-    }
+  /* Bosnian kilim (ćilim): madder-red field with small stars, black band with leaves,
+     cream border with hooked flowers, red sawtooth edges. Palette taken from traditional rugs. */
+  var K = { red: '#c8271c', cream: '#f3e7cf', black: '#1b1411', orange: '#e5652a', gold: '#efaa2f', maroon: '#7c1d1b', green: '#2f5b2c', white: '#fffaf0' };
+  var FLOWER = ['.AA.......AA.', 'A..A.....A..A', 'A.AAA...AAA.A', '.A..AAAAA..A.', '...ABBBBBA...', '..AABCBCBAA..', '.AAABBCBBAAA.', '..AABCBCBAA..', '...ABBBBBA...', '.A..AAAAA..A.', 'A.AAA...AAA.A', 'A..A.....A..A', '.AA.......AA.'];
+  var LEAF = ['....AAA..', '..AAAABA.', '.AAABBCA.', '.AABBCBA.', '.ABCBBAA.', '.ABAAAA..', '..AAA....'];
+  var STAR = ['...A...', '..WAW..', '.WAYAW.', 'AAYGYAA', '.WAYAW.', '..WAW..', '...A...'];
+  var FLOWER_COLORS = [[K.orange, K.black, K.cream], [K.gold, K.maroon, K.cream], [K.maroon, K.black, K.gold], [K.black, K.red, K.cream], [K.red, K.black, K.gold], [K.green, K.black, K.cream]];
+  var LEAF_COLORS = [[K.orange, K.maroon, K.cream], [K.gold, K.red, K.black], [K.white, K.red, K.black], [K.red, K.gold, K.cream], [K.green, K.gold, K.cream], [K.gold, K.green, K.cream]];
+  function px(x, y, w, c) { return '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="1" fill="' + c + '"/>'; }
+  function saw(W, y, dir, color, period) { // red teeth pointing into the band
+    var s = ''; for (var x = 0; x < W; x++) { var p = x % period; if (p < period - 1) s += px(x, y, 1, color); if (p === Math.floor(period / 2) - 1 || (period === 3 && p === 0)) s += px(x, y + dir, 1, color); } return s;
+  }
+  function bandTile(kind) { // cream border with hooked flowers
+    var H = 19, step = 17, count = 6, W = step * count;
+    var s = '<rect width="' + W + '" height="' + H + '" fill="' + K.cream + '"/>' + px(0, 0, W, K.red) + px(0, H - 1, W, K.red) + saw(W, 1, 1, K.red, 4) + saw(W, H - 2, -1, K.red, 4);
+    for (var i = 0; i < count; i++) { var c = FLOWER_COLORS[(i + kind) % FLOWER_COLORS.length]; s += rects(FLOWER, { A: c[0], B: c[1], C: c[2] }, i * step + 2, 3); s += px(i * step + 16, 9, 1, K.maroon); }
     return { svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + ' ' + H + '" shape-rendering="crispEdges">' + s + '</svg>', W: W, H: H };
   }
-  function bandSlim() {
-    var H = 9, W = 24, s = '<rect width="' + W + '" height="' + H + '" fill="' + C.n + '"/>';
-    s += '<rect x="0" y="0" width="' + W + '" height="1" fill="' + C.r + '"/><rect x="0" y="8" width="' + W + '" height="1" fill="' + C.r + '"/>';
-    var d = ['..A..', '.ABA.', 'ABCBA', '.ABA.', '..A..'], cols = [['c', 'm', 'y'], ['k', 'c', 'r']];
-    for (var i = 0; i < 4; i++) { var c = cols[i % 2]; s += rects(d, { A: C[c[0]], B: C[c[1]], C: C[c[2]] }, i * 6 + .5, 2); }
+  function bandSlim() { // black band with leaves
+    var H = 11, step = 11, count = 6, W = step * count;
+    var s = '<rect width="' + W + '" height="' + H + '" fill="' + K.black + '"/>' + px(0, 0, W, K.red) + px(0, H - 1, W, K.red);
+    for (var x = 0; x < W; x += 3) { s += px(x, 1, 1, K.red) + px(x, H - 2, 1, K.red); }
+    for (var i = 0; i < count; i++) { var c = LEAF_COLORS[i % LEAF_COLORS.length]; s += rects(LEAF, { A: c[0], B: c[1], C: c[2] }, i * step + 1, 2); }
     return { svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + ' ' + H + '" shape-rendering="crispEdges">' + s + '</svg>', W: W, H: H };
   }
   $$('[data-band]').forEach(function (el) {
@@ -94,15 +91,35 @@
     el.style.backgroundImage = 'url("data:image/svg+xml,' + encodeURIComponent(t.svg) + '")';
     el.style.backgroundSize = (t.W * h / t.H) + 'px ' + h + 'px';
   });
-  $$('[data-mini]').forEach(function (el) { svgGrid(el, MINI, { A: C.k, B: C.m }); });
+  $$('[data-mini]').forEach(function (el) { svgGrid(el, STAR, { A: K.red, W: K.gold, Y: K.black, G: K.green }); });
+
+  /* round kilim medallion: red field with stars and a diamond lattice, black leaf ring, cream flower ring */
+  $$('[data-medallion]').forEach(function (el, n) {
+    var id = 'md' + n, fl = '', lf = '', st = '';
+    for (var i = 0; i < 4; i++) { var c = FLOWER_COLORS[(i * 2 + n) % FLOWER_COLORS.length]; fl += rects(FLOWER, { A: c[0], B: c[1], C: c[2] }, (i % 2) * 15 + 1, Math.floor(i / 2) * 15 + 1); }
+    for (var j = 0; j < 4; j++) { var d = LEAF_COLORS[j % LEAF_COLORS.length]; lf += rects(LEAF, { A: d[0], B: d[1], C: d[2] }, (j % 2) * 10 + 1, Math.floor(j / 2) * 8 + 1); }
+    st = rects(STAR, { A: K.black, W: K.white, Y: K.gold, G: K.green }, 1, 1) + rects(STAR, { A: K.black, W: K.white, Y: K.gold, G: K.green }, 6, 6);
+    function teeth(r1, r2, steps, color) { var p = ''; for (var k = 0; k < steps; k++) { var a = k / steps * Math.PI * 2, b = (k + .5) / steps * Math.PI * 2, e = (k + 1) / steps * Math.PI * 2; p += 'M' + (100 + Math.cos(a) * r1).toFixed(2) + ' ' + (100 + Math.sin(a) * r1).toFixed(2) + 'L' + (100 + Math.cos(b) * r2).toFixed(2) + ' ' + (100 + Math.sin(b) * r2).toFixed(2) + 'L' + (100 + Math.cos(e) * r1).toFixed(2) + ' ' + (100 + Math.sin(e) * r1).toFixed(2) + 'Z'; } return '<path d="' + p + '" fill="' + color + '"/>'; }
+    function diamond(r) { return '<path d="M100 ' + (100 - r) + 'L' + (100 + r) + ' 100L100 ' + (100 + r) + 'L' + (100 - r) + ' 100Z" fill="none" stroke="' + K.black + '" stroke-width="1.6"/>'; }
+    el.setAttribute('viewBox', '0 0 200 200');
+    el.innerHTML = '<defs>' +
+      '<pattern id="' + id + 'f" width="30" height="30" patternUnits="userSpaceOnUse" patternTransform="scale(.62)"><rect width="30" height="30" fill="' + K.cream + '"/>' + fl + '</pattern>' +
+      '<pattern id="' + id + 'l" width="20" height="16" patternUnits="userSpaceOnUse" patternTransform="scale(.6)"><rect width="20" height="16" fill="' + K.black + '"/>' + lf + '</pattern>' +
+      '<pattern id="' + id + 's" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="scale(.85)"><rect width="10" height="10" fill="' + K.red + '"/>' + st + '</pattern></defs>' +
+      '<g shape-rendering="crispEdges"><circle cx="100" cy="100" r="99" fill="' + K.red + '"/><circle cx="100" cy="100" r="96" fill="url(#' + id + 'f)"/>' +
+      '<circle cx="100" cy="100" r="75" fill="url(#' + id + 'l)"/><circle cx="100" cy="100" r="64" fill="url(#' + id + 's)"/></g>' +
+      teeth(96.2, 93, 96, K.red) + teeth(75, 77.6, 72, K.red) + teeth(64, 66, 60, K.red) +
+      diamond(44) + diamond(30) + '<path d="M100 56V144M56 100H144" stroke="' + K.black + '" stroke-width="1" opacity=".5"/>' +
+      '<g transform="translate(91.25 91.25) scale(2.5)" shape-rendering="crispEdges">' + rects(STAR, { A: K.black, W: K.cream, Y: K.gold, G: K.green }) + '</g>';
+  });
   $$('[data-sign]').forEach(function (el) { svgGrid(el, SIGNS[el.getAttribute('data-sign')], { A: el.getAttribute('data-ink') === 'dark' ? C.e : C.c, B: el.getAttribute('data-ink') === 'dark' ? C.k : C.m }, .5); });
-  $$('.corner').forEach(function (el) { el.innerHTML = '<svg viewBox="0 0 7 7" shape-rendering="crispEdges">' + rects(['AAAA...', 'A......', 'A.BB...', 'A.B....', '.......', '.......', '.......'], { A: C.k, B: C.m }) + '</svg>'; });
+  $$('.corner').forEach(function (el) { el.innerHTML = '<svg viewBox="0 0 7 7" shape-rendering="crispEdges">' + rects(['AAAA...', 'A......', 'A.BB...', 'A.B....', '.......', '.......', '.......'], { A: K.red, B: K.gold }) + '</svg>'; });
 
   /* ---------- loader (home, once per visit) ---------- */
   (function () {
     var L = $('#loader');
     if (!L) { document.body.classList.add('ready'); return; }
-    svgGrid($('[data-rhomb]', L), RHOMB, { A: C.c, B: C.r, C: C.k, D: C.m });
+    svgGrid($('[data-rhomb]', L), FLOWER, { A: K.cream, B: K.red, C: K.gold });
     var seen = false; try { seen = sessionStorage.getItem('mly-loom') === '1'; } catch (e) {}
     function done() { L.classList.add('done'); document.body.classList.add('ready'); try { sessionStorage.setItem('mly-loom', '1'); } catch (e) {} }
     if (seen || reduce) { L.style.display = 'none'; document.body.classList.add('ready'); } else setTimeout(done, 1500);
