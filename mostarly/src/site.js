@@ -93,6 +93,18 @@
   });
   $$('[data-mini]').forEach(function (el) { svgGrid(el, STAR, { A: K.red, W: K.gold, Y: K.black, G: K.green }); });
 
+  /* tone-on-tone kilim watermark behind the whole page (barely visible, day and night) */
+  (function () {
+    function tile(tone) {
+      var s = rects(FLOWER, { A: tone, B: tone, C: 'none' }, 2, 2) + rects(FLOWER, { A: tone, B: tone, C: 'none' }, 16, 16) +
+        rects(STAR, { A: tone, W: 'none', Y: tone, G: tone }, 17, 5) + rects(STAR, { A: tone, W: 'none', Y: tone, G: tone }, 3, 19);
+      return 'url("data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" shape-rendering="crispEdges">' + s + '</svg>') + '")';
+    }
+    var r = document.documentElement.style;
+    r.setProperty('--wm-day', tile('#f0e7d6'));
+    r.setProperty('--wm-night', tile('#1c1b27'));
+  })();
+
   /* round kilim medallion: red field with stars and a diamond lattice, black leaf ring, cream flower ring */
   $$('[data-medallion]').forEach(function (el, n) {
     var id = 'md' + n, fl = '', lf = '', st = '';
@@ -119,10 +131,10 @@
   (function () {
     var L = $('#loader');
     if (!L) { document.body.classList.add('ready'); return; }
-    svgGrid($('[data-rhomb]', L), FLOWER, { A: K.cream, B: K.red, C: K.gold });
+    var rh = $('[data-rhomb]', L); if (rh) svgGrid(rh, FLOWER, { A: K.cream, B: K.red, C: K.gold });
     var seen = false; try { seen = sessionStorage.getItem('mly-loom') === '1'; } catch (e) {}
     function done() { L.classList.add('done'); document.body.classList.add('ready'); try { sessionStorage.setItem('mly-loom', '1'); } catch (e) {} }
-    if (seen || reduce) { L.style.display = 'none'; document.body.classList.add('ready'); } else setTimeout(done, 1500);
+    if (seen || reduce) { L.style.display = 'none'; document.body.classList.add('ready'); } else setTimeout(done, 3000);
     L.addEventListener('click', done);
   })();
 
@@ -175,7 +187,7 @@
 
   /* ---------- reveal on scroll ---------- */
   var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }); }, { threshold: .15, rootMargin: '0px 0px -5% 0px' });
-  $$('.rv,.shine,.sigsvg,.coffee,.rows').forEach(function (el) { io.observe(el); });
+  $$('.rv,.shine,.sigsvg,.coffee,.rows,.bridge.signature').forEach(function (el) { io.observe(el); });
   var proxy = new Map();
   var io2 = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { proxy.get(e.target).classList.add('in'); io2.unobserve(e.target); } }); }, { threshold: .01 });
   $$('.weave').forEach(function (el) { var w = document.createElement('div'); w.style.position = 'relative'; w.style.zIndex = 3; el.parentNode.insertBefore(w, el); w.appendChild(el); proxy.set(w, el); io2.observe(w); });

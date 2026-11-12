@@ -82,6 +82,25 @@ const tourImg = (t, cls = '', eager = false) => (t.image
   ? `<img src="/img/${esc(t.image)}" alt="${esc(t.imageAlt || t.name)}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async"${cls}>`
   : art(t));
 
+
+/* ---------- Stari Most drawn with one line, in the style of the logo ---------- */
+function cubicAt(p0, p1, p2, p3, t) { const u = 1 - t; return u * u * u * p0 + 3 * u * u * t * p1 + 3 * u * t * t * p2 + t * t * t * p3; }
+function bridge(cls = '') {
+  const lines = [
+    ['M0 150 C 20 140, 30 128, 34 118 H112 V158', 0],
+    ['M58 118 V40 L76 26 L94 40 V118 M58 40 H94 M70 62 H82 M70 86 H82', .15],
+    ['M104 106 C 150 52, 210 52, 256 106', .35],
+    ['M104 99 C 150 45, 210 45, 256 99', .45],
+    ['M116 156 C 132 78, 228 78, 244 156', .55],
+    ['M248 118 H330 C 340 128, 350 140, 360 150 M248 118 V158', .3],
+    ['M272 118 V52 C 272 38, 306 38, 306 52 V118 M272 52 H306 M283 72 H295 M283 94 H295', .2],
+    ['M0 160 C 40 154, 80 166, 120 160 S 200 154, 240 160 S 320 166, 360 160', .7, 'water'],
+    ['M150 168 h18 M186 168 h26 M224 168 h12', .9, 'water']
+  ];
+  const lamps = [.12, .3, .5, .7, .88].map((t, i) => `<g class="lamp" style="--i:${i}"><circle cx="${cubicAt(104, 150, 210, 256, t).toFixed(1)}" cy="${(cubicAt(99, 45, 45, 99, t) - 7).toFixed(1)}" r="7" class="glow"/><circle cx="${cubicAt(104, 150, 210, 256, t).toFixed(1)}" cy="${(cubicAt(99, 45, 45, 99, t) - 7).toFixed(1)}" r="2.4"/><path d="M${cubicAt(104, 150, 210, 256, t).toFixed(1)} ${(cubicAt(99, 45, 45, 99, t) - 4.6).toFixed(1)}v4.5"/></g>`).join('');
+  return `<svg class="bridge ${cls}" viewBox="0 -4 360 178" role="img" aria-label="Stari Most, drawn in one line"><g fill="none" stroke-linecap="round" stroke-linejoin="round">${lines.map(([d, delay, k]) => `<path class="ln${k ? ' ' + k : ''}" pathLength="1" style="--d:${delay}s" d="${d}"/>`).join('')}</g>${lamps}</svg>`;
+}
+
 /* ---------- price ---------- */
 function priceInfo(p) {
   const show = p.basis !== 'request' && (p.confirmed || DRAFT);
@@ -119,7 +138,7 @@ function nav(current, overHero) {
 <div class="sheet-foot"><a class="btn wa block" href="${wa('Hello Mirna, I would like to ask about a tour in Mostar.')}">${I.wa} WhatsApp Mirna</a><a href="${tel}">${esc(S.contact.phone)}</a><a href="mailto:${S.contact.email}">${S.contact.email}</a></div></div>`;
 }
 function foot() {
-  return `<footer class="foot"><div class="band" data-band="0" style="--bh:28px" aria-hidden="true"></div><div class="wrap">
+  return `<section class="bridge-sign" aria-label="Stari Most">${bridge('signature')}<p>Stari Most · 1566</p></section><footer class="foot"><div class="band" data-band="1" style="--bh:44px" aria-hidden="true"></div><div class="fringe down" aria-hidden="true"></div><div class="wrap">
 <div><img class="flogo" src="/img/logo-light.png" alt="Mostarly Guide" width="196" height="40" loading="lazy"><p>Licensed local guide in Mostar,<br>Bosnia and Herzegovina.</p></div>
 <div><h4>Tours</h4><ul>${S.categories.map((c) => `<li><a href="/tours/#${c.id}">${esc(c.name)}</a></li>`).join('')}</ul></div>
 <div><h4>Plan</h4><ul><li><a href="/mostar-herzegovina/">Mostar &amp; Herzegovina</a></li><li><a href="/faq/">Practical information</a></li><li><a href="/travel-professionals/">For travel professionals</a></li><li><a href="/about/">About Mirna</a></li></ul></div>
@@ -222,7 +241,7 @@ const emit = (url, html) => out.push([url, html]);
       <div class="cta"><a class="btn mint" href="/tours/">Explore the tours</a><a class="btn ghost" href="/mostar-herzegovina/">Plan your visit</a></div>
     </div><p class="now" id="now"><i>☀</i><span>In Mostar</span></p></div>
   </div>
-  <div class="band weave" data-band="1" style="--bh:56px" aria-hidden="true"></div>
+  <div class="fringe up" aria-hidden="true"></div><div class="band weave" data-band="1" style="--bh:56px" aria-hidden="true"></div>
 </section>
 
 <section class="sec tight"><div class="wrap intro">
@@ -269,7 +288,7 @@ const emit = (url, html) => out.push([url, html]);
   <p class="rv d2">Send the tour you are interested in, your preferred date and how many of you are coming. You will get a personal reply with availability and the final price.</p>
   <div class="contact-row rv d3"><a class="btn mint" href="/contact/">Send an enquiry</a><a class="btn wa" href="${wa('Hello Mirna, I would like to ask about a tour in Mostar.')}">${I.wa} WhatsApp</a><a class="btn ghost" href="${tel}">${I.phone} Call</a></div>
 </div></section>`;
-  const loader = `<div class="loader" id="loader" aria-hidden="true"><div class="loom"><svg class="rh" data-rhomb viewBox="0 0 15 15"></svg><img class="lg" src="/img/mark-light.png" alt=""></div></div>`;
+  const loader = `<div class="loader" id="loader" aria-hidden="true"><div class="loom2">${bridge('draw')}<img class="lg2" src="/img/logo-light.png" alt=""></div></div>`;
   emit('/', head({ title: 'Mostarly Guide · Private Tours in Mostar with a Licensed Local Guide', desc: S.description, url: '/', ld: [orgLd] }) + page({ current: '/', hero: true, body, extraTop: loader, stickyArgs: ['Tours in Mostar', 'With a licensed local guide', '/contact/', 'Hello Mirna, I would like to ask about a tour in Mostar.'] }));
 }
 

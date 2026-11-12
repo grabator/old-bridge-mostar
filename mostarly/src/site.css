@@ -517,3 +517,35 @@ body:not(.ready) .hero *{animation-play-state:paused!important}
 .kilim-sec .medal.big{position:absolute;right:-90px;top:-60px;width:300px;opacity:.22;filter:none;margin:0}
 .kilim-sec .wrap{position:relative}
 @media (min-width:1000px){.medal{width:240px;margin-top:2rem}.kilim-sec .medal.big{width:520px;right:-140px;top:-120px;opacity:.18}}
+
+/* ===== the page is one kilim: fringes at both ends, tone-on-tone watermark ===== */
+body{background-image:var(--wm-day);background-size:84px 84px}
+html.is-night body{background-image:var(--wm-night)}
+.fringe{position:relative;z-index:3;height:18px;width:100%;
+  background:repeating-linear-gradient(90deg,#f3e7cf 0 1.6px,transparent 1.6px 3.2px,#f3e7cf 3.2px 4.8px,transparent 4.8px 9px);
+  -webkit-mask-image:linear-gradient(var(--fd,to top),#000 55%,transparent);mask-image:linear-gradient(var(--fd,to top),#000 55%,transparent);
+  transform-origin:50% 100%;animation:sway 5s ease-in-out infinite alternate}
+.fringe.up{margin-bottom:-1px}
+.fringe.down{--fd:to bottom;transform-origin:50% 0;margin-top:-1px;height:22px}
+@keyframes sway{from{transform:skewX(-5deg)}to{transform:skewX(5deg)}}
+
+/* ===== Stari Most in one line (loader, signature above the footer) ===== */
+.bridge .ln{stroke:currentColor;stroke-width:2.2;stroke-dasharray:1;stroke-dashoffset:1}
+.bridge .ln.water{stroke:var(--mint)}
+.bridge.draw .ln,.bridge.in .ln{animation:drawln 1.5s cubic-bezier(.6,.1,.2,1) var(--d,0s) forwards}
+@keyframes drawln{to{stroke-dashoffset:0}}
+.bridge .lamp{opacity:0;fill:var(--yellow);stroke:var(--yellow);stroke-width:1.4}
+.bridge .lamp .glow{fill:var(--yellow);stroke:none;opacity:.28;filter:blur(2px)}
+.bridge.draw .lamp,.bridge.in .lamp{animation:lampOn .45s ease calc(1.5s + var(--i) * .14s) forwards}
+@keyframes lampOn{from{opacity:0;transform:translateY(3px)}to{opacity:var(--lamp,1);transform:none}}
+.bridge .lamp{transform-box:fill-box;transform-origin:center}
+.loom2{width:min(78vw,340px);display:grid;justify-items:center;gap:1.4rem;color:#fff}
+.loom2 .bridge{width:100%}
+.loom2 .lg2{height:30px;width:auto;opacity:0;animation:up .6s ease 2.1s forwards;transform:translateY(8px)}
+.bridge-sign{display:grid;justify-items:center;padding:3.6rem 1rem 2.2rem;color:var(--ink);text-align:center}
+.bridge-sign .bridge{width:min(78vw,380px);--lamp:.35}
+html.is-night .bridge-sign .bridge{--lamp:1}
+.bridge-sign p{margin-top:.9rem;font:italic 400 1rem var(--serif);color:var(--mut);letter-spacing:.02em}
+html.is-night .bridge-sign .bridge .glow{opacity:.55}
+@media (prefers-reduced-motion:reduce){.bridge .ln{stroke-dashoffset:0}.bridge .lamp{opacity:var(--lamp,1)}.fringe{animation:none}}
+.foot{overflow:hidden}
