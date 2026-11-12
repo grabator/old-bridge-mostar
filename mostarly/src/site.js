@@ -109,25 +109,32 @@
     L.addEventListener('click', done);
   })();
 
-  /* ---------- day / night by Mostar time (home hero) ---------- */
+  /* ---------- day / night theme: saved choice, otherwise Mostar time (set in <head>) ---------- */
   (function () {
-    var sky = $('#sky'), now = $('#now');
-    if (!sky || !now) return;
-    var SUN = [[7.2, 16.5], [6.75, 17.25], [6.1, 17.9], [6.3, 19.5], [5.6, 20.1], [5.25, 20.5], [5.4, 20.4], [5.9, 19.85], [6.5, 19.0], [7.1, 18.15], [6.75, 16.5], [7.15, 16.25]];
-    var parts = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Sarajevo', hour: '2-digit', minute: '2-digit', month: 'numeric', hourCycle: 'h23' }).formatToParts(new Date());
-    var g = function (t) { return +parts.filter(function (p) { return p.type === t; })[0].value; };
-    var h = g('hour') + g('minute') / 60, sun = SUN[g('month') - 1];
-    var clock = ('0' + g('hour')).slice(-2) + ':' + ('0' + g('minute')).slice(-2);
-    var st = ''; for (var i = 0; i < 46; i++) { var r = (i * 9301 + 49297) % 233280 / 233280, q = (i * 4096 + 150889) % 714025 / 714025; st += '<b style="left:' + (r * 100).toFixed(1) + '%;top:' + (q * 100).toFixed(1) + '%;animation-delay:' + (r * 3.5).toFixed(2) + 's;opacity:' + (.35 + q * .6).toFixed(2) + '"></b>'; }
-    sky.innerHTML = st;
-    function set(n, user) {
-      document.documentElement.classList.toggle('is-night', n);
-      $$('.tswitch button').forEach(function (b) { b.setAttribute('aria-pressed', String((b.getAttribute('data-t') === 'night') === n)); });
-      $('i', now).textContent = n ? '☾' : '☀';
-      $('span', now).textContent = user ? (n ? 'Mostar after akšam, the bridge lit' : 'Mostar by day, the emerald Neretva') : 'In Mostar it is ' + clock + (n ? ', the bridge is lit' : '');
+    var M = window.__mly || { choice: '', clock: '' }, sky = $('#sky'), now = $('#now'), meta = $('meta[name=theme-color]');
+    if (sky) {
+      var st = ''; for (var i = 0; i < 46; i++) { var r = (i * 9301 + 49297) % 233280 / 233280, q = (i * 4096 + 150889) % 714025 / 714025; st += '<b style="left:' + (r * 100).toFixed(1) + '%;top:' + (q * 100).toFixed(1) + '%;animation-delay:' + (r * 3.5).toFixed(2) + 's;opacity:' + (.35 + q * .6).toFixed(2) + '"></b>'; }
+      sky.innerHTML = st;
     }
-    set(h < sun[0] || h >= sun[1], false);
-    $$('.tswitch button').forEach(function (b) { b.addEventListener('click', function () { set(b.getAttribute('data-t') === 'night', true); }); });
+    function set(n, user) {
+      var root = document.documentElement;
+      if (user) { root.classList.add('theme-anim'); setTimeout(function () { root.classList.remove('theme-anim'); }, 700); }
+      root.classList.toggle('is-night', n);
+      if (meta) meta.setAttribute('content', n ? '#14131d' : '#2b2a3c');
+      $$('.tswitch button').forEach(function (b) { b.setAttribute('aria-pressed', String((b.getAttribute('data-t') === 'night') === n)); });
+      if (now) {
+        $('i', now).textContent = n ? '☾' : '☀';
+        $('span', now).textContent = user || M.choice || !M.clock ? (n ? 'Mostar after akšam, the bridge lit' : 'Mostar by day, the emerald Neretva') : 'In Mostar it is ' + M.clock + (n ? ', the bridge is lit' : '');
+      }
+    }
+    set(document.documentElement.classList.contains('is-night'), false);
+    $$('.tswitch button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var n = b.getAttribute('data-t') === 'night';
+        try { localStorage.setItem('mly-theme', n ? 'night' : 'day'); } catch (e) {}
+        set(n, true); track('theme_' + (n ? 'night' : 'day'));
+      });
+    });
     window.__setNight = set;
   })();
 

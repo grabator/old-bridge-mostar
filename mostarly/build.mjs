@@ -22,6 +22,8 @@ const JS = fs.readFileSync(path.join(ROOT, 'src/site.js'), 'utf8');
 const V = { css: hash(CSS), js: hash(JS) };
 const wa = (text) => `https://wa.me/${S.contact.whatsapp}?text=${encodeURIComponent(text)}`;
 const tel = 'tel:' + S.contact.phone.replace(/\s/g, '');
+// Runs in <head> before the page paints: the visitor's saved choice, otherwise day or night in Mostar right now.
+const THEME_BOOT = `(function(){var S=[[7.2,16.5],[6.75,17.25],[6.1,17.9],[6.3,19.5],[5.6,20.1],[5.25,20.5],[5.4,20.4],[5.9,19.85],[6.5,19],[7.1,18.15],[6.75,16.5],[7.15,16.25]],c='',n=false,k='';try{c=localStorage.getItem('mly-theme')||''}catch(e){}try{var p=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Sarajevo',hour:'2-digit',minute:'2-digit',month:'numeric',hourCycle:'h23'}).formatToParts(new Date()),g=function(t){return +p.filter(function(x){return x.type===t})[0].value},h=g('hour')+g('minute')/60,s=S[g('month')-1];n=h<s[0]||h>=s[1];k=('0'+g('hour')).slice(-2)+':'+('0'+g('minute')).slice(-2)}catch(e){}if(c)n=c==='night';if(n)document.documentElement.classList.add('is-night');window.__mly={choice:c,clock:k}})();`;
 const catName = (id) => (S.categories.find((c) => c.id === id) || {}).name || '';
 
 /* ---------- icons & marks ---------- */
@@ -87,7 +89,8 @@ function head({ title, desc, url, image = '/img/hero-d.jpg', ld = [], noindex = 
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}"><link rel="canonical" href="${full}">
 ${noindex || DRAFT ? '<meta name="robots" content="noindex">' : ''}
 <meta property="og:type" content="website"><meta property="og:site_name" content="Mostarly Guide"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${full}"><meta property="og:image" content="${BASE + image}"><meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#2b2a3c"><link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#2b2a3c"><meta name="color-scheme" content="light dark"><link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<script>${THEME_BOOT}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..500&family=Inter:wght@400..700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/site.css?v=${V.css}">
@@ -98,7 +101,7 @@ function nav(current, overHero) {
   return `<header class="nav${overHero ? '' : ' solid'}">
   <a class="home" href="/" aria-label="Mostarly Guide home">${LOGO()}<span class="brand">Mostarly<small>Guide · Mostar</small></span></a>
   <nav class="links" aria-label="Main">${NAV.map(([h, l]) => `<a href="${h}"${current === h ? ' aria-current="page"' : ''}>${l}</a>`).join('')}</nav>
-  <div class="nav-tools">${overHero ? `<div class="tswitch" role="group" aria-label="Day or night in Mostar"><button type="button" data-t="day" aria-label="Show Mostar by day" aria-pressed="true">${I.sun}</button><button type="button" data-t="night" aria-label="Show Mostar at night" aria-pressed="false">${I.moon}</button></div>` : ''}
+  <div class="nav-tools"><div class="tswitch" role="group" aria-label="Day or night theme"><button type="button" data-t="day" aria-label="Day theme" aria-pressed="true">${I.sun}</button><button type="button" data-t="night" aria-label="Night theme" aria-pressed="false">${I.moon}</button></div>
   <a class="btn sm ${overHero ? 'mint' : ''} enq" href="/contact/">Enquire</a>
   <button class="menu-btn" type="button" data-menu aria-expanded="false" aria-controls="sheet" aria-label="Open menu">${I.menu}</button></div>
 </header>
