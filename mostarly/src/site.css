@@ -833,3 +833,4 @@ html.is-night .jr-tour:hover{background:#1f2f2b}
 @keyframes hint{15%,75%{opacity:1}100%{opacity:0}}
 .jr.is-wide .jr-view{left:1.4rem;right:auto;width:min(40%,460px);top:7.5rem;bottom:5.4rem}
 .jr.is-wide .jr-view-x{display:none}
+html.is-night .jr-lookbtn{background:#48e5c2;color:#16151f}html.is-night .jr-lookbtn svg{color:#16151f}
