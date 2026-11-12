@@ -262,19 +262,101 @@ h3{font-size:1.55rem}
   .form{margin-top:0}
   .foot .wrap{grid-template-columns:auto 1fr 1fr 1fr;padding-bottom:3rem}
 }
+
+/* loader: a kilim is woven, then becomes the logo */
+.loader{position:fixed;inset:0;z-index:100;background:var(--navy);display:grid;place-items:center;transition:opacity .6s .1s,visibility .7s}
+.loader.done{opacity:0;visibility:hidden}
+.loom{position:relative;width:168px;height:168px}
+.loom svg.rh{position:absolute;inset:0;width:100%;height:100%;clip-path:inset(0 0 100% 0);animation:weave 1s steps(15,end) .15s forwards}
+.loom .shuttle{position:absolute;left:-14px;right:-14px;height:2px;top:0;background:linear-gradient(90deg,transparent,var(--copper2),transparent);animation:shuttle 1s steps(15,end) .15s forwards;opacity:.9}
+@keyframes shuttle{to{top:100%;opacity:0}}
+.loom .lg{position:absolute;inset:34px;opacity:0;transform:scale(.6);animation:lg .6s cubic-bezier(.3,1.5,.5,1) 1.25s forwards}
+@keyframes lg{to{opacity:1;transform:none}}
+.loader p{position:absolute;bottom:calc(14% + env(safe-area-inset-bottom));left:0;right:0;text-align:center;color:#cfc9dc;font:italic 400 1.05rem Fraunces,serif;opacity:0;animation:up .8s .9s forwards}
+body:not(.ready) .hero *{animation-play-state:paused!important}
+
+/* day / night */
+.tswitch{display:flex;align-items:center;gap:2px;border:1px solid rgba(255,255,255,.4);border-radius:99px;padding:3px;margin-left:auto;background:rgba(20,19,30,.18);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.tswitch button{width:30px;height:30px;border-radius:50%;border:0;background:transparent;color:#fff;display:grid;place-items:center;cursor:pointer;transition:background .3s,color .3s}
+.tswitch button svg{width:16px;height:16px}
+.tswitch button[aria-pressed=true]{background:#fff;color:var(--navy)}
+.nav .lang{margin-left:.5rem}
+.hero .night{opacity:0;transition:opacity 1.4s ease}
+html.is-night .hero .night{opacity:1}
+.now{display:inline-flex;align-items:center;gap:.5rem;margin-top:1rem;font-size:.78rem;color:#fff;background:rgba(20,19,30,.32);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.22);border-radius:99px;padding:.35rem .8rem .35rem .45rem;opacity:0;animation:up .9s .85s forwards}
+.now i{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;background:var(--yellow);color:var(--navy);font-style:normal;font-size:11px}
+html.is-night .now i{background:#cfd6ff}
+.sky{position:absolute;inset:0 0 55% 0;z-index:1;pointer-events:none;opacity:0;transition:opacity 1.4s}
+html.is-night .sky{opacity:1}
+.sky b{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff;animation:tw 3.5s ease-in-out infinite}
+@keyframes tw{50%{opacity:.15}}
+html.is-night .hero::after{background:linear-gradient(180deg,rgba(15,16,32,.55) 0%,rgba(15,16,32,.1) 30%,rgba(15,16,32,.45) 55%,rgba(15,16,32,.9) 100%)}
+
+/* copper catches the light */
+.glint{position:relative}
+.rozeta .gl{mix-blend-mode:soft-light}
+.price b{background-size:220% 100%;background-position:calc(50% + var(--tx,0)*40%) 50%;transition:background-position .4s ease-out}
+
+/* signature */
+.sigsvg{display:block;width:210px;height:70px;margin-top:1.1rem;overflow:visible}
+.sigsvg text{font:italic 400 52px Fraunces,serif;fill:var(--copper);fill-opacity:0;stroke:var(--copper);stroke-width:.9;stroke-dasharray:420;stroke-dashoffset:420}
+.in .sigsvg text,.sigsvg.in text{animation:sign 2.4s .3s ease forwards}
+@keyframes sign{70%{stroke-dashoffset:0;fill-opacity:0}100%{stroke-dashoffset:0;fill-opacity:1}}
+.signame{font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--mut);margin-top:.1rem!important}
+
+/* speak a little Mostar */
+.speak{background:linear-gradient(180deg,var(--cream),#efe5d4)}
+.speak-grid{display:grid;gap:2rem;align-items:center}
+.coffee{position:relative;max-width:360px;margin:0 auto;width:100%}
+.coffee svg{width:100%;height:auto;display:block;overflow:visible}
+.dz{transform-origin:150px 120px;transform:rotate(0deg)}
+.coffee.in .dz{animation:pour 5.5s .4s ease-in-out forwards}
+@keyframes pour{0%{transform:translate(0,0) rotate(0)}22%{transform:translate(-6px,-4px) rotate(-38deg)}70%{transform:translate(-6px,-4px) rotate(-38deg)}100%{transform:translate(0,0) rotate(0)}}
+.stream{stroke-dasharray:60;stroke-dashoffset:60;opacity:0}
+.coffee.in .stream{animation:stream 3.4s 1.5s ease forwards}
+@keyframes stream{8%{opacity:1;stroke-dashoffset:0}85%{opacity:1;stroke-dashoffset:0}100%{opacity:0;stroke-dashoffset:-60}}
+.lvl{transform:translateY(22px)}
+.coffee.in .lvl{animation:fill 2.6s 1.8s ease-out forwards}
+@keyframes fill{to{transform:translateY(0)}}
+.steam path{opacity:0}
+.coffee.in .steam path{animation:steam 3s ease-in-out infinite}
+.coffee.in .steam path:nth-child(1){animation-delay:4.2s}.coffee.in .steam path:nth-child(2){animation-delay:4.9s}.coffee.in .steam path:nth-child(3){animation-delay:5.6s}
+@keyframes steam{0%{opacity:0;transform:translateY(6px)}40%{opacity:.75}100%{opacity:0;transform:translateY(-16px)}}
+.words{display:flex;flex-wrap:wrap;gap:.5rem;margin:1.2rem 0}
+.words button{font:600 .95rem Inter,sans-serif;color:var(--navy);background:#fffaf2;border:1px solid var(--line);border-radius:99px;padding:.55rem 1rem;cursor:pointer;transition:all .25s}
+.words button[aria-pressed=true]{background:var(--navy);color:#fff;border-color:var(--navy)}
+.word{position:relative;background:#fffaf2;border:1px solid var(--line);border-radius:24px;padding:1.4rem 1.4rem 1.3rem;min-height:150px}
+.word .w{font:italic 400 2.4rem Fraunces,serif;line-height:1;color:var(--navy)}
+.word .say{font-size:.8rem;color:var(--copper);letter-spacing:.06em;margin:.4rem 0 .7rem;display:block}
+.word p{color:#4a4642;max-width:38ch}
+.word .corner{position:absolute;width:20px;height:20px;right:12px;top:12px;transform:scaleX(-1)}
+.word.swap{animation:swap .45s ease}
+@keyframes swap{from{opacity:0;transform:translateY(8px)}}
+
+/* kaldrma rail */
+.rail{position:fixed;right:6px;top:18vh;height:64vh;width:10px;z-index:15;pointer-events:none;opacity:0;transition:opacity .4s}
+.rail.show{opacity:1}
+.rail svg{width:100%;height:100%;overflow:visible}
+.rail ellipse{opacity:.12;transition:opacity .3s,fill .3s}
+.rail ellipse.on{opacity:.95}
+@media (min-width:900px){.speak-grid{grid-template-columns:1fr 1.1fr;gap:5rem}.rail{right:14px;width:12px}.tswitch{margin-left:1.2rem}.nav .lang{margin-left:1rem}}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
   .rv,.stone,.pin,.hero h1 span,.lead,.cta,.rating{opacity:1!important;transform:none!important}
   .weave{clip-path:none}
+  .loader{display:none}.sigsvg text{fill-opacity:1;stroke-dashoffset:0}.lvl{transform:none}
 }
 </style>
 </head>
 <body>
+<div class="loader" id="loader" aria-hidden="true"><div class="loom"><svg class="rh" data-rhomb2 viewBox="0 0 15 15"></svg><span class="shuttle"></span><svg class="lg" viewBox="0 0 448 448"><circle cx="224" cy="224" r="224" fill="#2b2a3c" stroke="#f6f0e6" stroke-width="10"/><g fill="none" stroke="#fff" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"><path d="M120 262V88l152 134"/><path d="M272 88v134"/><path d="M240 300v56M240 356a62 62 0 1 1 78-4"/></g><circle cx="282" cy="268" r="19" fill="#f2cf3a"/><path d="M92 282h54l-27 26z" fill="#1de9b6"/></svg></div><p>Mostar, woven by a local.</p></div>
+<div class="rail" id="rail"><svg id="railsvg"></svg></div>
 
 <header class="nav">
   <svg class="logo" viewBox="0 0 448 448" aria-label="Mostarly Guide"><circle cx="224" cy="224" r="224" fill="#2b2a3c"/><g fill="none" stroke="#fff" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"><path d="M120 262V88l152 134"/><path d="M272 88v134"/><path d="M240 300v56M240 356a62 62 0 1 1 78-4"/></g><circle cx="282" cy="268" r="19" fill="#f2cf3a"/><path d="M92 282h54l-27 26z" fill="#1de9b6"/></svg>
   <span class="brand">Mostarly<small>Guide · Mostar</small></span>
   <nav class="links"><a href="#reviews">Reviews</a><a href="#mirna">Your guide</a><a href="#tours">Tours</a><a href="#book">Contact</a></nav>
+  <div class="tswitch" role="group" aria-label="Day or night in Mostar"><button type="button" data-t="day" aria-label="Day" aria-pressed="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.5" fill="currentColor"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></g></svg></button><button type="button" data-t="night" aria-label="Night" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z" fill="currentColor"/></svg></button></div>
   <span class="lang">EN</span>
 </header>
 
@@ -283,6 +365,11 @@ h3{font-size:1.55rem}
     <source media="(min-width:900px)" srcset="img/hero-d.jpg">
     <img src="img/hero-m.jpg" alt="Stari Most over the emerald Neretva river in Mostar">
   </picture>
+  <picture class="night">
+    <source media="(min-width:900px)" srcset="img/sumrak.jpg">
+    <img src="img/night-m.jpg" alt="" loading="lazy" style="object-position:50% 50%">
+  </picture>
+  <div class="sky" id="sky"></div>
   <div class="hero-in">
     <p class="kick"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M0 2h12L6 11z" fill="#1de9b6"/></svg>Licensed local guide · Mostar</p>
     <h1 aria-label="Mostar"><span>M</span><span>O</span><span>S</span><span>T</span><span>A</span><span>R</span></h1>
@@ -291,7 +378,8 @@ h3{font-size:1.55rem}
         <p class="lead">See the city through the eyes of someone born here.</p>
         <div class="cta"><a class="btn mint" href="#book">Book a tour</a><a class="btn ghost" href="#tours">See tours</a></div>
       </div>
-      <p class="rating"><span class="stars"><i>★</i><i>★</i><i>★</i><i>★</i><i>★</i></span> Loved by travellers on Tripadvisor</p>
+      <div><p class="now" id="now"><i>☀</i><span>Mostar now</span></p>
+      <p class="rating"><span class="stars"><i>★</i><i>★</i><i>★</i><i>★</i><i>★</i></span> Loved by travellers on Tripadvisor</p></div>
     </div>
   </div>
   <div class="band weave" data-band="1" style="--bh:62px"></div>
@@ -334,6 +422,7 @@ h3{font-size:1.55rem}
         <circle cx="60" cy="60" r="31" fill="#2b2a3c"/>
         <g fill="none" stroke="url(#cuG)" stroke-width="1.6" id="petals"></g>
         <circle cx="60" cy="60" r="4" fill="#f2cf3a"/>
+        <circle class="gl" id="glint" cx="40" cy="36" r="34" fill="url(#glG)"/><radialGradient id="glG"><stop offset="0" stop-color="#fff" stop-opacity=".85"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
       </svg>
     </div>
     <div>
@@ -341,7 +430,7 @@ h3{font-size:1.55rem}
       <h2 class="rv d1">Hi, I’m <em>Mirna.</em></h2>
       <p class="rv d2">I was born and raised in Mostar. I know the stories behind the stones, the quiet corners for the best photos and the places where locals really drink their coffee.</p>
       <p class="rv d2">Walk with me and you will not just see Stari Most, you will understand why this city loves it so much.</p>
-      <p class="sig rv d3">Mirna Cemalović Kukrića</p>
+      <svg class="sigsvg rv d3" viewBox="0 0 210 70" aria-label="Mirna"><text x="2" y="54">Mirna</text></svg><p class="signame rv d3">Mirna Cemalović Kukrića</p>
       <div class="facts rv d3"><div><b>1566</b><span>Stari Most built</span></div><div><b>2004</b><span>Rebuilt</span></div><div><b>2005</b><span>UNESCO</span></div></div>
     </div>
   </div>
@@ -423,6 +512,41 @@ h3{font-size:1.55rem}
       <div class="stop rv d1"><div class="tile" style="background:#efe0cb" data-tile="star"></div><div><em>Stop 2</em><b>Počitelj</b><span>Stone village above the Neretva</span></div></div>
       <div class="road">≈ 25 min drive</div>
       <div class="stop rv d2"><div class="tile" style="background:#cfe9f0" data-tile="water"></div><div><em>Stop 3</em><b>Kravice</b><span>Waterfalls &amp; a summer swim</span></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec speak" id="speak">
+  <div class="wrap speak-grid">
+    <div class="coffee rv" id="coffee">
+      <svg viewBox="0 0 320 260" aria-hidden="true">
+        <defs>
+          <linearGradient id="cu2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8f4a26"/><stop offset=".45" stop-color="#eab087"/><stop offset=".62" stop-color="#c47647"/><stop offset="1" stop-color="#7d3f1f"/></linearGradient>
+          <clipPath id="cupIn"><path d="M196 168 h52 l-6 40 q-20 8-40 0z"/></clipPath>
+        </defs>
+        <ellipse cx="190" cy="226" rx="128" ry="22" fill="url(#cu2)"/>
+        <ellipse cx="190" cy="222" rx="118" ry="17" fill="none" stroke="#fbe1c8" stroke-width="1" opacity=".55"/>
+        <g opacity=".55" stroke="#fbe1c8" stroke-width=".8" fill="none"><path d="M120 222 q20-8 40 0 t40 0 t40 0 t40 0"/></g>
+        <g class="steam" fill="none" stroke="#b9ab97" stroke-width="2.2" stroke-linecap="round"><path d="M212 150 c-6-10 6-16 0-28"/><path d="M224 152 c-6-10 6-16 0-28"/><path d="M236 150 c-6-10 6-16 0-28"/></g>
+        <path d="M190 166 h64 l-8 46 q-24 10-48 0z" fill="#fffaf2" stroke="#2b2a3c" stroke-width="2.5" stroke-linejoin="round"/>
+        <g clip-path="url(#cupIn)"><rect class="lvl" x="190" y="186" width="66" height="40" fill="#5a3420"/><rect class="lvl" x="190" y="186" width="66" height="3" fill="#a8744f"/></g>
+        <path d="M194 178 h56" stroke="#1de9b6" stroke-width="2.5"/><path d="M196 190 l4 4 4-4 4 4 4-4 4 4 4-4 4 4 4-4 4 4 4-4 4 4" fill="none" stroke="#b5683d" stroke-width="1.6"/>
+        <path class="stream" d="M178 112 C 186 122, 210 140, 220 176" fill="none" stroke="#5a3420" stroke-width="4" stroke-linecap="round"/>
+        <g class="dz">
+          <path d="M96 92 h70 l6 8 -14 6 6 60 q-38 14-70 0 l8-60 -12-6z" fill="url(#cu2)" stroke="#6e3517" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M100 124 q32 10 62 0 M98 140 q34 10 66 0" fill="none" stroke="#fbe1c8" stroke-width="1.2" opacity=".7"/>
+          <path d="M108 150 c6-8 14-8 20 0 c6 8 14 8 20 0" fill="none" stroke="#6e3517" stroke-width="1.4"/>
+          <path d="M96 100 L 22 128" stroke="#c9a24b" stroke-width="7" stroke-linecap="round"/>
+          <path d="M60 114 l4 10 M46 119 l4 10 M74 108 l4 10" stroke="#8a6a24" stroke-width="2"/>
+        </g>
+      </svg>
+    </div>
+    <div>
+      <p class="eyebrow rv"><svg data-mini></svg>Speak a little Mostar</p>
+      <h2 class="rv d1">The tour ends with <em>ćejf.</em></h2>
+      <p class="rv d2" style="color:#4a4642;max-width:42ch">Learn a few words before you come. Locals will smile, and Mirna will teach you the rest over coffee.</p>
+      <div class="words rv d2" id="words"></div>
+      <div class="word rv d3" id="word"></div>
     </div>
   </div>
 </section>
@@ -595,12 +719,65 @@ const rows=document.getElementById('rows');rows.addEventListener('scroll',()=>{c
     [...pins.children].forEach((e,i)=>{const idx=[0,Math.round(st.length*.3),Math.round(st.length*.55),Math.round(st.length*.78),st.length-1][i];setTimeout(()=>e.classList.add('on'),idx*28+150)})};
 })();
 
+
+/* loader */
+(function(){const L=document.getElementById('loader');const el=L.querySelector('[data-rhomb2]');svgGrid(el,RHOMB,{A:C.c,B:C.r,C:C.k,D:C.m});
+  let seen=false;try{seen=sessionStorage.getItem('mly-loom')==='1'}catch(e){}
+  const done=()=>{L.classList.add('done');document.body.classList.add('ready');try{sessionStorage.setItem('mly-loom','1')}catch(e){}};
+  if(seen||matchMedia('(prefers-reduced-motion: reduce)').matches){L.style.display='none';document.body.classList.add('ready')}else setTimeout(done,2100);
+  L.addEventListener('click',done)})();
+
+/* day / night by Mostar time */
+(function(){const SUN=[[7.2,16.5],[6.75,17.25],[6.1,17.9],[6.3,19.5],[5.6,20.1],[5.25,20.5],[5.4,20.4],[5.9,19.85],[6.5,19.0],[7.1,18.15],[6.75,16.5],[7.15,16.25]];
+  const parts=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Sarajevo',hour:'2-digit',minute:'2-digit',month:'numeric',hourCycle:'h23'}).formatToParts(new Date());
+  const g=t=>+parts.find(p=>p.type===t).value;const h=g('hour')+g('minute')/60,[rise,dusk]=SUN[g("month")-1];
+  const clock=String(g('hour')).padStart(2,'0')+':'+String(g('minute')).padStart(2,'0');
+  const autoNight=h<rise||h>=dusk;const now=document.getElementById('now');
+  const sky=document.getElementById('sky');let st='';for(let i=0;i<46;i++){const r=(i*9301+49297)%233280/233280,q=(i*4096+150889)%714025/714025;st+=`<b style="left:${(r*100).toFixed(1)}%;top:${(q*100).toFixed(1)}%;animation-delay:${(r*3.5).toFixed(2)}s;opacity:${(.35+q*.6).toFixed(2)}"></b>`}sky.innerHTML=st;
+  function set(n,user){document.documentElement.classList.toggle('is-night',n);document.querySelectorAll('.tswitch button').forEach(b=>b.setAttribute('aria-pressed',String((b.dataset.t==='night')===n)));
+    now.querySelector('i').textContent=n?'☾':'☀';
+    now.querySelector('span').textContent=user?(n?'Mostar after akšam: the bridge is lit':'Mostar by day: emerald Neretva'):`Mostar now · ${clock}${n?' · the bridge is lit':''}`;}
+  set(autoNight,false);document.querySelectorAll('.tswitch button').forEach(b=>b.onclick=()=>set(b.dataset.t==='night',true));
+  window.__setNight=set;})();
+
+/* copper catches the light: phone tilt, mouse, or a slow drift */
+(function(){const gl=document.getElementById('glint');let tx=0,ty=0,live=false;
+  const apply=()=>{gl.setAttribute('cx',(60+tx*30).toFixed(1));gl.setAttribute('cy',(60+ty*30).toFixed(1));document.documentElement.style.setProperty('--tx',tx.toFixed(3))};
+  addEventListener('deviceorientation',e=>{if(e.gamma==null)return;live=true;tx=Math.max(-1,Math.min(1,e.gamma/30));ty=Math.max(-1,Math.min(1,(e.beta-45)/30));apply()},{passive:true});
+  addEventListener('pointermove',e=>{if(e.pointerType!=='mouse')return;live=true;tx=e.clientX/innerWidth*2-1;ty=e.clientY/innerHeight*2-1;apply()},{passive:true});
+  let t=0;(function drift(){if(!live){t+=.012;tx=Math.sin(t)*.8;ty=Math.cos(t*.7)*.6;apply()}requestAnimationFrame(drift)})();})();
+
+/* speak a little Mostar */
+(function(){const W=[['ćejf','chayf','Slow, deliberate enjoyment. A Bosnian coffee is never rushed, it is an excuse to sit, talk and watch the city go by.'],
+ ['polahko','po-lah-ko','Easy, take your time. You will hear it everywhere in Herzegovina, usually with a smile.'],
+ ['merak','meh-rak','The quiet joy of doing something you love, just for the pleasure of it.'],
+ ['sevdah','sev-dah','Love and longing, and the soulful old songs, sevdalinke, that are sung about it.'],
+ ['akšam','ak-sham','Dusk. The moment the light turns gold over the Neretva and the bridge lamps come on.'],
+ ['hajde','hai-deh','Come on, let’s go! The word that starts every good walk.']];
+  const box=document.getElementById('words'),card=document.getElementById('word');
+  const corner=`<svg viewBox="0 0 7 7" shape-rendering="crispEdges">${rects(['AAAA...','A......','A.BB...','A.B....','.......','.......','.......'],{A:C.k,B:C.m})}</svg>`;
+  function show(i){const [w,say,m]=W[i];card.classList.remove('swap');void card.offsetWidth;card.classList.add('swap');
+    card.innerHTML=`<span class="corner">${corner}</span><div class="w">${w}</div><span class="say">say “${say}”</span><p>${m}</p>`;
+    [...box.children].forEach((b,j)=>b.setAttribute('aria-pressed',String(j===i)))}
+  box.innerHTML=W.map(([w])=>`<button type="button">${w}</button>`).join('');[...box.children].forEach((b,i)=>b.onclick=()=>show(i));show(0);
+  document.querySelectorAll('#speak [data-mini]').forEach(el=>svgGrid(el,MINI,{A:C.k,B:C.m}));})();
+
+/* kaldrma rail: stones fill in as you scroll */
+(function(){const svg=document.getElementById('railsvg'),rail=document.getElementById('rail');const N=34;let s='';
+  const gr=['#9b958b','#857f75','#b4ada1','#6f6a61'];
+  for(let i=0;i<N;i++){const y=(i+.5)/N*100,rx=3.2+((i*37)%10)/10*1.4,ry=2+((i*53)%10)/10*.9;s+=`<ellipse cx="50%" cy="${y}%" rx="${rx}" ry="${ry}" fill="${i%9===8?'#1de9b6':gr[i%4]}" stroke="#f6f0e6" stroke-width=".8"/>`}
+  svg.innerHTML=s;const st=[...svg.children];
+  const upd=()=>{const max=document.documentElement.scrollHeight-innerHeight,p=max>0?scrollY/max:0;const k=Math.round(p*N);st.forEach((e,i)=>e.classList.toggle('on',i<k));rail.classList.toggle('show',scrollY>innerHeight*.6)};
+  addEventListener('scroll',upd,{passive:true});upd();})();
+
 /* reveal on scroll */
 const proxy=new Map();
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){const t=proxy.get(e.target)||e.target;t.classList.add('in');if(t.id==='map')window.__route();io.unobserve(e.target)}}),{threshold:.18,rootMargin:'0px 0px -6% 0px'});
 document.querySelectorAll('.rv,.shine,.reviews,.rev-score').forEach(el=>io.observe(el));
+io.observe(document.getElementById('coffee'));
 /* clipped elements have no visible area, so watch a stand-in */
-document.querySelectorAll('.weave').forEach(el=>{let w;if(el.classList.contains('band')){w=document.createElement('div');w.style.position='relative';w.style.zIndex=3;el.replaceWith(w);w.appendChild(el)}else w=el.parentElement;proxy.set(w,el);io.observe(w)});
+const io2=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){proxy.get(e.target).classList.add('in');io2.unobserve(e.target)}}),{threshold:.01});
+document.querySelectorAll('.weave').forEach(el=>{let w;if(el.classList.contains('band')){w=document.createElement('div');w.style.position='relative';w.style.zIndex=3;el.replaceWith(w);w.appendChild(el)}else w=el.parentElement;proxy.set(w,el);io2.observe(w)});
 if(matchMedia('(prefers-reduced-motion: reduce)').matches){document.querySelectorAll('.stone,.pin').forEach(e=>e.classList.add('on'))}
 
 /* sticky CTA */
