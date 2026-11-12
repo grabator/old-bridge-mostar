@@ -1047,3 +1047,4 @@ html.is-night .tk-n{background:#173a33;color:#8ff0d6}
 .enq-card{container-type:inline-size}
 @container (max-width:340px){.form .two{grid-template-columns:1fr}.tk-list{grid-template-columns:1fr}}
 .form,.fstep{grid-template-columns:minmax(0,1fr)}.fsum,.ticks,.fmsg{min-width:0;max-width:100%}
+@media (min-width:1000px){.tlayout>.aside{margin-top:1.8rem}}.tlayout>.aside{margin-bottom:2rem}
