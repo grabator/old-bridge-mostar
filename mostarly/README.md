@@ -41,9 +41,9 @@ Each price has a type: `person`, `group` or `request`, plus `amount`, `from` (sh
 The form never presents an enquiry as a confirmed booking. It offers two ways to send it:
 
 1. **WhatsApp:** opens a chat with a pre-written message (tour, date, guests, children's ages, tickets, message).
-2. **Email:** `POST /api/enquiry` (`functions/api/enquiry.js`, a Cloudflare Pages Function) sends it to the inbox through [Resend](https://resend.com). If the mail service is not configured, the visitor's email app opens with the message ready.
+2. **Email:** `POST /api/enquiry` (`functions/api/enquiry.js`, called from the Worker) sends it to the inbox through [Resend](https://resend.com). If the mail service is not configured, the visitor's email app opens with the message ready.
 
-Environment variables on Cloudflare Pages:
+Variables on the Worker:
 
 | Variable | Meaning |
 |---|---|
@@ -70,14 +70,27 @@ Setup:
 2. Deploy a GitHub OAuth proxy on Cloudflare Workers (for example `sveltia-cms-auth` or `decap-proxy`) and put its address in `base_url`.
 3. Give the owner's GitHub account write access to the repository.
 
-## Deploy on Cloudflare Pages
+## Deploy on Cloudflare Workers
+
+The site is a Worker with static assets: `worker.js` serves `dist/` and handles `POST /api/enquiry`; `wrangler.jsonc` holds the settings.
+
+From a computer (once: `npx wrangler login`):
+
+```
+cd mostarly
+node build.mjs
+npx wrangler deploy
+```
+
+Or connect the repository in the Cloudflare dashboard (Workers & Pages > Create > Import a repository):
 
 | Setting | Value |
 |---|---|
 | Root directory | `mostarly` |
 | Build command | `node build.mjs` |
-| Output directory | `dist` |
-| Environment variable | `SITE_URL=https://your-domain` (if the domain differs from `url` in `site.json`) |
+| Deploy command | `npx wrangler deploy` |
+
+Secrets for the email form (Worker > Settings > Variables and secrets): `RESEND_API_KEY` (secret), `MAIL_TO`, `MAIL_FROM`. Without them the form falls back to the visitor's email app. Set `SITE_URL` as a build variable if the domain differs from `url` in `site.json`.
 
 ## Languages
 

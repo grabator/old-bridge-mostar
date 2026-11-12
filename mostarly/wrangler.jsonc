@@ -1,0 +1,13 @@
+{
+  // Cloudflare Workers deploy: node build.mjs && npx wrangler deploy
+  "name": "mostarly-guide",
+  "main": "worker.js",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "404-page",
+    "run_worker_first": ["/api/*"]
+  },
+  "observability": { "enabled": true }
+}
