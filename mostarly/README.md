@@ -82,7 +82,7 @@ How it is built: `worker.js` (routing), `server/auth.js` (sign-in check), `serve
    - Policy: Allow, Include: Emails, Mirna's email (and yours).
    - Login method: One-time PIN (a code is sent to the email; nothing else to set up).
    - After saving, copy the **Application Audience (AUD) Tag**.
-5. In `wrangler.jsonc` set `vars`: `ACCESS_TEAM` (your team domain, here `mostarly.cloudflareaccess.com`), `ACCESS_AUD` (the AUD tag), `ADMIN_EMAILS` (allowed emails, comma separated). Deploy again.
+5. In `wrangler.jsonc` set `vars`: `ACCESS_TEAM` (your team domain, here `mostarly.cloudflareaccess.com`), `ACCESS_AUD` (the AUD tag), `ADMIN_EMAILS` (optional: extra list of allowed emails, comma separated; empty = whoever the Access policy lets in). Deploy again.
 
 The Worker checks the Access token itself as well, so the API stays closed even if Access were switched off by mistake. Without `ACCESS_TEAM` and `ACCESS_AUD` the admin is simply closed.
 
