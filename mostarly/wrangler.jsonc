@@ -20,7 +20,7 @@
   "vars": {
     // Cloudflare Access (Zero Trust > Access > Applications), see README "Admin"
     "ACCESS_TEAM": "mostarly.cloudflareaccess.com",
-    "ACCESS_AUD": "",
+    "ACCESS_AUD": "02faa1f931da7bd4746846d8183e51f195aac883053171081067b1e88ccbbdae",
     "ADMIN_EMAILS": ""
   },
   "observability": { "enabled": true }
