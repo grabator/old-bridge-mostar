@@ -4,17 +4,17 @@
 // (the application's "AUD tag") and ADMIN_EMAILS (comma separated). For local development only:
 // ADMIN_DEV=1 in .dev.vars lets localhost in without Access.
 
-let certs = null, certsAt = 0;
+const certs = {}, certsAt = {};
 
 const b64url = (s) => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(s.length / 4) * 4, '=')), (c) => c.charCodeAt(0));
 const json = (s) => JSON.parse(new TextDecoder().decode(b64url(s)));
 
 async function keys(team) {
-  if (certs && Date.now() - certsAt < 3600e3) return certs;
+  if (certs[team] && Date.now() - certsAt[team] < 3600e3) return certs[team];
   const r = await fetch(`https://${team}/cdn-cgi/access/certs`);
   if (!r.ok) throw new Error('certs ' + r.status);
-  certs = (await r.json()).keys || []; certsAt = Date.now();
-  return certs;
+  certs[team] = (await r.json()).keys || []; certsAt[team] = Date.now();
+  return certs[team];
 }
 
 function tokenOf(request) {
@@ -29,7 +29,12 @@ async function verify(token, env) {
   if (!h || !p || !s) return null;
   const head = json(h), body = json(p);
   if (head.alg !== 'RS256') return null;
-  const jwk = (await keys(env.ACCESS_TEAM)).find((k) => k.kid === head.kid);
+  // ACCESS_TEAM may list several team domains (e.g. after renaming the team): use the one that signed the token
+  const teams = String(env.ACCESS_TEAM || '').split(',').map((x) => x.trim()).filter(Boolean);
+  const issHost = String(body.iss || '').replace(/^https:\/\//, '').replace(/\/$/, '');
+  const team = teams.includes(issHost) ? issHost : teams[0];
+  if (!team) return null;
+  const jwk = (await keys(team)).find((k) => k.kid === head.kid);
   if (!jwk) return null;
   const key = await crypto.subtle.importKey('jwk', jwk, { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['verify']);
   const ok = await crypto.subtle.verify('RSASSA-PKCS1-v1_5', key, b64url(s), new TextEncoder().encode(h + '.' + p));
@@ -38,7 +43,7 @@ async function verify(token, env) {
   const aud = Array.isArray(body.aud) ? body.aud : [body.aud];
   if (body.exp < now || (body.nbf && body.nbf > now + 60)) return null;
   if (!aud.includes(env.ACCESS_AUD)) return null;
-  if (body.iss && body.iss !== `https://${env.ACCESS_TEAM}`) return null;
+  if (body.iss && body.iss !== `https://${team}`) return null;
   return body;
 }
 
