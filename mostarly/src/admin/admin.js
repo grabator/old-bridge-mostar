@@ -427,7 +427,8 @@
   function digits(p) { return String(p || '').replace(/[^\d+]/g, '').replace(/^\+/, '').replace(/^00/, ''); }
   function firstName(n) { return String(n || '').trim().split(/\s+/)[0] || ''; }
 
-  function loadBookings() { return api('GET', '/bookings').then(function (j) { B = j.bookings || []; }).catch(function () { B = B || []; }); }
+  var BL = 0; // when the planner was last loaded
+  function loadBookings() { return api('GET', '/bookings').then(function (j) { B = j.bookings || []; BL = Date.now(); }).catch(function () { B = B || []; }); }
   function newCount() { return B.filter(function (b) { return b.status === 'new'; }).length; }
 
   function bkCard(b) {
@@ -551,6 +552,7 @@
     if (ph) acts.push('<a class="qa" href="tel:+' + ph + '">' + IC.phone + '<span>Pozovi</span></a>');
     if (d.instagram) acts.push('<a class="qa" href="https://instagram.com/' + esc(d.instagram) + '" target="_blank" rel="noopener">' + IC.ig + '<span>Instagram</span></a>');
     if (draft.date) acts.push('<a class="qa" href="' + esc(gcalUrl(draft)) + '" target="_blank" rel="noopener">' + IC.gcal + '<span>U kalendar</span></a>');
+    if ((ph || d.email || d.instagram) && d.price && !isNew) acts.splice(1, 0, '<button type="button" class="qa" data-paymsg>' + IC.card + '<span>Plaćanje</span></button>');
     acts.push('<button type="button" class="qa" data-copy>' + IC.copy + '<span>Kopiraj</span></button>');
     var fromTime = d.time && !/^\d{1,2}:\d{2}$/.test(d.time) ? '<small>Gost je izabrao: <b>' + esc(timeText(d.time)) + '</b>. Kad dogovorite tačno vrijeme, upišite ga.</small>' : '';
     shell('planer', ehead('#/planer', 'Nazad na planer', isNew ? 'Novi upit' : esc(d.name || 'Upit')) +
@@ -565,7 +567,7 @@
       field('Mjesto sastanka', 'data.meeting', { ph: 'npr. ispred Hamama' }) + '' + '</div></details>' +
       sec('gosti', 'Gosti', guests(d) + ' gostiju' + ((d.tickets || []).length ? ' · ' + d.tickets.length + ' ulaz.' : ''), isNew) + '<div class="two">' + stepper('Odrasli', 'data.adults') + stepper('Djeca', 'data.children') + '</div>' + (d.children ? field('Godine djece', 'data.ages', { ph: 'npr. 6 i 9' }) : '') + '<div class="f"><span>Ulaznice</span><div class="ticks">' + tk + '</div></div>' + '</div></details>' +
       sec('novac', 'Novac', (d.paidOnline ? 'Online ' + money(d.paidOnline) + ' · ' : '') + (d.price != null && d.price !== '' ? '€' + esc(d.price) + (d.paid ? ' · plaćeno' : ' · nije plaćeno') : 'Cijena nije upisana'), false) +
-      ((d.payments || []).length ? '<div class="paylist"><p class="mlabel" style="margin-top:0">Online uplate</p>' + d.payments.map(function (x) { return '<div class="payrow">' + IC.card + '<b>' + money(x.amount) + '</b><span>' + esc(String(x.at || '').slice(0, 16)) + (x.test ? ' · probna' : '') + '</span><small>' + esc(x.order || '') + '</small></div>'; }).join('') + '</div>' : '') + '<div class="two">' + field('Dogovorena cijena (€)', 'data.price', { num: true, ph: 'npr. 80' }) + '<div>' + toggle('Plaćeno', 'data.paid') + '</div></div>' + '</div></details>' +
+      moneyBox(draft) + ((d.payments || []).length ? '<div class="paylist"><p class="mlabel" style="margin-top:0">Online uplate</p>' + d.payments.map(function (x) { return '<div class="payrow">' + IC.card + '<b>' + money(x.amount) + '</b><span>' + esc(String(x.at || '').slice(0, 16)) + (x.test ? ' · probna' : '') + '</span><small>' + esc(x.order || '') + '</small></div>'; }).join('') + '</div>' : '') + '<div class="two">' + field('Dogovorena cijena (€)', 'data.price', { num: true, ph: 'npr. 80' }) + '<div>' + toggle('Plaćeno', 'data.paid') + '</div></div>' + '</div></details>' +
       sec('poruke', 'Poruke', esc(String(d.message || d.note || 'Nema poruka').slice(0, 60)), false) + '' + field('Poruka gosta', 'data.message', { area: true, rows: 3 }) + field('Moja bilješka (vidim samo ja)', 'data.note', { area: true, rows: 3, ph: 'npr. dogovoreno 10h, platit će na licu mjesta' }) + '' + '</div></details>' +
       (isNew ? '' : '<section class="card"><button type="button" class="btn danger" data-delbk>' + IC.trash + 'Obriši upit</button></section>') +
       '</form>' + savebar(isNew, isNew ? 'Dodaj' : 'Sačuvaj'));
@@ -584,6 +586,9 @@
     $$('[name=bsrc]').forEach(function (r) { r.addEventListener('change', function () { draft.source = r.value; setDirty(true); }); });
     $$('[data-st]').forEach(function (b) { b.addEventListener('click', function () { var a = b.getAttribute('data-st').split('|'), v = Math.max(0, Math.min(99, (get(draft, a[0]) || 0) + (+a[1]))); set(draft, a[0], v); $('[data-sv="' + a[0] + '"]').textContent = v; setDirty(true); if (a[0] === 'data.children' && (v === 0 || v === 1)) renderBooking(isNew, id); }); });
     $$('[data-btk]').forEach(function (c) { c.addEventListener('change', function () { var lab = c.getAttribute('data-btk'), name = lab.split(' (€')[0]; var a = (draft.data.tickets || []).filter(function (x) { return x.indexOf(name) !== 0; }); if (c.checked) a.push(lab); draft.data.tickets = a; setDirty(true); }); });
+    var pm2 = $('[data-paymsg]'); if (pm2) pm2.addEventListener('click', function () {
+      msgFlow({ id: id, status: draft.status, date: draft.date, data: draft.data }, 'pay', function () { var b = B.filter(function (x) { return x.id === id; })[0]; if (b && !dirty) bookingEditor(id, ''); });
+    });
     var mg = $('[data-msg]'); if (mg) mg.addEventListener('click', function () {
       msgFlow({ id: isNew ? null : id, status: draft.status, date: draft.date, data: draft.data }, null, function () {
         var b = B.filter(function (x) { return x.id === id; })[0]; if (!b) return;
@@ -747,9 +752,19 @@
     { id: 'de-pay', name: 'Link za plaćanje', lang: 'DE', text: 'Hallo {ime}, Ihre Tour {tura} am {datum} ist für Sie reserviert. Zur Bestätigung zahlen Sie bitte hier die Anzahlung: {placanje} Vielen Dank! Mirna' },
   ]; }
 
+  // what is agreed, what is paid online and what is left for the day of the tour
+  function moneyBox(dr) {
+    var d = dr.data, pol = (X.site && X.site.policy) || { depositPercent: 50, freeCancelHours: 48 };
+    if (!d.price && !d.paidOnline) return '<p class="help">Upišite dogovorenu cijenu: u poruci "Link za plaćanje" gost onda dobije iznos akontacije (' + pol.depositPercent + '%).</p>';
+    var dep = d.price ? Math.ceil(d.price * pol.depositPercent / 100) : 0, paid = d.paidOnline || 0, rest = d.price ? Math.max(d.price - paid, 0) : 0;
+    var rows = (d.price ? '<div><span>Cijena</span><b>' + money(d.price) + '</b></div><div><span>Akontacija ' + pol.depositPercent + '%</span><b>' + money(dep) + '</b></div>' : '') +
+      '<div><span>Plaćeno online</span><b class="' + (paid ? 'ok' : '') + '">' + money(paid) + '</b></div>' + (d.price ? '<div class="rest"><span>Ostatak na turi</span><b>' + money(rest) + '</b></div>' : '');
+    var hint = dr.status === 'cancelled' && paid ? '<p class="blknote">' + IC.card + 'Upit je otkazan, a gost je platio ' + money(paid) + '. Ako je otkazao najkasnije ' + pol.freeCancelHours + 'h prije ture, povrat novca se radi u Monri portalu (Transakcije → Povrat).</p>' : (d.price && paid && paid < dep ? '<p class="help">Gost je platio manje od akontacije.</p>' : '');
+    return '<div class="mbox">' + rows + '</div>' + hint;
+  }
   // link to the payment page, with the deposit, tour and date already filled in for the guest
   function payLink(dr) {
-    var d = dr.data, pol = (X.site && X.site.policy) || { depositPercent: 30 }, q = [];
+    var d = dr.data, pol = (X.site && X.site.policy) || { depositPercent: 50 }, q = [];
     if (d.price) { var a = pol.depositPercent ? Math.ceil(d.price * pol.depositPercent / 100) : d.price; a = Math.max(a - (d.paidOnline || 0), 0); if (a) q.push('amount=' + a); }
     if (d.tourSlug) q.push('tour=' + encodeURIComponent(d.tourSlug));
     if (dr.date) q.push('date=' + dr.date);
@@ -939,9 +954,13 @@
 
   /* ---------- router ---------- */
   function route() {
+    // a sheet left open (message, photos, list) never stays over the next page
+    document.querySelectorAll('.modal').forEach(function (m) { m.remove(); }); document.documentElement.classList.remove('locked');
     lastHash = location.hash || '#/planer';
     var hq = lastHash.split('?'), parts = hq[0].replace(/^#\/?/, '').split('/');
     window.scrollTo(0, 0);
+    // the planner is reloaded when it is older than 20 s (e.g. Mirna taps a notification about a new payment)
+    if ((parts[0] === 'planer' || parts[0] === '') && !dirty && Date.now() - BL > 20000 && !route.loading) { route.loading = true; return loadBookings().then(function () { route.loading = false; route(); }, function () { route.loading = false; BL = Date.now(); route(); }); }
     if (parts[0] === 'planer' && parts[1]) return bookingEditor(decodeURIComponent(parts[1]), hq[1] || '');
     if (parts[0] === 'planer' || parts[0] === '') return plannerHome();
     if (parts[0] === 'ture' && parts[1]) return tourEditor(decodeURIComponent(parts[1]));

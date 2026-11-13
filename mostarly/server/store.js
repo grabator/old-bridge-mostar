@@ -42,6 +42,9 @@ export function mergeSite(base, o) {
   if (o.contact) { S_CONTACT.forEach((k) => { if (typeof o.contact[k] === 'string') S.contact[k] = o.contact[k]; }); if (Array.isArray(o.contact.notes)) S.contact.notes = o.contact.notes; }
   if (o.about) { ['short', 'experience'].forEach((k) => { if (typeof o.about[k] === 'string') S.about[k] = o.about[k]; }); ['paragraphs', 'notes'].forEach((k) => { if (Array.isArray(o.about[k])) S.about[k] = o.about[k]; }); }
   ['why', 'services', 'faq', 'onRequest'].forEach((k) => { if (Array.isArray(o[k])) S[k] = o[k]; });
+  // FAQ answers saved before the payment rules were decided are replaced by the current text from site.json
+  const OLD_FAQ = ['Payment details are confirmed personally together with your booking. No online payment is needed to send an enquiry.', 'The cancellation policy is confirmed with your booking.'];
+  if (Array.isArray(o.faq)) S.faq = S.faq.map((f) => { if (!f || !OLD_FAQ.includes(f.a)) return f; const b = base.faq.find((x) => x.q === f.q); return b ? Object.assign({}, f, { a: b.a }) : f; });
   // company details: an empty field in the admin keeps the value from site.json
   if (o.company && typeof o.company === 'object') { S.company = Object.assign({}, S.company || {}); Object.keys(o.company).forEach((k) => { if (o.company[k]) S.company[k] = o.company[k]; }); }
   if (o.policy && typeof o.policy === 'object') S.policy = Object.assign({}, S.policy || {}, o.policy);

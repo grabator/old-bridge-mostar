@@ -40,7 +40,9 @@ const HLOGO = '<img class="lg-dark" src="/img/logo-dark.png" alt="Mostarly Guide
 const mini = '<svg data-mini aria-hidden="true"></svg>';
 const PAYMARKS = `<span class="paymarks" aria-label="Visa, Mastercard, Apple Pay and Google Pay accepted, payments processed by Monri"><svg viewBox="0 0 48 30" aria-hidden="true"><rect width="48" height="30" rx="5" fill="#fff"/><text x="24" y="20.5" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="13" font-weight="900" font-style="italic" fill="#1a1f71">VISA</text></svg><svg viewBox="0 0 48 30" aria-hidden="true"><rect width="48" height="30" rx="5" fill="#fff"/><circle cx="19.5" cy="15" r="8" fill="#eb001b"/><circle cx="28.5" cy="15" r="8" fill="#f79e1b" fill-opacity=".9"/></svg><svg viewBox="0 0 48 30" aria-hidden="true"><rect width="48" height="30" rx="5" fill="#fff"/><text x="24" y="19.5" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="8.5" font-weight="700" fill="#000">Apple Pay</text></svg><svg viewBox="0 0 48 30" aria-hidden="true"><rect width="48" height="30" rx="5" fill="#fff"/><text x="24" y="19.5" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="8.5" font-weight="700" fill="#3c4043">Google Pay</text></svg><b>Secure payments by Monri</b></span>`;
 const CO = () => Object.assign({ name: '', address: '', idNumber: '', vatNumber: '' }, S.company || {});
-const POL = () => Object.assign({ depositPercent: 30, freeCancelHours: 48 }, S.policy || {});
+const POL = () => Object.assign({ depositPercent: 50, freeCancelHours: 48 }, S.policy || {});
+// FAQ answers can say {deposit} and {hours}: they follow the rules set in the admin
+const polTxt = (t) => String(t || '').replace(/\{deposit\}/g, POL().depositPercent).replace(/\{hours\}/g, POL().freeCancelHours);
 const starsOf = (n = 5) => { n = Math.max(1, Math.min(5, Math.round(+n || 5))); return `<span class="stars" aria-label="${n} out of 5">${'<i>★</i>'.repeat(n)}${'<i class="off">★</i>'.repeat(5 - n)}</span>`; };
 const stars = starsOf(5);
 const tbc = (txt = 'to confirm') => (DRAFT ? `<span class="tbc">${esc(txt)}</span>` : '');
@@ -197,7 +199,7 @@ function enquiryForm(selected = '') {
   <div class="hp" aria-hidden="true"><label>Website<input name="website" tabindex="-1" autocomplete="off"></label></div>
   <p class="formerr" role="alert"></p>
   <div class="actions"><button type="button" class="btn wa block" data-send="wa">${I.wa} Send on WhatsApp</button><button type="submit" class="btn block">Send enquiry by email</button></div>
-  <p class="tiny">This is an enquiry, not a confirmed booking. Mirna confirms availability, the final price and arrangements personally. No payment needed now.</p>
+  <p class="tiny">This is an enquiry, not a confirmed booking. Mirna confirms availability, the final price and arrangements personally. No payment needed now. After Mirna confirms, a ${POL().depositPercent}% deposit secures your date.</p>
   </div>
 </form>
 <div class="done" role="status" aria-live="polite">${I.check}<h3>Thank you</h3><p class="done-how"></p><p style="margin-top:.6rem"><b>Your tour is not confirmed yet.</b> Mirna will reply personally to confirm availability, the final price and arrangements.</p><p style="margin-top:1rem"><button type="button" class="btn sm line" data-again>Send another enquiry</button></p></div>
@@ -651,9 +653,9 @@ ${notes(['Section 13 (B2B) in the brief is empty: add group rates, commission te
 {
   const c = [['/', 'Home'], ['/faq/', 'Practical information']];
   const body = phead(c, 'Practical <em>information</em>', 'Meeting points, tickets, clothing, children and more. If your question is not here, just ask.') + `
-<section class="sec" style="padding-top:2.4rem"><div class="wrap narrow"><div class="faq">${S.faq.map((f, i) => `<details${i === 0 ? ' open' : ''}><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p>${f.note ? notes([f.note]) : ''}</details>`).join('')}</div>
+<section class="sec" style="padding-top:2.4rem"><div class="wrap narrow"><div class="faq">${S.faq.map((f, i) => `<details${i === 0 ? ' open' : ''}><summary>${esc(f.q)}</summary><p>${esc(polTxt(f.a))}</p>${f.note ? notes([f.note]) : ''}</details>`).join('')}</div>
 <p style="margin-top:2rem"><a class="btn" href="/contact/">Ask a question</a></p></div></section>`;
-  const ld = [crumbLd(c), { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: S.faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) }];
+  const ld = [crumbLd(c), { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: S.faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: polTxt(f.a) } })) }];
   emit('/faq/', head({ title: 'Practical Information & FAQ · Tours in Mostar · Mostarly Guide', desc: 'Meeting points, entrance tickets, accessibility, children, what to wear and bad weather: practical answers for tours in Mostar and Herzegovina.', url: '/faq/', ld }) + page({ current: '/faq/', body }));
 }
 
@@ -666,7 +668,7 @@ ${notes(['Section 13 (B2B) in the brief is empty: add group rates, commission te
   const pages = [
     ['/cancellation-policy/', 'Booking & cancellation', 'How bookings, deposits, changes and cancellations work.', `
 <h2>Booking a tour</h2><p>Send an enquiry by the form, WhatsApp, phone or email. Mirna replies personally with availability and the final price. A tour is booked when Mirna has confirmed it${dep ? ` and the deposit has been paid` : ''}.</p>
-${dep ? `<h2>Deposit and payment</h2><p>To secure your date, a deposit of about ${dep}% of the tour price is paid online by card on the <a href="/pay/">payment page</a>. The rest is paid on the day of the tour, in cash or as agreed with Mirna. Prices are confirmed in writing before you pay.</p>` : `<h2>Payment</h2><p>Payment can be made online by card on the <a href="/pay/">payment page</a> or as agreed with Mirna.</p>`}
+${dep ? `<h2>Deposit and payment</h2><p>To secure your date, a deposit of ${dep}% of the tour price is paid online by card on the <a href="/pay/">payment page</a>. The rest is paid on the day of the tour, in cash or as agreed with Mirna. Prices are confirmed in writing before you pay.</p>` : `<h2>Payment</h2><p>Payment can be made online by card on the <a href="/pay/">payment page</a> or as agreed with Mirna.</p>`}
 <h2>If you cancel</h2><ul><li><b>Up to ${h} hours before the tour:</b> free cancellation, the amount you paid is refunded in full.</li><li><b>Less than ${h} hours before the tour, or if you do not come:</b> the amount paid is not refunded.</li><li>Want to change the date instead? Just ask: Mirna will move your tour if there is availability.</li></ul>
 <h2>If we cancel</h2><p>If Mirna has to cancel (for example because of illness, unsafe weather or road conditions), you choose between a new date and a full refund.</p>
 <h2>Refunds</h2><p>Refunds go back to the card used for payment. Depending on your bank, the money usually appears within 5 to 10 working days.</p>
@@ -676,6 +678,8 @@ ${dep ? `<h2>Deposit and payment</h2><p>To secure your date, a deposit of about 
 <h2>Who we are</h2><p>Tours are provided by ${who}, led by Mirna, a licensed tour guide in Mostar.</p>
 <h2>Tours and prices</h2><p>Each tour page describes what is included. Prices are shown per person or per group and are confirmed in writing before you book. Entrance tickets and personal expenses are not included unless stated.</p>
 <h2>Booking and payment</h2><p>A tour is booked once Mirna confirms it. Online card payments are processed securely by Monri; we never see or store your card details. See <a href="/cancellation-policy/">Booking &amp; cancellation</a> for deposits, changes and refunds.</p>
+<h2>Prices and currency</h2><p>Prices are shown in euro (€). If a payment is processed in Bosnian convertible marks (BAM), the amount is converted at the fixed rate of the Central Bank of Bosnia and Herzegovina (1 EUR = 1.95583 BAM). Your bank may charge its own fees for payments in a foreign currency.</p>
+<h2>Payment security</h2><p>Card payments are processed by Monri Payments with 3-D Secure (Visa Secure, Mastercard Identity Check). Card details are entered only on Monri's page and are sent encrypted (TLS); this website never sees or stores them.</p>
 <h2>On the tour</h2><p>Please arrive at the meeting point on time and wear comfortable shoes. Tours include walking on uneven cobblestones and steps; tell us in advance about any mobility needs. Children must be accompanied by an adult. Mirna may adjust the route for safety, weather or opening hours.</p>
 <h2>Responsibility</h2><p>Guests take part at their own responsibility and should have their own travel insurance. We are not responsible for lost personal belongings or for services of third parties (restaurants, museums, transport) beyond our control.</p>
 <h2>Law</h2><p>These terms are governed by the law of Bosnia and Herzegovina.</p>
@@ -722,7 +726,7 @@ ${dep ? `<h2>Deposit and payment</h2><p>To secure your date, a deposit of about 
 </div>
 <aside class="pay-info">
   <div class="pi"><h3>How it works</h3><ol><li>Mirna confirms your tour and the amount.</li><li>You pay here by card, Apple Pay or Google Pay.</li><li>You get a receipt by email, and Mirna sees your payment straight away.</li></ol></div>
-  <div class="pi"><h3>Deposit &amp; cancellation</h3><p>${pol.depositPercent ? `Usually you pay a deposit of about ${pol.depositPercent}% now and the rest on the day.` : 'Pay the amount Mirna confirmed with you.'} Free cancellation up to ${pol.freeCancelHours} hours before the tour. <a href="/cancellation-policy/">Full terms</a></p></div>
+  <div class="pi"><h3>Deposit &amp; cancellation</h3><p>${pol.depositPercent ? `A ${pol.depositPercent}% deposit secures your date; the rest is paid on the day of the tour.` : 'Pay the amount Mirna confirmed with you.'} Free cancellation up to ${pol.freeCancelHours} hours before the tour. <a href="/cancellation-policy/">Full terms</a></p></div>
   <div class="pi"><h3>Safe</h3><p>Your card details are entered only on Monri’s secure page (3-D Secure). We never see or store them.</p></div>
   <a class="btn wa block" href="${wa('Hello Mirna, I have a question about paying for my tour.')}">${I.wa} Questions? WhatsApp Mirna</a>
 </aside>

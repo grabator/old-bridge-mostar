@@ -530,3 +530,10 @@ details.adv[open]>summary{margin-bottom:.9rem}
 .payrow small{color:var(--mut);font-size:.7rem}
 .payrow{flex-wrap:nowrap;overflow:hidden}
 @media (max-width:560px){.payrow small{display:none}}
+
+.mbox{display:grid;gap:.1rem;border:1px solid var(--line);border-radius:14px;background:var(--field);padding:.3rem .85rem;margin-bottom:.9rem}
+.mbox div{display:flex;justify-content:space-between;align-items:center;padding:.45rem 0;font-size:.9rem;color:var(--ink2)}
+.mbox div+div{border-top:1px dashed var(--line)}
+.mbox b{color:var(--strong)}
+.mbox b.ok{color:var(--okt)}
+.mbox .rest b{font-size:1.05rem}

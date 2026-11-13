@@ -170,13 +170,11 @@
     },
     {
       "q": "How do I pay?",
-      "a": "Payment details are confirmed personally together with your booking. No online payment is needed to send an enquiry.",
-      "note": "Add accepted payment methods after confirming them."
+      "a": "After Mirna confirms your tour and the price, a {deposit}% deposit secures your date. You pay it online by card, Apple Pay or Google Pay through a secure payment link (processed by Monri). The rest is paid on the day of the tour. No payment is needed to send an enquiry."
     },
     {
       "q": "What is the cancellation policy?",
-      "a": "The cancellation policy is confirmed with your booking.",
-      "note": "Publish a clear cancellation policy approved by the business before taking bookings."
+      "a": "Free cancellation up to {hours} hours before the tour: the deposit is refunded in full to your card. For later cancellations or no-shows the deposit is not refunded. If Mirna has to cancel, you get a new date or a full refund. See the booking and cancellation page for details."
     }
   ],
   "services": [
@@ -216,7 +214,7 @@
     "vatNumber": ""
   },
   "policy": {
-    "depositPercent": 30,
+    "depositPercent": 50,
     "freeCancelHours": 48
   }
 }

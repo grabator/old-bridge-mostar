@@ -111,7 +111,7 @@ function siteForm(S) {
     contact: { phone: S.contact.phone || '', whatsapp: S.contact.whatsapp || '', email: S.contact.email || '', instagram: S.contact.instagram || '', tripadvisor: S.contact.tripadvisor || '', meetingPoint: S.contact.meetingPoint || '', notes: S.contact.notes || [] },
     about: { short: S.about.short || '', experience: S.about.experience || '', paragraphs: S.about.paragraphs || [], notes: S.about.notes || [] },
     why: S.why || [], services: S.services || [], faq: S.faq || [], onRequest: S.onRequest || [],
-    company: Object.assign({ name: '', address: '', idNumber: '', vatNumber: '' }, S.company || {}), policy: Object.assign({ depositPercent: 30, freeCancelHours: 48 }, S.policy || {}),
+    company: Object.assign({ name: '', address: '', idNumber: '', vatNumber: '' }, S.company || {}), policy: Object.assign({ depositPercent: 50, freeCancelHours: 48 }, S.policy || {}),
     tickets: S.tickets.map((t) => ({ id: t.id, label: t.label, price: t.price })),
     categories: S.categories.map((c) => ({ id: c.id, name: c.name, intro: c.intro || '' }))
   };
