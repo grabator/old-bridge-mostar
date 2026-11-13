@@ -19,7 +19,7 @@
   ],
   "vars": {
     // Cloudflare Access (Zero Trust > Access > Applications), see README "Admin"
-    "ACCESS_TEAM": "falling-fog-be2e.cloudflareaccess.com",
+    "ACCESS_TEAM": "mostarly.cloudflareaccess.com",
     "ACCESS_AUD": "",
     "ADMIN_EMAILS": "mostarlyguide@gmail.com"
   },
