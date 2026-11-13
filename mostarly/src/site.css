@@ -1191,3 +1191,4 @@ html.is-night .filters a[href="#daytrip"]{--c:#d27b5c!important}
 html.is-night .filters a[href="#experience"]{--c:#e8b98a!important}
 html.is-night .filters a[href="#on-request"]{--c:#a8968a!important}
 html.is-night .cat#city{--c:#c98a52!important}html.is-night .cat#food{--c:#dca06c!important}html.is-night .cat#daytrip{--c:#d27b5c!important}html.is-night .cat#experience{--c:#e8b98a!important}
+.stars i.off{opacity:.25}

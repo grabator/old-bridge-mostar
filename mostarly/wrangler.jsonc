@@ -1,5 +1,6 @@
 {
-  // Cloudflare Workers deploy: node build.mjs && npx wrangler deploy
+  // Cloudflare Workers. First time: node scripts/cf-setup.mjs (creates the database and the photo
+  // storage, then fills in database_id below). Every deploy: node build.mjs && npx wrangler deploy
   "name": "mostarly-guide",
   "main": "worker.js",
   "compatibility_date": "2026-11-01",
@@ -7,7 +8,20 @@
     "directory": "./dist",
     "binding": "ASSETS",
     "not_found_handling": "404-page",
-    "run_worker_first": ["/api/*"]
+    // the Worker runs first for pages, the admin and the API; images, CSS and JS go straight to the files
+    "run_worker_first": ["/*", "!/img/*", "!/geo/*", "!/site.css", "!/site.js", "!/maps.js"]
+  },
+  "d1_databases": [
+    { "binding": "DB", "database_name": "mostarly", "database_id": "REPLACE_WITH_DATABASE_ID", "migrations_dir": "migrations" }
+  ],
+  "r2_buckets": [
+    { "binding": "MEDIA", "bucket_name": "mostarly-media" }
+  ],
+  "vars": {
+    // Cloudflare Access (Zero Trust > Access > Applications), see README "Admin"
+    "ACCESS_TEAM": "",
+    "ACCESS_AUD": "",
+    "ADMIN_EMAILS": "mostarlyguide@gmail.com"
   },
   "observability": { "enabled": true }
 }

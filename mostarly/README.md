@@ -60,21 +60,48 @@ Add the GA4 measurement ID to `analytics.ga4` in `content/site.json`. A cookie n
 - `enquiry_submit`, `enquiry_whatsapp`, `enquiry_mailto` (with the tour)
 - `whatsapp_click`, `email_click`, `phone_click`
 
-## Admin (owner edits without a developer)
+## Admin (Mirna edits without a developer)
 
-`/admin` runs [Decap CMS](https://decapcms.org). The owner edits tours, prices, photos, FAQ and texts in the browser; each save is committed to the repository and Cloudflare rebuilds the site.
+`/admin` is Mirna's own admin, in Bosnian and made for a phone. Phase 1:
 
-Setup:
+- **Tours:** add, edit, hide, delete and reorder; name, texts, category, price (per person, per group or on request, "from", confirmed), details, itinerary with optional stops, included / not included, good to know, entrance tickets for the enquiry form, featured on the home page, Google title and description; the yellow notes can be marked as done.
+- **Photos:** main photo and gallery per tour. Photos are made smaller in the browser (max 2000 px, WebP) before upload, stored in R2 and served at `/media/...`.
+- **Reviews:** add, edit, hide, reorder; name, country, date, rating, title, text, source.
 
-1. Set `repo` and `branch` in `admin/config.yml` to the repository the site deploys from.
-2. Deploy a GitHub OAuth proxy on Cloudflare Workers (for example `sveltia-cms-auth` or `decap-proxy`) and put its address in `base_url`.
-3. Give the owner's GitHub account write access to the repository.
+Every save is published at once: the Worker renders the whole site with the same code as the build (`src/render.mjs`) and stores the pages in D1. Until the first save, the site is served from the built files. The first time the admin opens, the tours from `content/tours/` are copied into the database; after that the database is the source for tours and reviews (the content files are still used for everything else).
+
+How it is built: `worker.js` (routing), `server/auth.js` (sign-in check), `server/api.js` (admin API, photos), `server/store.js` (database, publishing), `src/admin/` (the admin page), `migrations/` (tables).
+
+### Setup (once)
+
+1. `cd mostarly`, `npx wrangler login`
+2. `node scripts/cf-setup.mjs`: creates the D1 database and the R2 bucket, writes the database id into `wrangler.jsonc` and creates the tables. (R2 has to be enabled once in the dashboard: R2 > Enable.)
+3. `node build.mjs && npx wrangler deploy`
+4. **Sign-in with Cloudflare Access** (free up to 50 users): Zero Trust > Access > Applications > Add an application > Self-hosted.
+   - Domain: the site's domain (or the workers.dev address), path `admin`; add a second destination with path `api/admin`.
+   - Policy: Allow, Include: Emails, Mirna's email (and yours).
+   - Login method: One-time PIN (a code is sent to the email; nothing else to set up).
+   - After saving, copy the **Application Audience (AUD) Tag**.
+5. In `wrangler.jsonc` set `vars`: `ACCESS_TEAM` (your team domain, e.g. `mostarly.cloudflareaccess.com`, from Zero Trust > Settings > Custom pages), `ACCESS_AUD` (the AUD tag), `ADMIN_EMAILS` (allowed emails, comma separated). Deploy again.
+
+The Worker checks the Access token itself as well, so the API stays closed even if Access were switched off by mistake. Without `ACCESS_TEAM` and `ACCESS_AUD` the admin is simply closed.
+
+### Working on the admin locally
+
+```
+node build.mjs
+npx wrangler d1 migrations apply mostarly --local
+echo ADMIN_DEV=1 > .dev.vars
+npx wrangler dev
+```
+
+Open http://localhost:8787/admin/ (ADMIN_DEV lets localhost in without Access; it never works on the real domain). `node dev.mjs` still serves the static site for quick design work, without the admin.
 
 ## Deploy on Cloudflare Workers
 
 The site is a Worker with static assets: `worker.js` serves `dist/` and handles `POST /api/enquiry`; `wrangler.jsonc` holds the settings.
 
-From a computer (once: `npx wrangler login`):
+From a computer (once: `npx wrangler login` and `node scripts/cf-setup.mjs`, see Admin):
 
 ```
 cd mostarly
