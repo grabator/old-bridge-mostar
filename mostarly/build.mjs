@@ -144,13 +144,11 @@ function nav(current, overHero) {
   <button class="menu-btn" type="button" data-menu aria-expanded="false" aria-controls="sheet" aria-label="Open menu">${I.menu}</button></div>
 </header>
 <div class="sheet" id="sheet" aria-label="Menu" role="dialog" aria-modal="true"><div class="sheet-bg" aria-hidden="true"><svg data-medallion></svg></div>
-<div class="sheet-top"><a class="home" href="/" aria-label="Mostarly Guide home"><img src="/img/logo-light.png" alt="Mostarly Guide" width="167" height="34" style="height:34px;width:auto"></a><button class="menu-btn" type="button" data-menu aria-label="Close menu">${I.close}</button></div>
+<div class="sheet-top"><a class="home" href="/" aria-label="Mostarly Guide home"><img src="/img/logo-light.png" alt="Mostarly Guide" width="167" height="34" style="height:34px;width:auto"></a><div class="sheet-tools"><div class="tswitch" role="group" aria-label="Day or night theme"><button type="button" data-t="day" aria-label="Day theme" aria-pressed="true">${I.sun}</button><button type="button" data-t="night" aria-label="Night theme" aria-pressed="false">${I.moon}</button></div><button class="menu-btn" type="button" data-menu aria-label="Close menu">${I.close}</button></div></div>
 <div class="sheet-band" aria-hidden="true"></div>
 <nav aria-label="Mobile">${[['/', 'Home']].concat(NAV).map(([h, l], i) => `<a href="${h}"${current === h ? ' aria-current="page"' : ''} style="--i:${i}"><span class="sn">${String(i + 1).padStart(2, '0')}</span><span class="st"><b>${l}</b><small>${esc(NAV_SUB[h] || '')}</small></span>${I.arrow}</a>`).join('')}</nav>
 <div class="sheet-foot">
   <div class="sheet-acts"><a class="sa wa" href="${wa('Hello Mirna, I would like to ask about a tour in Mostar.')}">${I.wa}<span>WhatsApp</span></a><a class="sa" href="${tel}">${I.phone}<span>Call</span></a><a class="sa" href="mailto:${S.contact.email}">${I.mail}<span>Email</span></a></div>
-  <div class="sheet-row"><span>Theme</span><div class="tswitch" role="group" aria-label="Day or night theme"><button type="button" data-t="day" aria-label="Day theme" aria-pressed="true">${I.sun}</button><button type="button" data-t="night" aria-label="Night theme" aria-pressed="false">${I.moon}</button></div></div>
-  <a class="btn mint block" href="/contact/">Send an enquiry ${I.arrow}</a>
 </div></div>`;
 }
 function foot() {

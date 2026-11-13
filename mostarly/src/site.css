@@ -1092,44 +1092,37 @@ html.is-night .nav.stuck .lg-dark{display:none}html.is-night .nav.stuck .lg-ligh
 .sheet .sheet-foot .btn{color:#16151f}
 @media (prefers-reduced-motion:reduce){.sheet nav a{opacity:1;transform:none;animation:none!important}}
 
-/* ===== phones: no long sideways lists ===== */
-/* reviews: one card at a time, fading */
-.revs.single .revs-vp{overflow:hidden;-webkit-mask:none;mask:none;margin:0;padding:.4rem 0 .6rem}
-.revs.single .revs-track{display:grid;width:auto}
-.revs.single .rev{grid-area:1/1;width:auto;opacity:0;visibility:hidden;transform:translateY(6px);transition:opacity .5s,transform .5s,visibility 0s linear .5s}
-.revs.single .rev.on{opacity:1;visibility:visible;transform:none;transition:opacity .5s,transform .5s,visibility 0s}
-.revs.single .rev.clone{display:none}
-.revs-dots{display:flex;gap:6px;align-items:center;padding:0 .3rem}
-.revs-dots i{width:7px;height:7px;border-radius:50%;background:var(--line);transition:background .3s,width .3s}
-.revs-dots i.on{width:20px;border-radius:99px;background:#c8271c}
-/* tours page: the categories wrap instead of scrolling sideways */
-@media (max-width:759px){
-  .filters{flex-wrap:wrap;overflow:visible;justify-content:center;gap:.35rem;padding:.2rem var(--g)}
-  .filters a{font-size:.78rem;padding:.42rem .7rem .42rem .55rem;gap:.35rem;box-shadow:none}
-  .filters a i{width:8px;height:8px}
-  .filters a span{min-width:18px;height:18px;line-height:18px;font-size:.64rem}
-  .filters-wrap{padding:1rem 0 .7rem}
-  .filters-wrap.stuck{padding:.4rem 0 .5rem}
-  .filters-wrap.stuck .filters{width:auto;max-width:none;border-radius:18px;margin:0 .6rem;padding:.35rem}
-  .cat{scroll-margin-top:190px}
-}
-@media (max-width:759px){
-  /* open: two columns, all categories visible at once */
-  .filters{display:grid;grid-template-columns:1fr 1fr;justify-content:stretch}
-  .filters a{justify-content:flex-start;min-width:0}
-  .filters a:last-child:nth-child(odd){grid-column:1/-1;justify-self:center}
-  .filters a{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .filters a span{margin-left:auto}
-  /* stuck: one short line, coloured dots and the section you are reading */
-  .filters-wrap.stuck .filters{display:flex;flex-wrap:nowrap;justify-content:center;align-items:center;width:max-content;max-width:calc(100% - 1.2rem);margin:0 auto;border-radius:99px;padding:.3rem}
-  .filters-wrap.stuck .filters a:not(.on){padding:0;width:30px;height:30px;justify-content:center;border-color:transparent;background:transparent;font-size:0;gap:0}
-  .filters-wrap.stuck .filters a:not(.on) span{display:none}
-  .filters-wrap.stuck .filters a:not(.on) i{width:10px;height:10px}
-  .filters-wrap.stuck .filters a.on{flex:none}
-  .filters-wrap.stuck .filters a:last-child:nth-child(odd){grid-column:auto;justify-self:auto}
-}
-@media (max-width:759px){
-  .filters a{white-space:normal;overflow:visible;line-height:1.15;text-align:left;font-size:.76rem}
-  .filters a i,.filters a span{flex:none}
-}
 html.is-night .filters a[href="#on-request"]{--c:#a59fbd!important}
+/* mobile menu fits on one screen, no scrolling */
+.sheet{height:100dvh;overflow:hidden;padding-top:calc(.7rem + env(safe-area-inset-top));padding-bottom:calc(.8rem + env(safe-area-inset-bottom))}
+.sheet-top{margin-bottom:.6rem}
+.sheet-tools{display:flex;align-items:center;gap:.5rem}
+.sheet-tools .tswitch{border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.05)}
+.sheet-band{height:8px;margin-bottom:.4rem;flex:none}
+.sheet nav{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+.sheet nav a{flex:1 1 0;min-height:0;max-height:76px;padding:0 .3rem;grid-template-columns:2rem 1fr auto}
+.sheet nav .st b{font-size:clamp(1.1rem,3.3dvh,1.5rem)}
+.sheet nav .st small{font-size:clamp(.66rem,1.65dvh,.78rem);margin-top:0}
+.sheet nav a:last-child{border-bottom:0}
+.sheet .sheet-foot{margin-top:.6rem;flex:none}
+.sheet .sheet-foot .sa{grid-auto-flow:column;align-items:center;justify-content:center;gap:.45rem;padding:.7rem .3rem;border-radius:14px}
+.sheet .sa svg{width:19px;height:19px}
+@media (max-height:560px){.sheet nav .st small{display:none}}
+
+/* ===== phones: long lists become a row you swipe through ===== */
+@media (max-width:759px){
+  .hs{display:flex!important;grid-template-columns:none!important;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;gap:.9rem;margin-left:calc(var(--g)*-1);margin-right:calc(var(--g)*-1);padding:.3rem var(--g) .9rem;scroll-padding-inline:var(--g);scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+  .hs::-webkit-scrollbar{display:none}
+  .hs>*{flex:0 0 84%;max-width:84%;scroll-snap-align:start;min-width:0}
+  .hs.why>*{flex-basis:72%;max-width:72%;border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:1rem;background:rgba(255,255,255,.03)}
+  .hs.signs>*{flex-basis:62%;max-width:62%}
+  .hs.tiles>*{flex-basis:78%;max-width:78%}
+  .hs-bar{display:flex;align-items:center;gap:.5rem;margin:-.2rem 0 .4rem}
+  .hs-bar i{flex:1;height:3px;border-radius:99px;background:var(--line);overflow:hidden;position:relative}
+  .hs-bar i::after{content:"";position:absolute;inset:0 auto 0 0;width:var(--w,30%);transform:translateX(var(--x,0%));border-radius:99px;background:#c8271c;transition:transform .15s}
+  .hs-bar span{font:600 .72rem var(--sans);color:var(--mut);font-variant-numeric:tabular-nums;white-space:nowrap}
+  .dark .hs-bar i{background:rgba(255,255,255,.15)}
+  .dark .hs-bar span{color:#c9c4d6}
+}
+@media (min-width:760px){.hs-bar{display:none}}
+@media (max-width:759px){.hs>.rv,.hs>*>.rv{opacity:1!important;transform:none!important}.revs .rev{width:82vw}}

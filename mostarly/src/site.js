@@ -322,20 +322,7 @@
   $$('[data-revs]').forEach(function (box) {
     var vp = $('.revs-vp', box), track = $('.revs-track', box), pauseBtn = $('[data-rv-pause]', box);
     var orig = $$('.rev', track); if (!orig.length) return;
-    if (matchMedia('(max-width:759px)').matches) {
-      box.classList.add('single');
-      var k = 0, auto = !reduce, timer = 0, dots = document.createElement('div'); dots.className = 'revs-dots'; dots.setAttribute('aria-hidden', 'true');
-      orig.forEach(function (_, i) { var d = document.createElement('i'); dots.appendChild(d); });
-      $('.revs-ctl', box).insertBefore(dots, pauseBtn);
-      var show = function (n) { k = (n + orig.length) % orig.length; orig.forEach(function (c, i) { c.classList.toggle('on', i === k); c.setAttribute('aria-hidden', String(i !== k)); }); $$('i', dots).forEach(function (d, i) { d.classList.toggle('on', i === k); }); };
-      var arm = function () { clearTimeout(timer); if (auto) timer = setTimeout(function () { show(k + 1); arm(); }, 7000); };
-      var setAuto = function (v) { auto = v; pauseBtn.setAttribute('aria-pressed', String(!v)); $('span', pauseBtn).textContent = v ? 'Pause' : 'Play'; box.classList.toggle('paused', !v); arm(); };
-      $$('[data-rv]', box).forEach(function (b) { b.addEventListener('click', function () { show(k + (+b.getAttribute('data-rv'))); arm(); }); });
-      pauseBtn.addEventListener('click', function () { setAuto(!auto); });
-      var sx = null; vp.addEventListener('touchstart', function (e) { sx = e.touches[0].clientX; clearTimeout(timer); }, { passive: true });
-      vp.addEventListener('touchend', function (e) { if (sx == null) return; var dx = e.changedTouches[0].clientX - sx; sx = null; if (Math.abs(dx) > 40) show(k + (dx < 0 ? 1 : -1)); arm(); }, { passive: true });
-      setAuto(auto); show(0); return;
-    }
+
     orig.forEach(function (c) { var k = c.cloneNode(true); k.setAttribute('aria-hidden', 'true'); k.classList.add('clone'); track.appendChild(k); });
     var userPaused = reduce, hold = false, last = 0, inView = false, resume = 0, pos = 0;
     function half() { return track.scrollWidth / 2; }
@@ -354,6 +341,23 @@
     $$('[data-rv]', box).forEach(function (b) { b.addEventListener('click', function () { holdFor(4000); var w = orig[0].getBoundingClientRect().width + 20; vp.scrollBy({ left: w * (+b.getAttribute('data-rv')), behavior: reduce ? 'auto' : 'smooth' }); }); });
     pauseBtn.addEventListener('click', function () { setPaused(!userPaused); });
     new IntersectionObserver(function (es) { inView = es[0].isIntersecting; }).observe(box);
+  });
+
+  /* ---------- phones: long lists (tour cards, places, reasons...) become a swipe row with a progress bar ---------- */
+  $$('.cards, .dest, .why, .tiles, .signs').forEach(function (el) {
+    if (el.children.length < 3 || el.closest('.jr')) return;
+    el.classList.add('hs');
+    var bar = document.createElement('div'); bar.className = 'hs-bar'; bar.setAttribute('aria-hidden', 'true'); bar.innerHTML = '<i></i><span></span>';
+    el.parentNode.insertBefore(bar, el.nextSibling);
+    var fill = $('i', bar), num = $('span', bar), n = el.children.length, raf = 0;
+    function upd() {
+      raf = 0; var max = el.scrollWidth - el.clientWidth; if (max <= 2) { bar.style.display = 'none'; return; } bar.style.display = '';
+      var vis = el.clientWidth / el.scrollWidth, pos = el.scrollLeft / max;
+      fill.style.setProperty('--w', (vis * 100).toFixed(1) + '%'); fill.style.setProperty('--x', (pos * (1 / vis - 1) * 100).toFixed(1) + '%');
+      var k = Math.min(n, Math.round(pos * (n - 1)) + 1); num.textContent = k + ' / ' + n;
+    }
+    el.addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(upd); }, { passive: true });
+    addEventListener('resize', upd); upd();
   });
 
   /* ---------- tours: the category bar lights up the section you are reading ---------- */
