@@ -195,6 +195,13 @@
 
   /* ---------- mobile menu ---------- */
   (function () {
+    // header: over the hero it is transparent; once you scroll it becomes a glass bar that stays on top
+    var navEl = $('.nav');
+    if (navEl && !navEl.classList.contains('solid')) {
+      var stuckNow = false, ticking = false;
+      var onNav = function () { ticking = false; var v = scrollY > 40; if (v !== stuckNow) { stuckNow = v; navEl.classList.toggle('stuck', v); } };
+      addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(onNav); } }, { passive: true }); onNav();
+    }
     var sheet = $('#sheet'); if (!sheet) return;
     function open(v) { sheet.classList.toggle('open', v); document.body.style.overflow = v ? 'hidden' : ''; $$('[data-menu]').forEach(function (b) { b.setAttribute('aria-expanded', String(v)); }); if (v) $('a', sheet).focus(); }
     $$('[data-menu]').forEach(function (b) { b.addEventListener('click', function () { open(!sheet.classList.contains('open')); }); });
@@ -315,6 +322,20 @@
   $$('[data-revs]').forEach(function (box) {
     var vp = $('.revs-vp', box), track = $('.revs-track', box), pauseBtn = $('[data-rv-pause]', box);
     var orig = $$('.rev', track); if (!orig.length) return;
+    if (matchMedia('(max-width:759px)').matches) {
+      box.classList.add('single');
+      var k = 0, auto = !reduce, timer = 0, dots = document.createElement('div'); dots.className = 'revs-dots'; dots.setAttribute('aria-hidden', 'true');
+      orig.forEach(function (_, i) { var d = document.createElement('i'); dots.appendChild(d); });
+      $('.revs-ctl', box).insertBefore(dots, pauseBtn);
+      var show = function (n) { k = (n + orig.length) % orig.length; orig.forEach(function (c, i) { c.classList.toggle('on', i === k); c.setAttribute('aria-hidden', String(i !== k)); }); $$('i', dots).forEach(function (d, i) { d.classList.toggle('on', i === k); }); };
+      var arm = function () { clearTimeout(timer); if (auto) timer = setTimeout(function () { show(k + 1); arm(); }, 7000); };
+      var setAuto = function (v) { auto = v; pauseBtn.setAttribute('aria-pressed', String(!v)); $('span', pauseBtn).textContent = v ? 'Pause' : 'Play'; box.classList.toggle('paused', !v); arm(); };
+      $$('[data-rv]', box).forEach(function (b) { b.addEventListener('click', function () { show(k + (+b.getAttribute('data-rv'))); arm(); }); });
+      pauseBtn.addEventListener('click', function () { setAuto(!auto); });
+      var sx = null; vp.addEventListener('touchstart', function (e) { sx = e.touches[0].clientX; clearTimeout(timer); }, { passive: true });
+      vp.addEventListener('touchend', function (e) { if (sx == null) return; var dx = e.changedTouches[0].clientX - sx; sx = null; if (Math.abs(dx) > 40) show(k + (dx < 0 ? 1 : -1)); arm(); }, { passive: true });
+      setAuto(auto); show(0); return;
+    }
     orig.forEach(function (c) { var k = c.cloneNode(true); k.setAttribute('aria-hidden', 'true'); k.classList.add('clone'); track.appendChild(k); });
     var userPaused = reduce, hold = false, last = 0, inView = false, resume = 0, pos = 0;
     function half() { return track.scrollWidth / 2; }
