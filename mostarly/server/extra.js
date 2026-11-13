@@ -20,13 +20,26 @@ export const DEFAULT_TEMPLATES = [
   { id: 'en-confirm', name: 'Potvrda ture', lang: 'EN', text: 'Hello {ime}, your tour is confirmed: {tura}, {datum} at {vrijeme}. Meeting point: {mjesto}. Price: {cijena}. See you in Mostar! Mirna' },
   { id: 'en-reminder', name: 'Podsjetnik dan prije', lang: 'EN', text: 'Hello {ime}, a quick reminder for tomorrow: {tura} at {vrijeme}, meeting point: {mjesto}. Comfortable shoes are a good idea. See you soon! Mirna' },
   { id: 'en-review', name: 'Molba za recenziju', lang: 'EN', text: 'Hello {ime}, thank you so much for exploring Mostar with me! If you enjoyed the tour, a short review would mean a lot to me: {recenzija} Mirna' },
+  { id: 'en-pay', name: 'Link za plaćanje', lang: 'EN', text: 'Hello {ime}, your tour {tura} on {datum} is reserved for you. To confirm it, please pay the deposit here: {placanje} Thank you! Mirna' },
   { id: 'de-thanks', name: 'Zahvala na upitu', lang: 'DE', text: 'Hallo {ime}, hier ist Mirna von Mostarly Guide. Vielen Dank für Ihre Anfrage zu {tura}! ' },
   { id: 'de-confirm', name: 'Potvrda ture', lang: 'DE', text: 'Hallo {ime}, Ihre Tour ist bestätigt: {tura}, {datum} um {vrijeme}. Treffpunkt: {mjesto}. Preis: {cijena}. Bis bald in Mostar! Mirna' },
   { id: 'de-reminder', name: 'Podsjetnik dan prije', lang: 'DE', text: 'Hallo {ime}, eine kurze Erinnerung für morgen: {tura} um {vrijeme}, Treffpunkt: {mjesto}. Bequeme Schuhe sind eine gute Idee. Bis morgen! Mirna' },
-  { id: 'de-review', name: 'Molba za recenziju', lang: 'DE', text: 'Hallo {ime}, vielen Dank, dass Sie Mostar mit mir entdeckt haben! Wenn Ihnen die Tour gefallen hat, würde mich eine kurze Bewertung sehr freuen: {recenzija} Mirna' }
+  { id: 'de-review', name: 'Molba za recenziju', lang: 'DE', text: 'Hallo {ime}, vielen Dank, dass Sie Mostar mit mir entdeckt haben! Wenn Ihnen die Tour gefallen hat, würde mich eine kurze Bewertung sehr freuen: {recenzija} Mirna' },
+  { id: 'de-pay', name: 'Link za plaćanje', lang: 'DE', text: 'Hallo {ime}, Ihre Tour {tura} am {datum} ist für Sie reserviert. Zur Bestätigung zahlen Sie bitte hier die Anzahlung: {placanje} Vielen Dank! Mirna' },
 ];
 function cleanTemplates(v) {
   return (Array.isArray(v) ? v : []).map((t, i) => ({ id: str(t && t.id, 40).replace(/[^a-z0-9-]/gi, '') || 't' + Date.now().toString(36) + i, name: str(t && t.name, 80) || 'Šablon', lang: str(t && t.lang, 8).toUpperCase(), text: str(t && t.text, 2000) })).filter((t) => t.text).slice(0, 40);
+}
+// templates added in a later version are offered once; the ones Mirna deleted on purpose do not come back
+const FIRST_DEFAULTS = ['en-thanks', 'en-confirm', 'en-reminder', 'en-review', 'de-thanks', 'de-confirm', 'de-reminder', 'de-review'];
+async function templatesWithNew(env) {
+  let T = await getJSON(env, 'templates', null);
+  if (!T) return DEFAULT_TEMPLATES;
+  const seen = await getJSON(env, 'tpl_defaults', FIRST_DEFAULTS);
+  const add = DEFAULT_TEMPLATES.filter((t) => !seen.includes(t.id) && !T.some((x) => x.id === t.id));
+  if (add.length) { T = T.concat(add); await setMeta(env, 'templates', JSON.stringify(T)); }
+  if (DEFAULT_TEMPLATES.some((t) => !seen.includes(t.id))) await setMeta(env, 'tpl_defaults', JSON.stringify(DEFAULT_TEMPLATES.map((t) => t.id)));
+  return T;
 }
 async function blockedDates(env) { return (await getJSON(env, 'blocked', [])).filter((d) => ISO.test(d)); }
 
@@ -37,7 +50,7 @@ export async function extraApi(p, m, request, env, url) {
     const token = await getMeta(env, 'ical_token');
     const subs = (await env.DB.prepare('SELECT COUNT(*) AS n FROM push_subs').first()) || { n: 0 };
     return J({
-      templates: await getJSON(env, 'templates', DEFAULT_TEMPLATES),
+      templates: await templatesWithNew(env),
       blocked: await blockedDates(env),
       site: siteForm(site.S), draft: site.DRAFT,
       icalUrl: token ? url.origin + '/cal/' + token + '.ics' : null,
@@ -98,6 +111,7 @@ function siteForm(S) {
     contact: { phone: S.contact.phone || '', whatsapp: S.contact.whatsapp || '', email: S.contact.email || '', instagram: S.contact.instagram || '', tripadvisor: S.contact.tripadvisor || '', meetingPoint: S.contact.meetingPoint || '', notes: S.contact.notes || [] },
     about: { short: S.about.short || '', experience: S.about.experience || '', paragraphs: S.about.paragraphs || [], notes: S.about.notes || [] },
     why: S.why || [], services: S.services || [], faq: S.faq || [], onRequest: S.onRequest || [],
+    company: Object.assign({ name: '', address: '', idNumber: '', vatNumber: '' }, S.company || {}), policy: Object.assign({ depositPercent: 30, freeCancelHours: 48 }, S.policy || {}),
     tickets: S.tickets.map((t) => ({ id: t.id, label: t.label, price: t.price })),
     categories: S.categories.map((c) => ({ id: c.id, name: c.name, intro: c.intro || '' }))
   };

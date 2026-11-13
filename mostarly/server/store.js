@@ -42,6 +42,8 @@ export function mergeSite(base, o) {
   if (o.contact) { S_CONTACT.forEach((k) => { if (typeof o.contact[k] === 'string') S.contact[k] = o.contact[k]; }); if (Array.isArray(o.contact.notes)) S.contact.notes = o.contact.notes; }
   if (o.about) { ['short', 'experience'].forEach((k) => { if (typeof o.about[k] === 'string') S.about[k] = o.about[k]; }); ['paragraphs', 'notes'].forEach((k) => { if (Array.isArray(o.about[k])) S.about[k] = o.about[k]; }); }
   ['why', 'services', 'faq', 'onRequest'].forEach((k) => { if (Array.isArray(o[k])) S[k] = o[k]; });
+  if (o.company && typeof o.company === 'object') S.company = Object.assign({}, S.company || {}, o.company);
+  if (o.policy && typeof o.policy === 'object') S.policy = Object.assign({}, S.policy || {}, o.policy);
   if (Array.isArray(o.tickets)) S.tickets = S.tickets.map((t) => { const x = o.tickets.find((y) => y && y.id === t.id); return x ? Object.assign({}, t, { label: x.label || t.label, price: x.price }) : t; });
   if (Array.isArray(o.categories)) S.categories = S.categories.map((c) => { const x = o.categories.find((y) => y && y.id === c.id); return x ? Object.assign({}, c, { name: x.name || c.name, intro: x.intro }) : c; });
   return S;
@@ -57,6 +59,8 @@ export function cleanSite(i) {
     about: { short: str(ab.short, 800), experience: str(ab.experience, 200), paragraphs: list(ab.paragraphs, 2000, 12), notes: list(ab.notes, 600, 20) },
     why: pairs(i.why, 't', 'd', 120, 500, 12), services: pairs(i.services, 't', 'd', 120, 500, 16), faq: pairs(i.faq, 'q', 'a', 300, 2000, 30),
     onRequest: list(i.onRequest, 160, 30),
+    company: { name: str((i.company || {}).name, 160), address: str((i.company || {}).address, 200), idNumber: str((i.company || {}).idNumber, 40), vatNumber: str((i.company || {}).vatNumber, 40) },
+    policy: { depositPercent: Math.max(0, Math.min(100, Math.round(Number((i.policy || {}).depositPercent)) || 0)), freeCancelHours: Math.max(0, Math.min(720, Math.round(Number((i.policy || {}).freeCancelHours)) || 0)) },
     tickets: (Array.isArray(i.tickets) ? i.tickets : []).filter((t) => t && C.S.tickets.some((b) => b.id === t.id)).map((t) => ({ id: t.id, label: str(t.label, 120), price: num(t.price) })),
     categories: (Array.isArray(i.categories) ? i.categories : []).filter((t) => t && C.S.categories.some((b) => b.id === t.id)).map((t) => ({ id: t.id, name: str(t.name, 80), intro: str(t.intro, 600) }))
   };

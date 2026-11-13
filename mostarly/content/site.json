@@ -208,5 +208,15 @@
       "t": "Teambuilding events",
       "d": "Programmes for companies and groups, planned around your dates and group size."
     }
-  ]
+  ],
+  "company": {
+    "name": "",
+    "address": "",
+    "idNumber": "",
+    "vatNumber": ""
+  },
+  "policy": {
+    "depositPercent": 30,
+    "freeCancelHours": 48
+  }
 }

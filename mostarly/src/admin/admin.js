@@ -363,7 +363,7 @@
   var MONTHS = ['januar', 'februar', 'mart', 'april', 'maj', 'juni', 'juli', 'august', 'septembar', 'oktobar', 'novembar', 'decembar'];
   var DAYS = ['nedjelja', 'ponedjeljak', 'utorak', 'srijeda', 'četvrtak', 'petak', 'subota'];
   var ST = { new: 'Novo', replied: 'Odgovoreno', confirmed: 'Potvrđeno', done: 'Završeno', cancelled: 'Otkazano' };
-  var SRC = { 'site-email': 'Sajt · email', 'site-whatsapp': 'Sajt · WhatsApp', instagram: 'Instagram', whatsapp: 'WhatsApp', phone: 'Telefon', email: 'Email', agency: 'Agencija', walkin: 'Uživo', other: 'Drugo' };
+  var SRC = { 'site-email': 'Sajt · email', 'site-whatsapp': 'Sajt · WhatsApp', 'site-pay': 'Sajt · plaćanje', instagram: 'Instagram', whatsapp: 'WhatsApp', phone: 'Telefon', email: 'Email', agency: 'Agencija', walkin: 'Uživo', other: 'Drugo' };
   var IC = {
     cal: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M3.5 10h17M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>',
     users: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8.5" r="3.2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M3 19c.8-3.2 3.2-5 6-5s5.2 1.8 6 5M16 5.5a3 3 0 0 1 0 6M18 14c1.6.6 2.6 2 3 4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>',
@@ -382,6 +382,7 @@
     plan: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14M5 12h14M5 18h9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
     tours: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18c3-6 6-9 9-9s6 3 9 9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M3 18h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M8 18c1-2.6 2.6-4 4-4s3 1.4 4 4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>',
     star: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3.8 2.5 5.2 5.6.7-4.1 3.9 1 5.6-5-2.7-5 2.7 1-5.6-4.1-3.9 5.6-.7z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>',
+    card: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M3 10h18M7 15h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>',
     more: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="16.75" cy="16.75" r="3.4" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>',
     chart: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><rect x="5.5" y="11" width="3.2" height="6.5" rx="1" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="10.4" y="6.5" width="3.2" height="11" rx="1" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="15.3" y="9" width="3.2" height="8.5" rx="1" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>',
     chat: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 19 17H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5v-9A1.5 1.5 0 0 1 5 5z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 9.5h8M8 12.5h5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>',
@@ -405,7 +406,7 @@
     trash: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     photo: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="3" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="9" cy="10" r="1.8" fill="currentColor"/><path d="m4.5 17 4.5-4 3 2.5 3-3 4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>'
   };
-  var SRC_IC = { 'site-email': 'globe', 'site-whatsapp': 'globe', instagram: 'ig', whatsapp: 'wa', phone: 'phone', email: 'mail', agency: 'brief', walkin: 'walk', other: 'dots' };
+  var SRC_IC = { 'site-email': 'globe', 'site-whatsapp': 'globe', 'site-pay': 'card', instagram: 'ig', whatsapp: 'wa', phone: 'phone', email: 'mail', agency: 'brief', walkin: 'walk', other: 'dots' };
 
   // dates are worked out in Mostar time
   function localISO(d) { var p = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Sarajevo', year: 'numeric', month: '2-digit', day: '2-digit' }).format(d || new Date()); return p; }
@@ -433,7 +434,7 @@
     var d = b.data;
     return '<a class="bk st-' + b.status + '" href="#/planer/' + esc(b.id) + '"><span class="bar"></span><div class="bk-main"><div class="bk-top"><b>' + esc(d.name || 'Bez imena') + '</b><span class="pill st-' + b.status + '">' + ST[b.status] + '</span></div>' +
       '<span class="bk-tour">' + esc(shortTour(d)) + '</span><div class="bk-meta"><span>' + IC.cal + (b.date ? esc(fmtDay(b.date)) : 'fleksibilno') + (d.time ? ' · ' + esc(timeText(d.time)) : '') + '</span><span>' + IC.users + guests(d) + '</span><span class="src" title="' + esc(SRC[b.source] || '') + '">' + IC[SRC_IC[b.source] || 'dots'] + esc(SRC[b.source] || '') + '</span></div></div>' +
-      '<small class="bk-ago">' + esc(ago(b.created_at)) + '</small></a>';
+      (d.paidOnline ? '<span class="paidpill">' + IC.card + money(d.paidOnline) + ' plaćeno</span>' : '') + '<small class="bk-ago">' + esc(ago(b.created_at)) + '</small></a>';
   }
 
   function plannerHome() {
@@ -563,7 +564,8 @@
       '<div class="two"><label class="f"><span>Datum</span><input type="date" data-path="date" value="' + esc(draft.date || '') + '"></label><label class="f"><span>Vrijeme</span><input type="time" data-path="data.time" value="' + (/^\d{1,2}:\d{2}$/.test(d.time) ? esc(d.time.padStart(5, '0')) : '') + '">' + fromTime + '</label></div>' +
       field('Mjesto sastanka', 'data.meeting', { ph: 'npr. ispred Hamama' }) + '' + '</div></details>' +
       sec('gosti', 'Gosti', guests(d) + ' gostiju' + ((d.tickets || []).length ? ' · ' + d.tickets.length + ' ulaz.' : ''), isNew) + '<div class="two">' + stepper('Odrasli', 'data.adults') + stepper('Djeca', 'data.children') + '</div>' + (d.children ? field('Godine djece', 'data.ages', { ph: 'npr. 6 i 9' }) : '') + '<div class="f"><span>Ulaznice</span><div class="ticks">' + tk + '</div></div>' + '</div></details>' +
-      sec('novac', 'Novac', d.price != null && d.price !== '' ? '€' + esc(d.price) + (d.paid ? ' · plaćeno' : ' · nije plaćeno') : 'Cijena nije upisana', false) + '<div class="two">' + field('Dogovorena cijena (€)', 'data.price', { num: true, ph: 'npr. 80' }) + '<div>' + toggle('Plaćeno', 'data.paid') + '</div></div>' + '</div></details>' +
+      sec('novac', 'Novac', (d.paidOnline ? 'Online ' + money(d.paidOnline) + ' · ' : '') + (d.price != null && d.price !== '' ? '€' + esc(d.price) + (d.paid ? ' · plaćeno' : ' · nije plaćeno') : 'Cijena nije upisana'), false) +
+      ((d.payments || []).length ? '<div class="paylist"><p class="mlabel" style="margin-top:0">Online uplate</p>' + d.payments.map(function (x) { return '<div class="payrow">' + IC.card + '<b>' + money(x.amount) + '</b><span>' + esc(String(x.at || '').slice(0, 16)) + (x.test ? ' · probna' : '') + '</span><small>' + esc(x.order || '') + '</small></div>'; }).join('') + '</div>' : '') + '<div class="two">' + field('Dogovorena cijena (€)', 'data.price', { num: true, ph: 'npr. 80' }) + '<div>' + toggle('Plaćeno', 'data.paid') + '</div></div>' + '</div></details>' +
       sec('poruke', 'Poruke', esc(String(d.message || d.note || 'Nema poruka').slice(0, 60)), false) + '' + field('Poruka gosta', 'data.message', { area: true, rows: 3 }) + field('Moja bilješka (vidim samo ja)', 'data.note', { area: true, rows: 3, ph: 'npr. dogovoreno 10h, platit će na licu mjesta' }) + '' + '</div></details>' +
       (isNew ? '' : '<section class="card"><button type="button" class="btn danger" data-delbk>' + IC.trash + 'Obriši upit</button></section>') +
       '</form>' + savebar(isNew, isNew ? 'Dodaj' : 'Sačuvaj'));
@@ -635,7 +637,7 @@
     var created = B.filter(function (b) { return String(b.created_at || '').slice(0, 7) === mo; });
     var tours = B.filter(function (b) { return isTour(b) && b.date && b.date.slice(0, 7) === mo; });
     var guests = tours.reduce(function (s, b) { return s + (b.data.adults || 0) + (b.data.children || 0); }, 0);
-    var earned = tours.reduce(function (s, b) { return s + (b.data.price || 0); }, 0), paid = tours.reduce(function (s, b) { return s + (b.data.paid ? (b.data.price || 0) : 0); }, 0);
+    var earned = tours.reduce(function (s, b) { return s + (b.data.price || 0); }, 0), paid = tours.reduce(function (s, b) { return s + Math.max(b.data.paidOnline || 0, b.data.paid ? (b.data.price || 0) : 0); }, 0);
     var conv = created.length ? Math.round(100 * created.filter(isTour).length / created.length) : 0;
     var months = []; for (var i = 5; i >= 0; i--) { var dt = new Date(Date.UTC(y, m - i, 1)), k = dt.toISOString().slice(0, 7); months.push({ k: k, label: MONTHS[dt.getUTCMonth()].slice(0, 3), n: B.filter(function (b) { return isTour(b) && b.date && b.date.slice(0, 7) === k; }).length, e: B.filter(function (b) { return isTour(b) && b.date && b.date.slice(0, 7) === k; }).reduce(function (s, b) { return s + (b.data.price || 0); }, 0) }); }
     var maxN = Math.max.apply(null, months.map(function (x) { return x.n; }).concat([1]));
@@ -703,7 +705,7 @@
   }
 
   /* ---------- šabloni poruka ---------- */
-  var PH = [['{ime}', 'ime'], ['{tura}', 'tura'], ['{datum}', 'datum'], ['{vrijeme}', 'vrijeme'], ['{mjesto}', 'mjesto'], ['{cijena}', 'cijena'], ['{gosti}', 'gosti'], ['{recenzija}', 'link za recenziju']];
+  var PH = [['{ime}', 'ime'], ['{tura}', 'tura'], ['{datum}', 'datum'], ['{vrijeme}', 'vrijeme'], ['{mjesto}', 'mjesto'], ['{cijena}', 'cijena'], ['{gosti}', 'gosti'], ['{recenzija}', 'link za recenziju'], ['{placanje}', 'link za plaćanje']];
   var LANGS = ['EN', 'DE', 'BS', 'IT', 'FR', 'ES'];
   function templatesView() { draft = { templates: clone(X.templates || []) }; renderTemplates(); }
   function renderTemplates() {
@@ -737,12 +739,22 @@
     { id: 'en-confirm', name: 'Potvrda ture', lang: 'EN', text: 'Hello {ime}, your tour is confirmed: {tura}, {datum} at {vrijeme}. Meeting point: {mjesto}. Price: {cijena}. See you in Mostar! Mirna' },
     { id: 'en-reminder', name: 'Podsjetnik dan prije', lang: 'EN', text: 'Hello {ime}, a quick reminder for tomorrow: {tura} at {vrijeme}, meeting point: {mjesto}. Comfortable shoes are a good idea. See you soon! Mirna' },
     { id: 'en-review', name: 'Molba za recenziju', lang: 'EN', text: 'Hello {ime}, thank you so much for exploring Mostar with me! If you enjoyed the tour, a short review would mean a lot to me: {recenzija} Mirna' },
+    { id: 'en-pay', name: 'Link za plaćanje', lang: 'EN', text: 'Hello {ime}, your tour {tura} on {datum} is reserved for you. To confirm it, please pay the deposit here: {placanje} Thank you! Mirna' },
     { id: 'de-thanks', name: 'Zahvala na upitu', lang: 'DE', text: 'Hallo {ime}, hier ist Mirna von Mostarly Guide. Vielen Dank für Ihre Anfrage zu {tura}! ' },
     { id: 'de-confirm', name: 'Potvrda ture', lang: 'DE', text: 'Hallo {ime}, Ihre Tour ist bestätigt: {tura}, {datum} um {vrijeme}. Treffpunkt: {mjesto}. Preis: {cijena}. Bis bald in Mostar! Mirna' },
     { id: 'de-reminder', name: 'Podsjetnik dan prije', lang: 'DE', text: 'Hallo {ime}, eine kurze Erinnerung für morgen: {tura} um {vrijeme}, Treffpunkt: {mjesto}. Bequeme Schuhe sind eine gute Idee. Bis morgen! Mirna' },
-    { id: 'de-review', name: 'Molba za recenziju', lang: 'DE', text: 'Hallo {ime}, vielen Dank, dass Sie Mostar mit mir entdeckt haben! Wenn Ihnen die Tour gefallen hat, würde mich eine kurze Bewertung sehr freuen: {recenzija} Mirna' }
+    { id: 'de-review', name: 'Molba za recenziju', lang: 'DE', text: 'Hallo {ime}, vielen Dank, dass Sie Mostar mit mir entdeckt haben! Wenn Ihnen die Tour gefallen hat, würde mich eine kurze Bewertung sehr freuen: {recenzija} Mirna' },
+    { id: 'de-pay', name: 'Link za plaćanje', lang: 'DE', text: 'Hallo {ime}, Ihre Tour {tura} am {datum} ist für Sie reserviert. Zur Bestätigung zahlen Sie bitte hier die Anzahlung: {placanje} Vielen Dank! Mirna' },
   ]; }
 
+  // link to the payment page, with the deposit, tour and date already filled in for the guest
+  function payLink(dr) {
+    var d = dr.data, pol = (X.site && X.site.policy) || { depositPercent: 30 }, q = [];
+    if (d.price) { var a = pol.depositPercent ? Math.ceil(d.price * pol.depositPercent / 100) : d.price; a = Math.max(a - (d.paidOnline || 0), 0); if (a) q.push('amount=' + a); }
+    if (d.tourSlug) q.push('tour=' + encodeURIComponent(d.tourSlug));
+    if (dr.date) q.push('date=' + dr.date);
+    return location.origin + '/pay/' + (q.length ? '?' + q.join('&') : '');
+  }
   // fill a template with a booking's details; parts with no value are left out
   var LOCALE = { EN: 'en-GB', DE: 'de-DE', BS: 'bs-BA', IT: 'it-IT', FR: 'fr-FR', ES: 'es-ES' };
   function fillTpl(t, dr) {
@@ -751,7 +763,7 @@
       ime: firstName(d.name), tura: tourFullName(d),
       datum: dr.date ? dObj(dr.date).toLocaleDateString(LOCALE[lang] || 'en-GB', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' }) : '',
       vrijeme: /^\d{1,2}:\d{2}$/.test(d.time || '') ? d.time : '', mjesto: d.meeting || '', cijena: d.price != null && d.price !== '' ? money(d.price) : '',
-      gosti: String((d.adults || 0) + (d.children || 0) || ''), recenzija: (S.contact && S.contact.tripadvisor) || ''
+      gosti: String((d.adults || 0) + (d.children || 0) || ''), recenzija: (S.contact && S.contact.tripadvisor) || '', placanje: payLink(dr)
     };
     var s = String(t.text || '');
     Object.keys(v).forEach(function (k) {
@@ -833,6 +845,7 @@
       [['site.about.notes', ab.notes || []], ['site.contact.notes', c.notes || []]].map(function (g) { return g[1].map(function (n, i) { return '<li><span>' + esc(n) + '</span><button type="button" class="btn sm line" data-snote="' + g[0] + '|' + i + '">Riješeno ✓</button></li>'; }).join(''); }).join('') + '</ul><small>Kad nešto riješite, kliknite "Riješeno" pa sačuvajte.</small></div></details>' : '';
     shell('vise', ehead('#/vise', 'Nazad na Više', 'Tekstovi sajta', '<a class="back" href="/" target="_blank" rel="noopener" aria-label="Otvori sajt" title="Otvori sajt">' + IC.ext + '</a>') + '<p class="sub esub">Tekst na sajtu pišite na engleskom. Nakon snimanja promjena je odmah na sajtu.</p>' + notesBlock +
       '<form id="ed" autocomplete="off" novalidate>' +
+      sec('firma', 'Podaci firme i pravila', esc(s.company.name || 'Podaci firme nisu upisani') + ' · akontacija ' + s.policy.depositPercent + '% · otkazivanje ' + s.policy.freeCancelHours + 'h', !s.company.name) + '<p class="help">Prikazuju se u podnožju sajta i na stranicama Uslovi, Privatnost i Otkazivanje. Monri ih traži prije odobrenja plaćanja karticom.</p>' + field('Naziv firme', 'site.company.name', { ph: 'npr. Mostarly d.o.o.' }) + field('Adresa', 'site.company.address', { ph: 'Ulica i broj, 88000 Mostar' }) + '<div class="two">' + field('ID broj (JIB)', 'site.company.idNumber') + field('PDV broj (ako postoji)', 'site.company.vatNumber') + field('Akontacija (%)', 'site.policy.depositPercent', { num: true, hint: 'Koliko gost plati unaprijed. 0 = puni iznos.' }) + field('Besplatno otkazivanje (sati prije ture)', 'site.policy.freeCancelHours', { num: true }) + '</div></div></details>' +
       sec('kontakt', 'Kontakt', esc([c.phone, c.email].filter(Boolean).join(' · ')), false) + '<div class="two">' + field('Telefon', 'site.contact.phone', { ph: '+387 63 000 000' }) + field('WhatsApp broj', 'site.contact.whatsapp', { ph: '38763000000', hint: 'Samo cifre, sa pozivnim brojem, bez + i razmaka.' }) + field('Email', 'site.contact.email') + field('Instagram', 'site.contact.instagram', { ph: 'mostarly.guide' }) + '</div>' + field('Tripadvisor link', 'site.contact.tripadvisor', { ph: 'https://www.tripadvisor.com/…', hint: 'Ovaj link ide i u poruku "Molba za recenziju".' }) + field('Glavno mjesto sastanka', 'site.contact.meetingPoint') + '</div></details>' +
       sec('opis', 'Naslov i opis sajta', esc(s.tagline), false) + field('Kratki slogan', 'site.tagline', { max: 200 }) + field('Opis (za Google i na početnoj)', 'site.description', { area: true, rows: 3, max: 600 }) + '</div></details>' +
       sec('omeni', 'O meni', esc(ab.experience || ''), false) + field('Kratko o meni (na početnoj)', 'site.about.short', { area: true, rows: 4, max: 800 }) + field('Iskustvo (jedna rečenica)', 'site.about.experience', { max: 200 }) + listEditor('Pasusi na stranici About', 'site.about.paragraphs', 'Novi pasus…') + '</div></details>' +
@@ -860,7 +873,8 @@
   function pushSupported() { return 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window; }
   function currentSub() { if (!pushSupported()) return Promise.resolve(null); return navigator.serviceWorker.getRegistration('/admin/').then(function (r) { return r ? r.pushManager.getSubscription() : null; }).catch(function () { return null; }); }
   function settingsView() {
-    currentSub().then(function (sub) {
+    Promise.all([currentSub(), api('GET', '/payments').catch(function () { return null; })]).then(function (rr) {
+      var sub = rr[0], PAY = rr[1];
       var cal = X.icalUrl, web = cal ? cal.replace(/^https?:/, 'webcal:') : '';
       var pushState = !pushSupported() ? (IOS && !STANDALONE ? 'ios' : 'no') : Notification.permission === 'denied' ? 'denied' : sub ? 'on' : 'off';
       var pushBody = {
@@ -878,8 +892,10 @@
           : '<p class="help">Uključite i dobićete privatni link koji jednom dodate u Google ili iPhone kalendar. Od tada se potvrđene ture same pojavljuju tamo.</p><button type="button" class="btn mint" data-con>' + IC.cal + 'Uključi kalendar</button>') + '</section>' +
         '<section class="card"><h2>' + IC.bell + ' Obavještenja na telefonu</h2>' + pushBody + '</section>' +
         '<section class="card"><h2>' + IC.phone + ' Admin kao aplikacija</h2>' + (STANDALONE ? '<p class="status ok">' + IC.check + 'Admin je otvoren kao aplikacija.</p>' : installEvt ? '<p class="help">Dodajte Mostarly admin na početni ekran: otvara se kao prava aplikacija, bez adresne trake.</p><button type="button" class="btn mint" data-install>Dodaj na početni ekran</button>' : IOS ? '<p class="help">U Safariju dodirnite <b>Dijeli</b> (kvadrat sa strelicom) pa <b>Dodaj na početni ekran</b>.</p>' : '<p class="help">U meniju preglednika (tri tačke) izaberite <b>Instaliraj aplikaciju</b> ili <b>Dodaj na početni ekran</b>.</p>') + '</section>' +
+        payCard(PAY) +
         '<section class="card"><h2>Tema</h2><div class="seg" role="radiogroup" aria-label="Tema">' + [['auto', 'Kao telefon'], ['light', 'Svijetla'], ['dark', 'Tamna']].map(function (o) { var cur = document.documentElement.getAttribute('data-theme') || 'auto'; return '<label><input type="radio" name="theme" value="' + o[0] + '"' + (cur === o[0] ? ' checked' : '') + '><span>' + o[1] + '</span></label>'; }).join('') + '</div></section>');
       var on = function (sel, fn) { var el = $(sel); if (el) el.addEventListener('click', fn); };
+      on('[data-paycopy]', function () { (navigator.clipboard ? navigator.clipboard.writeText(PAY.payUrl) : Promise.reject()).then(function () { toast('Link kopiran'); }).catch(function () { prompt('Kopirajte link:', PAY.payUrl); }); });
       on('[data-con]', function () { api('POST', '/ical/reset').then(function (j) { X.icalUrl = j.icalUrl; toast('Kalendar je uključen'); settingsView(); }).catch(function (e) { toast(e.message, true); }); });
       on('[data-creset]', function () { if (!confirm('Napraviti novi link? Stari link prestaje raditi, pa ga treba ponovo dodati u kalendar.')) return; api('POST', '/ical/reset').then(function (j) { X.icalUrl = j.icalUrl; toast('Novi link je spreman'); settingsView(); }); });
       on('[data-ccopy]', function () { var i = $('#icalu'); (navigator.clipboard ? navigator.clipboard.writeText(i.value) : Promise.reject()).then(function () { toast('Link kopiran'); }).catch(function () { i.select(); }); });
@@ -896,6 +912,16 @@
       on('[data-install]', function () { if (!installEvt) return; installEvt.prompt(); installEvt.userChoice.then(function () { installEvt = null; settingsView(); }); });
       $$('[name=theme]').forEach(function (r) { r.addEventListener('change', function () { var root = document.documentElement; if (r.value === 'auto') { root.removeAttribute('data-theme'); try { localStorage.removeItem('mly-admin-theme'); } catch (er) {} } else { root.setAttribute('data-theme', r.value); try { localStorage.setItem('mly-admin-theme', r.value); } catch (er) {} } }); });
     });
+  }
+
+  var PST = { paid: ['Plaćeno', 'st-confirmed'], pending: ['Nije završeno', 'st-done'], failed: ['Odbijeno', 'st-new'], review: ['Provjeriti', 'st-replied'] };
+  function payCard(P) {
+    if (!P) return '';
+    var mode = { off: ['Još nije uključeno', 'Plaćanje karticom proradi kad Monri pošalje ključeve i uključimo ga. Do tada stranica gostima kaže da će im Mirna javiti kako da plate.'], test: ['Probni režim', 'Plaćanje se samo simulira, nikakav novac se ne skida. Samo za testiranje.'], live: ['Uključeno', 'Gosti plaćaju karticom preko Monrija. Svaka uplata se sama upiše u planer i stigne obavještenje na telefon.'] }[P.mode] || ['', ''];
+    var list = (P.payments || []).slice(0, 12);
+    return '<section class="card"><h2>' + IC.card + ' Plaćanje karticom</h2><p class="status ' + (P.mode === 'live' ? 'ok' : '') + '">' + (P.mode === 'live' ? IC.check : '') + esc(mode[0]) + '</p><p class="help">' + esc(mode[1]) + '</p>' +
+      '<label class="f"><span>Link za plaćanje (isti za sve goste)</span><div class="copyrow"><input type="text" readonly value="' + esc(P.payUrl) + '"><button type="button" class="btn line sm" data-paycopy>' + IC.copy + 'Kopiraj</button></div><small>U šablonu "Link za plaćanje" link sam dobije iznos akontacije, turu i datum.</small></label>' +
+      (list.length ? '<p class="mlabel">Zadnje uplate</p><div class="paylist">' + list.map(function (x) { var st = PST[x.status] || [x.status, 'st-done']; return '<a class="payrow" href="' + (x.booking_id ? '#/planer/' + esc(x.booking_id) : '#/vise/postavke') + '"><b>' + money(x.amount) + '</b><span>' + esc(x.name || '') + ' · ' + esc(String(x.created_at || '').slice(5, 16)) + (x.mode === 'test' ? ' · probna' : '') + '</span><span class="pill ' + st[1] + '">' + st[0] + '</span></a>'; }).join('') + '</div>' : '') + '</section>';
   }
 
   /* ---------- podsjetnici na početnoj planera ---------- */

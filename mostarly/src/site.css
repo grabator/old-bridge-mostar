@@ -1194,3 +1194,57 @@ html.is-night .cat#city{--c:#c98a52!important}html.is-night .cat#food{--c:#dca06
 .stars i.off{opacity:.25}
 /* days Mirna marked as busy in the admin */
 .dp-day.busy{text-decoration:line-through;text-decoration-color:#c8271c;background:repeating-linear-gradient(135deg,rgba(200,39,28,.08) 0 4px,transparent 4px 8px)}
+/* ---------- payment page ---------- */
+.paymarks{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem}
+.paymarks svg{width:42px;height:26px;border-radius:5px;box-shadow:0 0 0 1px rgba(0,0,0,.12)}
+.paymarks b{font-size:.74rem;font-weight:600;color:var(--mut);margin-left:.2rem}
+.foot .legal .paymarks{width:100%;margin-bottom:.4rem}
+.foot .legal .paymarks b{color:rgba(255,255,255,.6)}
+.pay-sec{padding-top:2.2rem}
+.pay-grid{display:grid;gap:1.4rem;align-items:start}
+@media (min-width:900px){.pay-grid{grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr)}}
+.pay-card{background:var(--paper);border:1px solid var(--line);border-radius:24px;padding:1.4rem;box-shadow:0 24px 50px -36px rgba(30,20,10,.55);scroll-margin-top:6rem}
+.pay-form{display:grid;gap:1rem;grid-template-columns:minmax(0,1fr)}
+.pay-amt{display:grid;gap:.35rem}
+.amt-in{display:flex;align-items:center;gap:.4rem;border:2px solid var(--line);border-radius:18px;padding:.4rem 1rem;background:var(--cream);transition:border-color .2s}
+.amt-in:focus-within{border-color:var(--emer)}
+.amt-in b{font:400 2rem/1 var(--serif,Georgia);color:var(--copper)}
+.amt-in input{flex:1;min-width:0;border:0!important;background:transparent!important;box-shadow:none!important;font:400 2.4rem/1.2 var(--serif,Georgia);padding:.2rem 0!important;color:var(--ink);outline:none}
+.amt-hint{font-size:.78rem;color:var(--mut)}
+.pay-form small{display:block;font-size:.76rem;color:var(--mut);margin-top:.25rem}
+.agree{display:flex!important;gap:.6rem;align-items:flex-start;font-size:.88rem;color:var(--ink2);line-height:1.45;cursor:pointer}
+.agree input{flex:none;width:20px;height:20px;margin-top:.1rem;accent-color:var(--emer)}
+.pay-btn{min-height:56px;font-size:1.05rem}
+.pay-btn svg{width:18px;height:18px}
+.pay-btn:disabled{opacity:.55;cursor:not-allowed}
+.pay-form .paymarks{justify-content:center}
+.pay-mode{border-radius:14px;padding:.7rem .9rem;font-size:.86rem;font-weight:600;margin-bottom:1rem}
+.pay-mode.test{background:#fff4c7;color:#6b5600;border:1px solid #ecd77a}
+.pay-mode.off{background:var(--cream);color:var(--ink2);border:1px dashed var(--line)}
+.pay-test{display:grid;gap:.6rem;text-align:center;padding:1rem 0}
+.pay-test .pt-sum{font-weight:600;color:var(--ink)}
+.pt-btns{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin-top:.4rem}
+.pay-res{text-align:center;display:grid;gap:.6rem;justify-items:center;padding:1.2rem 0}
+.pay-res h3{font-size:1.5rem}
+.pay-res .pr-t{color:var(--ink2);max-width:42ch}
+.pay-res .pr-help{font-size:.84rem;color:var(--mut)}
+.pr-ic{width:64px;height:64px;border-radius:50%;display:grid;place-items:center}
+.pr-ic svg{width:34px;height:34px}
+.pay-res.ok .pr-ic{background:rgba(10,138,113,.14);color:var(--emer)}
+.pay-res.bad .pr-ic{background:rgba(200,39,28,.12);color:#c8271c}
+.pay-res.wait .pr-ic{background:var(--cream)}
+.spin{width:28px;height:28px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--emer);animation:pspin .8s linear infinite}
+@keyframes pspin{to{transform:rotate(360deg)}}
+.pay-info{display:grid;gap:.8rem}
+.pay-info .pi{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:1rem 1.1rem}
+.pay-info h3{font-size:1.1rem;margin-bottom:.4rem}
+.pay-info p,.pay-info li{font-size:.9rem;color:var(--ink2);line-height:1.5}
+.pay-info ol{padding-left:1.1rem;display:grid;gap:.3rem}
+.ts{min-height:65px}
+.legaltext h2{font-size:1.35rem}
+.pay-form .two{align-items:start}
+.amt-in b{font:600 1.7rem/1 var(--sans,system-ui)}
+.amt-in input{font:600 2.1rem/1.2 var(--sans,system-ui)!important;letter-spacing:-.01em}
+.pay-form .agree{text-transform:none;letter-spacing:0;font-size:.88rem;font-weight:400;color:var(--ink2)}
+.pay-form .agree input{width:20px!important;height:20px!important;min-height:0!important;padding:0!important;margin:.1rem 0 0!important;border-radius:5px!important;-webkit-appearance:auto;appearance:auto;box-shadow:none!important;flex:none}
+.pay-form small,.amt-hint{text-transform:none;letter-spacing:0;font-weight:400}

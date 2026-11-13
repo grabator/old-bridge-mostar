@@ -124,6 +124,22 @@ Or connect the repository in the Cloudflare dashboard (Workers & Pages > Create 
 
 Secrets for the email form (Worker > Settings > Variables and secrets): `RESEND_API_KEY` (secret), `MAIL_TO`, `MAIL_FROM`. Without them the form falls back to the visitor's email app. Set `SITE_URL` as a build variable if the domain differs from `url` in `site.json`.
 
+## Payments (Monri)
+
+`/pay/` is one payment link for every guest: the guest enters the amount Mirna confirmed (Mirna's message template "Link za plaćanje" fills in the deposit, tour and date), pays on Monri's secure page, and the payment appears in the planner with a phone notification. Code: `server/pay.js`, page in `src/render.mjs`, script in `src/site.js`.
+
+Security: the merchant key stays on the server; the amount is signed on the server and checked again in Monri's callback; a payment counts only after a callback with a valid Monri signature (SHA-512 of merchant key + body); callbacks are idempotent; amount limits, attempt limits per visitor, honeypot and optional Cloudflare Turnstile; card details never touch this site; the page cannot be framed and its forms can only post to this site or Monri.
+
+Going live, once Mirna's company has a Monri contract:
+
+1. Fill in the company details and the deposit / cancellation rules in the admin (Više > Tekstovi sajta > Podaci firme i pravila).
+2. Secrets from Monri: `npx wrangler secret put MONRI_MERCHANT_KEY` and `npx wrangler secret put MONRI_AUTHENTICITY_TOKEN`.
+3. In Monri's portal set the callback URL to `https://<domain>/api/pay/callback`.
+4. Check the form fields and the callback signature in `server/pay.js` against Monri's current documentation, then test with `"MONRI_ENV": "test"` and `"PAY_MODE": "live"` in `wrangler.jsonc` (Monri test cards), and finally `"MONRI_ENV": "prod"`.
+5. Optional bot protection: `TURNSTILE_SITE_KEY` (variable) and `TURNSTILE_SECRET` (secret).
+
+Locally, `PAY_MODE=test` in `.dev.vars` simulates Monri (no money). Never use test mode on the public site.
+
 ## Languages
 
 English at launch. Planned: Bosnian, German, Spanish and Turkish. The content files are kept per field so translations can be added per language later.

@@ -517,3 +517,16 @@ details.adv[open]>summary{margin-bottom:.9rem}
 .rem .btn{min-height:34px;padding:.3rem .75rem;font-size:.8rem}
 .esub{display:block}
 .esub svg{vertical-align:-3px;margin-right:.25rem}
+
+/* online payments */
+.paidpill{display:inline-flex;align-items:center;gap:.25rem;font:700 .64rem/1.5 var(--sans);letter-spacing:.04em;padding:.1rem .45rem;border-radius:99px;background:var(--ok);color:var(--okt);border:1px solid var(--okb);white-space:nowrap;position:absolute;right:.9rem;bottom:.7rem}
+.paidpill svg{width:12px;height:12px}
+.paylist{display:grid;gap:.35rem;margin-bottom:.9rem}
+.payrow{display:flex;align-items:center;gap:.55rem;padding:.55rem .7rem;border:1px solid var(--line);border-radius:12px;background:var(--field);text-decoration:none;color:var(--ink);font-size:.86rem}
+.payrow svg{width:17px;height:17px;color:var(--emer)}
+.payrow b{color:var(--strong)}
+.payrow span{flex:1;min-width:0;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.payrow span.pill{flex:none}
+.payrow small{color:var(--mut);font-size:.7rem}
+.payrow{flex-wrap:nowrap;overflow:hidden}
+@media (max-width:560px){.payrow small{display:none}}

@@ -10,8 +10,12 @@ import { onRequestPost as enquiry } from './functions/api/enquiry.js';
 import { adminEmail } from './server/auth.js';
 import { adminApi, serveMedia } from './server/api.js';
 import { icsFeed, publicBlocked, eveningReminder } from './server/extra.js';
+import { payApi } from './server/pay.js';
 
 const SEC = { 'x-content-type-options': 'nosniff', 'referrer-policy': 'strict-origin-when-cross-origin', 'permissions-policy': 'camera=(), microphone=(), geolocation=()' };
+
+// the payment page: never inside another site's frame, forms only to us or Monri, nothing cached
+const PAYSEC = { 'content-security-policy': "frame-ancestors 'none'; form-action 'self' https://ipg.monri.com https://ipgtest.monri.com; base-uri 'self'; object-src 'none'", 'x-frame-options': 'DENY', 'cache-control': 'no-store' };
 
 function denied() {
   return new Response(`<!doctype html><html lang="bs"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Prijava · Mostarly admin</title>
@@ -23,7 +27,7 @@ async function page(env, path) {
   if (!env.DB) return null;
   let row;
   try { row = await env.DB.prepare('SELECT body, type FROM pages WHERE url = ?').bind(path).first(); } catch { return null; }
-  if (row) return new Response(row.body, { headers: Object.assign({ 'content-type': row.type, 'cache-control': 'public, max-age=0, must-revalidate' }, SEC) });
+  if (row) return new Response(row.body, { headers: Object.assign({ 'content-type': row.type, 'cache-control': 'public, max-age=0, must-revalidate' }, SEC, path === '/pay/' ? PAYSEC : {}) });
   const nf = await env.DB.prepare("SELECT body FROM pages WHERE url = '/404'").first();
   if (nf && path !== '/sitemap.xml' && path !== '/robots.txt') return new Response(nf.body, { status: 404, headers: Object.assign({ 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' }, SEC) });
   return null;
@@ -40,6 +44,7 @@ export default {
         return new Response('Method not allowed', { status: 405, headers: { allow: 'POST' } });
       }
       if (path === '/api/blocked' && method === 'GET') return publicBlocked(env);
+      if (path.startsWith('/api/pay/')) return payApi(request, env, path);
       if (path.startsWith('/cal/') && path.endsWith('.ics') && method === 'GET') return icsFeed(env, path.slice(5, -4));
       if (path.startsWith('/media/')) return (method === 'GET' || method === 'HEAD') ? serveMedia(request, env) : new Response('Method not allowed', { status: 405 });
       if (path === '/admin' || path.startsWith('/admin/') || path.startsWith('/api/admin')) {

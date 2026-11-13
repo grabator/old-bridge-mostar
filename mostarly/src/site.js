@@ -299,6 +299,7 @@
       pop.innerHTML = h;
     }
     dp._render = function () { if (!pop.hidden) render(); };
+    dp._set = function (v) { set(v); };
     function set(v) {
       inp.value = v; dp.classList.toggle('has', !!v);
       label.textContent = v ? new Date(v + 'T12:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' }) : 'Choose a date';
@@ -531,4 +532,79 @@
 
   // pre-select a tour from ?tour= on the contact page
   (function () { var p = new URLSearchParams(location.search).get('tour'); var s = $('[data-enq] [name=tour]'); if (p && s && tourBy(p)) { s.value = p; s.dispatchEvent(new Event('change')); } })();
+  /* ---------- /pay/: online payment (Monri). The server signs the amount; card details only on Monri's page. ---------- */
+  (function () {
+    var box = $('[data-pay]'); if (!box) return;
+    var form = $('.pay-form', box), err = $('.formerr', box), btn = $('.pay-btn', box), btnTxt = $('.pay-btn span', box), amt = $('[name=amount]', box);
+    var testBox = $('.pay-test', box), res = $('.pay-res', box), modeBox = $('.pay-mode', box), tsBox = $('.ts', box);
+    var C = { mode: 'off', currency: 'EUR', symbol: '€', min: 10, max: 1000 }, busy = false, tsToken = '';
+    var q = new URLSearchParams(location.search);
+    function money(n) { n = Number(n) || 0; var t = n % 1 ? n.toFixed(2) : String(n); return C.currency === 'EUR' ? '€' + t : t + ' KM'; }
+    function val() { var v = String(amt.value || '').replace(/[^\d.,]/g, '').replace(',', '.'); var n = parseFloat(v); return isFinite(n) ? Math.round(n * 100) / 100 : 0; }
+    function label() { var n = val(); btnTxt.textContent = n ? 'Pay ' + money(n) + ' securely' : 'Pay securely'; }
+    function show(el) { [form, testBox, res].forEach(function (x) { x.hidden = x !== el; }); box.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' }); }
+    function keyFor(o) { try { return sessionStorage.getItem('mly-pay-' + o) || ''; } catch (e) { return ''; } }
+    function result(kind, title, text, again) {
+      res.className = 'pay-res ' + kind;
+      res.innerHTML = '<div class="pr-ic">' + (kind === 'ok' ? '<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>' : kind === 'wait' ? '<span class="spin"></span>' : '<svg viewBox="0 0 24 24"><path d="M7 7l10 10M17 7 7 17" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>') + '</div><h3></h3><p class="pr-t"></p>' + (again ? '<p><button type="button" class="btn line" data-again>Try again</button></p>' : '') + '<p class="pr-help">Questions? <a href="https://wa.me/' + (D.whatsapp || '') + '">WhatsApp Mirna</a></p>';
+      $('h3', res).textContent = title; $('.pr-t', res).textContent = text;
+      var a = $('[data-again]', res); if (a) a.addEventListener('click', function () { history.replaceState(null, '', location.pathname); show(form); });
+      show(res);
+    }
+    // after Monri sends the guest back: the server decides, from Monri's signed callback, whether it is paid
+    function poll(order, tries) {
+      var k = keyFor(order);
+      if (!k) { result('wait', 'Thank you', 'If your payment went through, you will get a receipt by email and Mirna will see it straight away.'); return; }
+      fetch('/api/pay/status?o=' + encodeURIComponent(order) + '&k=' + encodeURIComponent(k)).then(function (r) { return r.json(); }).then(function (j) {
+        if (j.status === 'paid') { track('payment_done', { value: j.amount, currency: j.currency }); result('ok', 'Thank you' + (j.name ? ', ' + j.name.split(' ')[0] : '') + '!', money(j.amount) + ' received' + (j.tour ? ' for ' + j.tour : '') + (j.date ? ', ' + new Date(j.date + 'T12:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long' }) : '') + '. A receipt is on its way to your email and Mirna will be in touch.'); }
+        else if (j.status === 'failed') result('bad', 'The payment did not go through', 'No money was taken. You can try again or use another card.', true);
+        else if (tries > 0) { result('wait', 'Confirming your payment…', 'This takes a few seconds. Please keep this page open.'); setTimeout(function () { poll(order, tries - 1); }, 2500); }
+        else result('wait', 'Payment received, confirmation pending', 'Your bank has not confirmed it yet. You will get a receipt by email, and Mirna will confirm your tour. No need to pay again.');
+      }).catch(function () { result('wait', 'Thank you', 'If your payment went through, you will get a receipt by email.'); });
+    }
+    fetch('/api/pay/config').then(function (r) { return r.json(); }).catch(function () { return C; }).then(function (c) {
+      C = c || C; $$('[data-sym]', box).forEach(function (x) { x.textContent = C.symbol; });
+      $('.amt-hint', box).textContent = 'Between ' + money(C.min) + ' and ' + money(C.max) + '.';
+      if (C.mode === 'off') { modeBox.hidden = false; modeBox.className = 'pay-mode off'; modeBox.textContent = 'Online payment is being set up. Until then, Mirna will tell you how to pay.'; btn.disabled = true; }
+      if (C.mode === 'test') { modeBox.hidden = false; modeBox.className = 'pay-mode test'; modeBox.textContent = 'Test mode: no real card is charged.'; }
+      if (C.turnstile && C.mode !== 'off') {
+        tsBox.hidden = false; window.mlyTs = function () { window.turnstile.render(tsBox, { sitekey: C.turnstile, callback: function (t) { tsToken = t; }, 'expired-callback': function () { tsToken = ''; } }); };
+        var s = document.createElement('script'); s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=mlyTs&render=explicit'; s.async = true; document.head.appendChild(s);
+      }
+      if (q.get('done')) poll(q.get('done'), 8);
+      else if (q.get('cancel')) result('bad', 'Payment cancelled', 'No money was taken. You can try again whenever you are ready.', true);
+    });
+    // prefill from the link Mirna sends (?amount=25&tour=slug&date=2026-11-16)
+    if (q.get('amount')) amt.value = String(q.get('amount')).replace(/[^\d.,]/g, '').slice(0, 8);
+    if (q.get('tour')) { var ts = $('[name=tour]', box); if (ts && ts.querySelector('option[value="' + q.get('tour').replace(/[^a-z0-9-]/g, '') + '"]')) { ts.value = q.get('tour'); ts.dispatchEvent(new Event('change')); } }
+    if (/^\d{4}-\d{2}-\d{2}$/.test(q.get('date') || '')) { var dp = $('[data-dp]', box); if (dp && dp._set) dp._set(q.get('date')); }
+    label();
+    amt.addEventListener('input', function () { var c = amt.value.replace(/[^\d.,]/g, ''); if (c !== amt.value) amt.value = c; label(); });
+    form.addEventListener('submit', function (e) {
+      e.preventDefault(); if (busy || C.mode === 'off') return;
+      var f = form.elements, n = val(), email = String(f.email.value).trim();
+      var problem = !n || n < C.min || n > C.max ? 'Please enter an amount between ' + money(C.min) + ' and ' + money(C.max) + '.' : String(f.name.value).trim().length < 2 ? 'Please enter your name.' : !/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(email) ? 'Please enter a valid email address.' : !f.agree.checked ? 'Please accept the booking and cancellation terms.' : C.turnstile && !tsToken ? 'Please confirm you are not a robot.' : '';
+      if (problem) { err.textContent = problem; return; }
+      err.textContent = ''; busy = true; btn.disabled = true; btnTxt.textContent = 'One moment…';
+      var sel = f.tour, tName = sel.value ? sel.options[sel.selectedIndex].textContent : '';
+      fetch('/api/pay/start', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ amount: n, name: f.name.value, email: email, tourSlug: sel.value, tour: tName, date: f.date.value, agree: true, website: f.website.value, turnstile: tsToken }) })
+        .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.error || 'Something went wrong. Please try again.'); return j; }); })
+        .then(function (j) {
+          try { sessionStorage.setItem('mly-pay-' + j.order, j.key); } catch (er) {}
+          track('payment_start', { value: n, currency: C.currency });
+          if (j.mode === 'test') { testBox.dataset.order = j.order; testBox.dataset.key = j.key; $('.pt-sum', testBox).textContent = money(n) + (tName ? ' · ' + tName : '') + ' · ' + f.name.value; show(testBox); busy = false; btn.disabled = false; label(); return; }
+          // live: post the signed form to Monri
+          var mf = document.createElement('form'); mf.method = 'POST'; mf.action = j.form.action; mf.style.display = 'none';
+          Object.keys(j.form.fields).forEach(function (k) { var i = document.createElement('input'); i.type = 'hidden'; i.name = k; i.value = j.form.fields[k]; mf.appendChild(i); });
+          document.body.appendChild(mf); mf.submit();
+        })
+        .catch(function (er) { err.textContent = er.message; busy = false; btn.disabled = false; label(); if (window.turnstile && C.turnstile) { try { window.turnstile.reset(tsBox); tsToken = ''; } catch (x) {} } });
+    });
+    $$('[data-pt]', testBox).forEach(function (b) { b.addEventListener('click', function () {
+      var ok = b.getAttribute('data-pt') === '1', o = testBox.dataset.order; b.disabled = true;
+      fetch('/api/pay/test', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ order: o, key: testBox.dataset.key, ok: ok }) }).then(function () {
+        b.disabled = false; history.replaceState(null, '', location.pathname + (ok ? '?done=' : '?cancel=') + o); if (ok) poll(o, 3); else result('bad', 'Payment declined (test)', 'No money was taken. You can try again.', true);
+      });
+    }); });
+  })();
 })();

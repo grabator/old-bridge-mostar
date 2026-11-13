@@ -21,7 +21,13 @@
     // Cloudflare Access (Zero Trust > Access > Applications), see README "Admin"
     "ACCESS_TEAM": "mostarly.cloudflareaccess.com,falling-fog-be2e.cloudflareaccess.com",
     "ACCESS_AUD": "02faa1f931da7bd4746846d8183e51f195aac883053171081067b1e88ccbbdae",
-    "ADMIN_EMAILS": ""
+    "ADMIN_EMAILS": "",
+    // Card payments on /pay/ (Monri), see README "Payments". off = page says payment is being set up;
+    // live = real payments (needs the secrets MONRI_MERCHANT_KEY and MONRI_AUTHENTICITY_TOKEN).
+    // Never use "test" here: it fakes payments. MONRI_ENV: "test" (Monri test system) or "prod".
+    "PAY_MODE": "off",
+    "PAY_CURRENCY": "EUR",
+    "MONRI_ENV": "test"
   },
   // every evening at 17:00 UTC (18:00 or 19:00 in Mostar): a phone notification with tomorrow's tours
   "triggers": { "crons": ["0 17 * * *"] },

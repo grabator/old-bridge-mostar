@@ -1,6 +1,7 @@
 // /api/admin/* : what the admin page calls. Every change is saved and the site is published right away.
 import { seed, loadAll, publish, cleanTour, cleanReview, slugify, siteContent, BASE_CONTENT as C } from './store.js';
 import { extraApi } from './extra.js';
+import { payConfig, recentPayments } from './pay.js';
 
 const J = (o, status = 200) => new Response(JSON.stringify(o), { status, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' } });
 const now = () => new Date().toISOString().replace('T', ' ').slice(0, 19);
@@ -142,6 +143,9 @@ export async function adminApi(request, env, email) {
       const b = await body(request); if (!b) return J({ error: 'Bad request' }, 400);
       const c = cleanBooking(b);
       if (!c.data.name) return J({ error: 'Upišite ime gosta.' }, 422);
+      // online payments are written only by the payment callback, never by the admin form
+      const old = await env.DB.prepare('SELECT data FROM bookings WHERE id = ?').bind(id).first();
+      if (old) { const od = JSON.parse(old.data); if (od.payments) c.data.payments = od.payments; if (od.paidOnline) c.data.paidOnline = od.paidOnline; }
       const r = await env.DB.prepare('UPDATE bookings SET status = ?, source = ?, date = ?, data = ?, updated_at = ? WHERE id = ?').bind(c.status, c.source, c.date, JSON.stringify(c.data), now(), id).run();
       if (!r.meta.changes) return J({ error: 'Ne postoji.' }, 404);
       return J({ ok: true, id });
@@ -152,6 +156,7 @@ export async function adminApi(request, env, email) {
     }
   }
 
+  if (p === '/payments' && m === 'GET') { const c = payConfig(env); return J({ mode: c.mode, currency: c.currency, min: c.min, max: c.max, payUrl: url.origin + '/pay/', payments: await recentPayments(env).catch(() => []) }); }
   if (p === '/publish' && m === 'POST') return J({ ok: true, published: await publish(env) });
   return J({ error: 'Not found' }, 404);
 }
@@ -181,7 +186,7 @@ export async function serveMedia(request, env) {
 
 /* ---------- planner entries ---------- */
 const STATUSES = ['new', 'replied', 'confirmed', 'done', 'cancelled'];
-const SOURCES = ['site-email', 'site-whatsapp', 'instagram', 'whatsapp', 'phone', 'email', 'agency', 'walkin', 'other'];
+const SOURCES = ['site-email', 'site-whatsapp', 'site-pay', 'instagram', 'whatsapp', 'phone', 'email', 'agency', 'walkin', 'other'];
 function cleanBooking(b) {
   const s = (v, n) => String(v ?? '').replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, '').trim().slice(0, n);
   const d = b.data || {};

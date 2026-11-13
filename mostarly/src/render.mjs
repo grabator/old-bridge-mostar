@@ -38,6 +38,9 @@ sun: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.5" fill="currentColo
 };
 const HLOGO = '<img class="lg-dark" src="/img/logo-dark.png" alt="Mostarly Guide" width="167" height="34"><img class="lg-light" src="/img/logo-light.png" alt="Mostarly Guide" width="167" height="34">';
 const mini = '<svg data-mini aria-hidden="true"></svg>';
+const PAYMARKS = `<span class="paymarks" aria-label="Visa, Mastercard, Apple Pay and Google Pay accepted, payments processed by Monri"><svg viewBox="0 0 48 30" aria-hidden="true"><rect width="48" height="30" rx="5" fill="#fff"/><text x="24" y="20.5" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="13" font-weight="900" font-style="italic" fill="#1a1f71">VISA</text></svg><svg viewBox="0 0 48 30" aria-hidden="true"><rect width="48" height="30" rx="5" fill="#fff"/><circle cx="19.5" cy="15" r="8" fill="#eb001b"/><circle cx="28.5" cy="15" r="8" fill="#f79e1b" fill-opacity=".9"/></svg><svg viewBox="0 0 48 30" aria-hidden="true"><rect width="48" height="30" rx="5" fill="#fff"/><text x="24" y="19.5" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="8.5" font-weight="700" fill="#000">Apple Pay</text></svg><svg viewBox="0 0 48 30" aria-hidden="true"><rect width="48" height="30" rx="5" fill="#fff"/><text x="24" y="19.5" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="8.5" font-weight="700" fill="#3c4043">Google Pay</text></svg><b>Secure payments by Monri</b></span>`;
+const CO = () => Object.assign({ name: '', address: '', idNumber: '', vatNumber: '' }, S.company || {});
+const POL = () => Object.assign({ depositPercent: 30, freeCancelHours: 48 }, S.policy || {});
 const starsOf = (n = 5) => { n = Math.max(1, Math.min(5, Math.round(+n || 5))); return `<span class="stars" aria-label="${n} out of 5">${'<i>★</i>'.repeat(n)}${'<i class="off">★</i>'.repeat(5 - n)}</span>`; };
 const stars = starsOf(5);
 const tbc = (txt = 'to confirm') => (DRAFT ? `<span class="tbc">${esc(txt)}</span>` : '');
@@ -137,9 +140,9 @@ function foot() {
   return `<section class="bridge-sign" aria-label="Stari Most">${bridge('signature')}<p>Stari Most · 1566</p></section><footer class="foot"><div class="band" data-band="1" style="--bh:44px" aria-hidden="true"></div><div class="fringe down" aria-hidden="true"></div><div class="wrap">
 <div><img class="flogo" src="/img/logo-light.png" alt="Mostarly Guide" width="196" height="40" loading="lazy"><p>Licensed local guide in Mostar,<br>Bosnia and Herzegovina.</p></div>
 <div><h4>Tours</h4><ul>${S.categories.map((c) => `<li><a href="/tours/#${c.id}">${esc(c.name)}</a></li>`).join('')}</ul></div>
-<div><h4>Plan</h4><ul><li><a href="/mostar-herzegovina/">Mostar &amp; Herzegovina</a></li><li><a href="/faq/">Practical information</a></li><li><a href="/travel-professionals/">For travel professionals</a></li><li><a href="/about/">About Mirna</a></li></ul></div>
+<div><h4>Plan</h4><ul><li><a href="/pay/">Pay for your tour</a></li><li><a href="/mostar-herzegovina/">Mostar &amp; Herzegovina</a></li><li><a href="/faq/">Practical information</a></li><li><a href="/travel-professionals/">For travel professionals</a></li><li><a href="/about/">About Mirna</a></li></ul></div>
 <div><h4>Contact</h4><ul><li><a href="${tel}">${esc(S.contact.phone)}</a></li><li><a href="${wa('Hello Mirna, I would like to ask about a tour in Mostar.')}">WhatsApp</a></li><li><a href="mailto:${S.contact.email}">${S.contact.email}</a></li><li><a href="https://instagram.com/${S.contact.instagram}">Instagram @${S.contact.instagram}</a></li></ul></div>
-<div class="legal"><span>© ${YEAR} Mostarly Guide, Mostar</span><span><a href="/privacy/">Privacy</a> · <a href="/terms/">Terms</a> · <a href="/cancellation-policy/">Cancellation policy</a></span></div>
+<div class="legal">${PAYMARKS}<span>© ${YEAR} Mostarly Guide, Mostar${CO().name ? ` · ${esc(CO().name)}${CO().address ? ', ' + esc(CO().address) : ''}${CO().idNumber ? ' · ID ' + esc(CO().idNumber) : ''}` : ''}</span><span><a href="/privacy/">Privacy</a> · <a href="/terms/">Terms</a> · <a href="/cancellation-policy/">Cancellation policy</a></span></div>
 </div></footer>`;
 }
 function sticky(label, sub, href, waText) {
@@ -654,18 +657,83 @@ ${notes(['Section 13 (B2B) in the brief is empty: add group rates, commission te
   emit('/faq/', head({ title: 'Practical Information & FAQ · Tours in Mostar · Mostarly Guide', desc: 'Meeting points, entrance tickets, accessibility, children, what to wear and bad weather: practical answers for tours in Mostar and Herzegovina.', url: '/faq/', ld }) + page({ current: '/faq/', body }));
 }
 
-// LEGAL placeholders
-for (const [url, title, intro] of [['/privacy/', 'Privacy policy', 'How Mostarly Guide handles the information you send with an enquiry.'], ['/terms/', 'Terms', 'Terms for tours and services booked with Mostarly Guide.'], ['/cancellation-policy/', 'Cancellation policy', 'What happens if you need to cancel or change a confirmed tour.']]) {
-  const c = [['/', 'Home'], [url, title]];
-  const privacy = url === '/privacy/' ? '<p>When you send an enquiry, we receive the details you enter (name, email or phone number, dates, number of guests and your message) so we can reply and plan your tour. We do not sell or share these details with third parties for marketing.</p>' : '';
-  const body = phead(c, esc(title), esc(intro)) + `<section class="sec" style="padding-top:2.4rem"><div class="wrap narrow prose">${privacy}${notes(['The owner must supply and approve the legal wording for this page before launch.'])}</div></section>`;
-  emit(url, head({ title: title + ' · Mostarly Guide', desc: intro, url, noindex: true }) + page({ body }));
+// LEGAL pages. Drafts: Mirna (and her accountant) approve the wording and fill in the company details.
+{
+  const co = CO(), pol = POL(), h = pol.freeCancelHours, dep = pol.depositPercent;
+  const who = co.name ? `${esc(co.name)}${co.address ? ', ' + esc(co.address) : ''}${co.idNumber ? ' (ID ' + esc(co.idNumber) + (co.vatNumber ? ', VAT ' + esc(co.vatNumber) : '') + ')' : ''}` : `Mostarly Guide, Mostar, Bosnia and Herzegovina${tbc('company name, address and ID number')}`;
+  const contactLine = `<a href="mailto:${esc(S.contact.email)}">${esc(S.contact.email)}</a>, <a href="${tel}">${esc(S.contact.phone)}</a>`;
+  const legalNote = notes(['Draft wording. Mirna (and her accountant) should read and approve this page and add the company name, address and ID number in the admin (Više > Tekstovi sajta > Podaci firme).']);
+  const pages = [
+    ['/cancellation-policy/', 'Booking & cancellation', 'How bookings, deposits, changes and cancellations work.', `
+<h2>Booking a tour</h2><p>Send an enquiry by the form, WhatsApp, phone or email. Mirna replies personally with availability and the final price. A tour is booked when Mirna has confirmed it${dep ? ` and the deposit has been paid` : ''}.</p>
+${dep ? `<h2>Deposit and payment</h2><p>To secure your date, a deposit of about ${dep}% of the tour price is paid online by card on the <a href="/pay/">payment page</a>. The rest is paid on the day of the tour, in cash or as agreed with Mirna. Prices are confirmed in writing before you pay.</p>` : `<h2>Payment</h2><p>Payment can be made online by card on the <a href="/pay/">payment page</a> or as agreed with Mirna.</p>`}
+<h2>If you cancel</h2><ul><li><b>Up to ${h} hours before the tour:</b> free cancellation, the amount you paid is refunded in full.</li><li><b>Less than ${h} hours before the tour, or if you do not come:</b> the amount paid is not refunded.</li><li>Want to change the date instead? Just ask: Mirna will move your tour if there is availability.</li></ul>
+<h2>If we cancel</h2><p>If Mirna has to cancel (for example because of illness, unsafe weather or road conditions), you choose between a new date and a full refund.</p>
+<h2>Refunds</h2><p>Refunds go back to the card used for payment. Depending on your bank, the money usually appears within 5 to 10 working days.</p>
+<h2>Entrance tickets</h2><p>Entrance tickets to museums, houses and other sites are paid separately on the day unless agreed otherwise.</p>
+<h2>Questions</h2><p>Contact Mirna: ${contactLine}.</p>`],
+    ['/terms/', 'Terms', 'Terms for tours and services booked with Mostarly Guide.', `
+<h2>Who we are</h2><p>Tours are provided by ${who}, led by Mirna, a licensed tour guide in Mostar.</p>
+<h2>Tours and prices</h2><p>Each tour page describes what is included. Prices are shown per person or per group and are confirmed in writing before you book. Entrance tickets and personal expenses are not included unless stated.</p>
+<h2>Booking and payment</h2><p>A tour is booked once Mirna confirms it. Online card payments are processed securely by Monri; we never see or store your card details. See <a href="/cancellation-policy/">Booking &amp; cancellation</a> for deposits, changes and refunds.</p>
+<h2>On the tour</h2><p>Please arrive at the meeting point on time and wear comfortable shoes. Tours include walking on uneven cobblestones and steps; tell us in advance about any mobility needs. Children must be accompanied by an adult. Mirna may adjust the route for safety, weather or opening hours.</p>
+<h2>Responsibility</h2><p>Guests take part at their own responsibility and should have their own travel insurance. We are not responsible for lost personal belongings or for services of third parties (restaurants, museums, transport) beyond our control.</p>
+<h2>Law</h2><p>These terms are governed by the law of Bosnia and Herzegovina.</p>
+<h2>Contact</h2><p>${contactLine}</p>`],
+    ['/privacy/', 'Privacy policy', 'How Mostarly Guide handles the information you send us.', `
+<h2>Who is responsible</h2><p>${who}. Contact: ${contactLine}.</p>
+<h2>What we collect</h2><ul><li><b>Enquiries:</b> name, email or phone number, preferred tour, date, number of guests and your message.</li><li><b>Payments:</b> name, email, tour, date and amount. Card details are entered only on the secure page of our payment processor Monri and are never seen or stored by us.</li><li><b>Messages</b> you send us on WhatsApp, Instagram or by email.</li></ul>
+<h2>Why</h2><p>Only to answer your enquiry, organise and confirm your tour, take payment and keep the records the law requires. We do not sell your details and do not use them for advertising.</p>
+<h2>Who else processes data</h2><p>Monri (card payments), Cloudflare (hosting of this website) and, if you choose them, WhatsApp, Instagram and your email provider.</p>
+<h2>How long</h2><p>Enquiries that do not become a booking are deleted within 12 months. Booking and payment records are kept as long as accounting law requires.</p>
+<h2>Your rights</h2><p>You can ask to see, correct or delete your data at any time: ${contactLine}.</p>
+<h2>Cookies</h2><p>This website does not use advertising cookies. Your choice of day or night theme is saved only in your browser.</p>`]
+  ];
+  for (const [url, title, intro, html] of pages) {
+    const c = [['/', 'Home'], [url, title]];
+    const body = phead(c, esc(title), esc(intro)) + `<section class="sec" style="padding-top:2.4rem"><div class="wrap narrow prose legaltext">${legalNote}${html}</div></section>`;
+    emit(url, head({ title: title + ' · Mostarly Guide', desc: intro, url, noindex: true }) + page({ body }));
+  }
+}
+
+// PAY: one link Mirna sends to every guest. The guest enters the amount she confirmed; site.js does the rest.
+{
+  const c = [['/', 'Home'], ['/pay/', 'Pay for your tour']], pol = POL();
+  const opts = S.categories.map((ct) => `<optgroup label="${esc(ct.name)}">${TOURS.filter((t) => t.category === ct.id).map((t) => `<option value="${t.slug}">${esc(t.name)}</option>`).join('')}</optgroup>`).join('');
+  const lock = '<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="7" width="10" height="7.5" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M5.2 7V5a2.8 2.8 0 0 1 5.6 0v2" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>';
+  const body = phead(c, 'Pay for your <em>tour</em>', 'Enter the amount Mirna confirmed with you. Secure card payment, processed by Monri.') + `
+<section class="sec pay-sec"><div class="wrap pay-grid">
+<div class="pay-card" data-pay>
+  <div class="pay-mode" hidden></div>
+  <form class="form pay-form" novalidate>
+    <label class="pay-amt"><span class="flabel">Amount</span><span class="amt-in"><b data-sym>€</b><input name="amount" inputmode="decimal" autocomplete="off" placeholder="0" aria-label="Amount to pay" maxlength="8" required></span><small class="amt-hint"></small></label>
+    <div class="two"><label>Your name<input name="name" autocomplete="name" required maxlength="100"></label><label>Email<input type="email" name="email" autocomplete="email" inputmode="email" required maxlength="160"><small>The receipt is sent here.</small></label></div>
+    <div class="fld"><span class="flabel" id="pay-tl">Tour</span><div class="dd" data-dd><select name="tour" class="native" tabindex="-1" aria-hidden="true"><option value="">Other / custom tour</option>${opts}</select><button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="pay-tl"><span>Other / custom tour</span><svg viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button><div class="dd-pop" role="listbox" hidden></div></div></div>
+    <div class="fld"><span class="flabel">Tour date</span><div class="dp" data-dp><input type="hidden" name="date"><button type="button" class="dd-btn dp-btn" aria-haspopup="dialog" aria-expanded="false">${I.cal}<span>Choose a date</span></button><div class="dp-pop" role="dialog" aria-label="Choose a date" hidden></div></div></div>
+    <label class="agree"><input type="checkbox" name="agree" required><span>I agree to the <a href="/cancellation-policy/" target="_blank">booking &amp; cancellation terms</a> and the <a href="/privacy/" target="_blank">privacy policy</a>.</span></label>
+    <div class="hp" aria-hidden="true"><label>Website<input name="website" tabindex="-1" autocomplete="off"></label></div>
+    <div class="ts" hidden></div>
+    <p class="formerr" role="alert"></p>
+    <button type="submit" class="btn mint block pay-btn">${lock}<span>Pay securely</span></button>
+    ${PAYMARKS}
+  </form>
+  <div class="pay-test" hidden><p class="eyebrow">Test payment</p><h3>Monri card page (simulation)</h3><p>This is a test. No card is charged and no money is taken.</p><p class="pt-sum"></p><div class="pt-btns"><button type="button" class="btn mint" data-pt="1">Approve test payment</button><button type="button" class="btn line" data-pt="0">Decline</button></div></div>
+  <div class="pay-res" hidden role="status" aria-live="polite"></div>
+</div>
+<aside class="pay-info">
+  <div class="pi"><h3>How it works</h3><ol><li>Mirna confirms your tour and the amount.</li><li>You pay here by card, Apple Pay or Google Pay.</li><li>You get a receipt by email, and Mirna sees your payment straight away.</li></ol></div>
+  <div class="pi"><h3>Deposit &amp; cancellation</h3><p>${pol.depositPercent ? `Usually you pay a deposit of about ${pol.depositPercent}% now and the rest on the day.` : 'Pay the amount Mirna confirmed with you.'} Free cancellation up to ${pol.freeCancelHours} hours before the tour. <a href="/cancellation-policy/">Full terms</a></p></div>
+  <div class="pi"><h3>Safe</h3><p>Your card details are entered only on Monri’s secure page (3-D Secure). We never see or store them.</p></div>
+  <a class="btn wa block" href="${wa('Hello Mirna, I have a question about paying for my tour.')}">${I.wa} Questions? WhatsApp Mirna</a>
+</aside>
+</div></section>`;
+  emit('/pay/', head({ title: 'Pay for your tour · Mostarly Guide', desc: 'Secure online payment for tours with Mostarly Guide in Mostar.', url: '/pay/', noindex: true }) + page({ body }));
 }
 
 // 404
 emit('/404', head({ title: 'Page not found · Mostarly Guide', desc: 'This page does not exist.', url: '/404', noindex: true }) + page({ body: `<section class="sec"><div class="wrap narrow" style="text-align:center"><p class="eyebrow" style="justify-content:center">${mini}404</p><h1>This street <em>ends here</em></h1><p class="lead" style="margin:1rem auto 2rem">The page you were looking for does not exist. The Old Bridge is still where it was.</p><a class="btn" href="/">Back home</a> <a class="btn line" href="/tours/">See the tours</a></div></section>` }));
 
-const urls = out.map(([u]) => u).filter((u) => u !== '/404' && !['/privacy/', '/terms/', '/cancellation-policy/'].includes(u));
+const urls = out.map(([u]) => u).filter((u) => u !== '/404' && !['/privacy/', '/terms/', '/cancellation-policy/', '/pay/'].includes(u));
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((u) => `<url><loc>${BASE}${u}</loc></url>`).join('\n')}\n</urlset>\n`;
 const robots = DRAFT ? 'User-agent: *\nDisallow: /\n' : `User-agent: *\nAllow: /\nDisallow: /admin/\nSitemap: ${BASE}/sitemap.xml\n`;
 /* ---------- checks: internal links and banned phrases ---------- */
