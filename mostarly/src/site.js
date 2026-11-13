@@ -503,6 +503,7 @@
     $('[data-send=wa]', f).addEventListener('click', function () {
       var d = collect(); if (!check(d)) return;
       track('enquiry_whatsapp', { tour: d.tourSlug });
+      try { fetch('/api/enquiry', { method: 'POST', keepalive: true, headers: { 'content-type': 'application/json' }, body: JSON.stringify(Object.assign({ channel: 'whatsapp' }, d)) }).catch(function () {}); } catch (e) {} // a copy for Mirna's planner
       window.open('https://wa.me/' + D.whatsapp + '?text=' + encodeURIComponent(message(d)), '_blank', 'noopener');
       finish('Your message is ready in WhatsApp. Press send there and Mirna will reply personally.');
     });
@@ -510,7 +511,7 @@
       e.preventDefault(); var d = collect(); if (!check(d)) return;
       if (d.website) return; // honeypot
       var btn = $('[type=submit]', f); btn.disabled = true; btn.textContent = 'Sending…';
-      fetch('/api/enquiry', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(d) })
+      fetch('/api/enquiry', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(Object.assign({ channel: 'email' }, d)) })
         .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
         .then(function () { track('enquiry_submit', { tour: d.tourSlug }); finish('We have received your enquiry and sent it to ' + D.email + '.'); })
         .catch(function () {

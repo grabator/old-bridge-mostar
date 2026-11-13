@@ -117,6 +117,36 @@ export async function adminApi(request, env, email) {
     return J({ ok: true });
   }
 
+  /* ----- planner: enquiries and bookings ----- */
+  if (p === '/bookings' && m === 'GET') {
+    const rows = (await env.DB.prepare('SELECT id, status, source, date, data, created_at, updated_at FROM bookings ORDER BY created_at DESC LIMIT 3000').all()).results;
+    return J({ bookings: rows.map((r) => ({ id: r.id, status: r.status, source: r.source, date: r.date, created_at: r.created_at, updated_at: r.updated_at, data: JSON.parse(r.data) })) });
+  }
+  if (p === '/bookings' && m === 'POST') {
+    const b = await body(request); if (!b) return J({ error: 'Bad request' }, 400);
+    const c = cleanBooking(b);
+    if (!c.data.name) return J({ error: 'Upišite ime gosta.' }, 422);
+    const id = rid() + rid().slice(0, 2);
+    await env.DB.prepare('INSERT INTO bookings (id, status, source, date, data, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)').bind(id, c.status, c.source, c.date, JSON.stringify(c.data), now(), now()).run();
+    return J({ ok: true, id });
+  }
+  mt = /^\/bookings\/([a-z0-9]+)$/.exec(p);
+  if (mt) {
+    const id = mt[1];
+    if (m === 'PUT') {
+      const b = await body(request); if (!b) return J({ error: 'Bad request' }, 400);
+      const c = cleanBooking(b);
+      if (!c.data.name) return J({ error: 'Upišite ime gosta.' }, 422);
+      const r = await env.DB.prepare('UPDATE bookings SET status = ?, source = ?, date = ?, data = ?, updated_at = ? WHERE id = ?').bind(c.status, c.source, c.date, JSON.stringify(c.data), now(), id).run();
+      if (!r.meta.changes) return J({ error: 'Ne postoji.' }, 404);
+      return J({ ok: true, id });
+    }
+    if (m === 'DELETE') {
+      await env.DB.prepare('DELETE FROM bookings WHERE id = ?').bind(id).run();
+      return J({ ok: true });
+    }
+  }
+
   if (p === '/publish' && m === 'POST') return J({ ok: true, published: await publish(env) });
   return J({ error: 'Not found' }, 404);
 }
@@ -142,4 +172,27 @@ export async function serveMedia(request, env) {
   h.set('cache-control', 'public, max-age=31536000, immutable');
   h.set('x-content-type-options', 'nosniff');
   return new Response(request.method === 'HEAD' ? null : obj.body, { headers: h });
+}
+
+/* ---------- planner entries ---------- */
+const STATUSES = ['new', 'replied', 'confirmed', 'done', 'cancelled'];
+const SOURCES = ['site-email', 'site-whatsapp', 'instagram', 'whatsapp', 'phone', 'email', 'agency', 'walkin', 'other'];
+function cleanBooking(b) {
+  const s = (v, n) => String(v ?? '').replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, '').trim().slice(0, n);
+  const d = b.data || {};
+  const num = (v) => { const x = Number(v); return Number.isFinite(x) && x >= 0 ? Math.round(x * 100) / 100 : null; };
+  const int = (v) => Math.max(0, Math.min(99, parseInt(v, 10) || 0));
+  return {
+    status: STATUSES.includes(b.status) ? b.status : 'new',
+    source: SOURCES.includes(b.source) ? b.source : 'other',
+    date: /^\d{4}-\d{2}-\d{2}$/.test(String(b.date || '')) ? b.date : null,
+    data: {
+      name: s(d.name, 120), phone: s(d.phone, 60), email: s(d.email, 160), instagram: s(d.instagram, 60).replace(/^@/, ''),
+      tourSlug: s(d.tourSlug, 80).replace(/[^a-z0-9-]/g, ''), tour: s(d.tour, 200), time: s(d.time, 20),
+      adults: int(d.adults), children: int(d.children), ages: s(d.ages, 60),
+      tickets: (Array.isArray(d.tickets) ? d.tickets : []).map((t) => s(t, 80)).filter(Boolean).slice(0, 10),
+      price: num(d.price), paid: !!d.paid, meeting: s(d.meeting, 200), lang: s(d.lang, 40),
+      message: s(d.message, 3000), note: s(d.note, 3000)
+    }
+  };
 }

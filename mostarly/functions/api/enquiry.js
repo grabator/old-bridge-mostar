@@ -1,7 +1,8 @@
-// Cloudflare Pages Function: POST /api/enquiry
-// Sends the enquiry to the owner's inbox through Resend (https://resend.com).
-// Environment variables (Pages > Settings > Variables): RESEND_API_KEY, MAIL_TO, MAIL_FROM
-// Without RESEND_API_KEY it answers 501 and the site opens the visitor's email app instead.
+// POST /api/enquiry (called from worker.js)
+// 1. Saves every enquiry in Mirna's planner (D1, table bookings), also the ones sent on WhatsApp
+//    (channel: 'whatsapp'), so nothing is lost. At most 6 enquiries per visitor per 10 minutes.
+// 2. For email enquiries, sends them to the inbox through Resend (RESEND_API_KEY, MAIL_TO, MAIL_FROM).
+//    Without RESEND_API_KEY it answers 501 and the site opens the visitor's email app instead.
 const clean = (v, n = 500) => String(v ?? '').replace(/[\u0000-\u001f\u007f]/g, ' ').trim().slice(0, n);
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
@@ -15,7 +16,33 @@ export async function onRequestPost({ request, env }) {
   const phone = clean(d.phone, 60);
   if (!name || (!email && !phone)) return json({ ok: false, error: 'missing contact' }, 422);
   if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return json({ ok: false, error: 'bad email' }, 422);
-  if (!env.RESEND_API_KEY) return json({ ok: false, error: 'mail not configured' }, 501);
+  const channel = d.channel === 'whatsapp' ? 'whatsapp' : 'email';
+
+  // save in the planner
+  let saved = false;
+  if (env.DB) {
+    try {
+      const ip = request.headers.get('cf-connecting-ip') || '';
+      const ipHash = ip ? [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('mly:' + ip)))].slice(0, 12).map((b) => b.toString(16).padStart(2, '0')).join('') : null;
+      if (ipHash) {
+        const recent = await env.DB.prepare("SELECT COUNT(*) AS n FROM bookings WHERE ip_hash = ? AND created_at > datetime('now', '-10 minutes')").bind(ipHash).first();
+        if (recent && recent.n >= 6) return json({ ok: false, error: 'too many requests' }, 429);
+      }
+      const date = /^\d{4}-\d{2}-\d{2}$/.test(String(d.date || '')) ? d.date : null;
+      const data = {
+        name, email, phone,
+        tour: clean(d.tour, 200), tourSlug: clean(d.tourSlug, 80).replace(/[^a-z0-9-]/g, ''),
+        time: clean(d.time, 20), adults: Math.max(0, Math.min(99, parseInt(d.adults, 10) || 0)), children: Math.max(0, Math.min(99, parseInt(d.children, 10) || 0)),
+        ages: clean(d.ages, 60), tickets: Array.isArray(d.tickets) ? d.tickets.map((t) => clean(t, 80)).slice(0, 10) : [],
+        message: clean(d.message, 3000)
+      };
+      const id = crypto.randomUUID().replace(/-/g, '').slice(0, 12);
+      await env.DB.prepare("INSERT INTO bookings (id, status, source, date, data, ip_hash, created_at, updated_at) VALUES (?, 'new', ?, ?, ?, ?, datetime('now'), datetime('now'))").bind(id, 'site-' + channel, date, JSON.stringify(data), ipHash).run();
+      saved = true;
+    } catch (e) { console.error('enquiry save', e); }
+  }
+  if (channel === 'whatsapp') return json({ ok: true, saved });
+  if (!env.RESEND_API_KEY) return json({ ok: false, saved, error: 'mail not configured' }, 501);
 
   const rows = [
     ['Tour', clean(d.tour, 200)],
@@ -42,5 +69,5 @@ export async function onRequestPost({ request, env }) {
     })
   });
   if (!r.ok) return json({ ok: false, error: 'mail failed' }, 502);
-  return json({ ok: true });
+  return json({ ok: true, saved });
 }
