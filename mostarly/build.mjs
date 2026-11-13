@@ -522,11 +522,12 @@ const emit = (url, html) => out.push([url, html]);
 }
 
 // TOURS CATALOGUE
-const CATC = { city: '#0a8a71', food: '#c47647', daytrip: '#c8271c', experience: '#c9961a' };
+// one family of colours for the categories: shades of copper, like the džezva
+const CATC = { city: '#8f4a26', food: '#b8693c', daytrip: '#a14a2e', experience: '#c98a52' };
 {
   const c = [['/', 'Home'], ['/tours/', 'Tours & Experiences']];
   const body = phead(c, 'Tours <em>&amp; experiences</em>', 'Private walks in Mostar, food and culture, and day trips around Herzegovina. Every tour can be adjusted to your time, pace and interests.') + `
-<div class="filters-wrap"><nav class="filters" aria-label="Tour categories" data-spy>${S.categories.map((x) => `<a href="#${x.id}" style="--c:${CATC[x.id] || '#272838'}"><i aria-hidden="true"></i>${esc(x.name)}<span>${TOURS.filter((t) => t.category === x.id).length}</span></a>`).join('')}<a href="#on-request" style="--c:#272838"><i aria-hidden="true"></i>On request<span>${S.onRequest.length}</span></a></nav></div>
+<div class="filters-wrap"><nav class="filters" aria-label="Tour categories" data-spy>${S.categories.map((x) => `<a href="#${x.id}" style="--c:${CATC[x.id] || '#272838'}"><i aria-hidden="true"></i>${esc(x.name)}<span>${TOURS.filter((t) => t.category === x.id).length}</span></a>`).join('')}<a href="#on-request" style="--c:#7a6a5c"><i aria-hidden="true"></i>On request<span>${S.onRequest.length}</span></a></nav></div>
 <div class="wrap">
 ${S.categories.map((x) => { const list = TOURS.filter((t) => t.category === x.id); return `<section class="cat" id="${x.id}" style="--c:${CATC[x.id] || '#272838'}"><h2 class="rv"><i class="cdot" aria-hidden="true"></i>${esc(x.name)}</h2><p class="rv d1">${esc(x.intro)}</p><div class="cards ${list.length === 4 ? 'four' : list.length === 2 ? 'two' : 'three'}">${list.map(card).join('')}</div></section>`; }).join('')}
 <section class="cat" id="on-request"><h2 class="rv">More on request</h2><p class="rv d1">Ask about these if they fit your plans. Details and prices are confirmed personally.</p>

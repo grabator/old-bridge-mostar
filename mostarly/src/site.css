@@ -243,7 +243,7 @@ body:not(.ready) .hero *{animation-play-state:paused!important}
 .rev .c1{top:10px;left:10px}.rev .c2{top:10px;right:10px;transform:scaleX(-1)}.rev .c3{bottom:10px;left:10px;transform:scaleY(-1)}.rev .c4{bottom:10px;right:10px;transform:scale(-1)}
 .rev blockquote{font:400 1.12rem/1.42 var(--serif);color:var(--ink2)}
 .rev figcaption{font-size:.82rem;color:var(--mut);margin-top:auto;display:flex;justify-content:space-between;align-items:center;gap:.5rem}
-.stars{display:inline-flex;gap:2px;color:var(--yellow);letter-spacing:0}
+.stars{display:inline-flex;gap:2px;color:var(--copper2);letter-spacing:0}
 .stars i{font-style:normal;opacity:.25;transform:scale(.6);transition:opacity .3s,transform .4s cubic-bezier(.3,1.6,.5,1)}
 .in .stars i{opacity:1;transform:none}
 .stars i:nth-child(2){transition-delay:.09s}.stars i:nth-child(3){transition-delay:.18s}.stars i:nth-child(4){transition-delay:.27s}.stars i:nth-child(5){transition-delay:.36s}
@@ -570,8 +570,8 @@ html.is-night .bridge-sign .bridge .glow{opacity:.55}
 .mly-map .stone.on{opacity:1}
 .mly-map .mover{transition:opacity .3s;pointer-events:none}
 .mly-map .mover circle{vector-effect:non-scaling-stroke}
-.mly-map .mover .mv-halo{fill:#fcec52;opacity:.45;transform:scale(var(--k,1));transform-box:fill-box;transform-origin:center}
-.mly-map .mover .mv-dot{fill:#272838;stroke:#fcec52;stroke-width:2;transform:scale(var(--k,1));transform-box:fill-box;transform-origin:center}
+.mly-map .mover .mv-halo{fill:#48e5c2;opacity:.45;transform:scale(var(--k,1));transform-box:fill-box;transform-origin:center}
+.mly-map .mover .mv-dot{fill:#272838;stroke:#48e5c2;stroke-width:2;transform:scale(var(--k,1));transform-box:fill-box;transform-origin:center}
 .mly-map .mover.walk .mv-dot{fill:#c8271c;stroke:#fff}
 /* pins keep their size on screen at any zoom (--k = viewBox width / 600) */
 .mly-map .pin{cursor:pointer}
@@ -584,7 +584,7 @@ html.is-night .bridge-sign .bridge .glow{opacity:.55}
 .mly-map .pin .dot{fill:#fffaf2;stroke:#c8271c;stroke-width:2.4;transition:fill .3s}
 .mly-map .pin.past .dot{fill:#c8271c}
 .mly-map .pin.hub .dot{fill:#272838;stroke:#fffaf2;stroke-width:2.2}
-.mly-map .pin.hub .core{fill:#fcec52}
+.mly-map .pin.hub .core{fill:#48e5c2}
 .mly-map .pin.num .dot{fill:#fffaf2;stroke:#272838;stroke-width:2}
 .mly-map .pin.num .n{font:700 8px var(--sans);fill:#272838;text-anchor:middle}
 .mly-map .pin.num.past .dot,.mly-map .pin.num.on .dot{fill:#c8271c;stroke:#fffaf2}
@@ -736,7 +736,7 @@ html.is-night .jr-b[data-step="1"]{background:#48e5c2;color:#16151f;border-color
 /* satellite */
 .jr.sat .mly-map .river,.jr.sat .mly-map .land,.jr.sat .mly-map .bih,.jr.sat .mly-map .sea{visibility:hidden}
 .mly-map .bih-line{fill:none;stroke:none}
-.jr.sat .mly-map .bih-line{stroke:#fcec52;stroke-width:1.6;stroke-dasharray:6 4;opacity:.85;vector-effect:non-scaling-stroke}
+.jr.sat .mly-map .bih-line{stroke:rgba(255,250,242,.75);stroke-width:1.6;stroke-dasharray:6 4;opacity:.85;vector-effect:non-scaling-stroke}
 .jr.sat .mly-map .border{stroke:rgba(255,255,255,.55)}
 .jr.sat .mly-map .clabel{fill:rgba(255,255,255,.8);paint-order:stroke;stroke:rgba(0,0,0,.35);stroke-width:2px}
 .jr.sat .mly-map .rlabel,.jr.sat .mly-map .sealabel{fill:#bff3e6;paint-order:stroke;stroke:rgba(0,0,0,.35);stroke-width:2px}
@@ -748,11 +748,11 @@ html.is-night .jr-b[data-step="1"]{background:#48e5c2;color:#16151f;border-color
 .jr.sat .mly-map .town circle{fill:#fff;stroke:rgba(0,0,0,.5)}
 .jr.sat .mly-map .town text{fill:#fff;stroke:rgba(20,18,28,.6)}
 .jr.sat .mly-map .pin .plabel{fill:#fff;stroke:rgba(20,18,28,.75);font-size:12px;font-weight:700}
-.jr.sat .mly-map .pin.on .plabel{fill:#fcec52}
+.jr.sat .mly-map .pin.on .plabel{fill:#48e5c2}
 .jr.sat .mly-map .pin .dot{stroke:#fff}
 .jr.sat .mly-map .pin:not(.hub):not(.num) .dot{fill:#c8271c}
 .jr.sat .mly-map .ghost{stroke:#fff;opacity:.6}
-.jr.sat .mly-map .spoke,.jr.sat .mly-map .road{stroke:#fcec52}
+.jr.sat .mly-map .spoke,.jr.sat .mly-map .road{stroke:#48e5c2}
 .jr.sat .jr-stage::after{background:linear-gradient(rgba(20,18,28,.62),transparent 26%,transparent 60%,rgba(20,18,28,.45))}
 .jr.sat .jr-place small{color:#fcd9a8}
 .jr.sat .jr-place b{color:#fff;text-shadow:0 2px 16px rgba(0,0,0,.45)}
@@ -768,7 +768,7 @@ html.is-night .jr-b[data-step="1"]{background:#48e5c2;color:#16151f;border-color
 .jr.has-sat .jr-sat{display:grid;margin-left:auto}
 .jr.has-sat .jr-b[data-step="1"]{margin-left:0}
 .jr-sat svg{width:20px;height:20px}
-.jr-sat[aria-pressed=true]{background:#fcec52;border-color:#e6d43f;color:#272838}
+.jr-sat[aria-pressed=true]{background:#48e5c2;border-color:#48e5c2;color:#16151f}
 .jr-credit{position:absolute;right:.8rem;bottom:4.4rem;z-index:4;font-size:.58rem;color:rgba(255,255,255,.85);text-shadow:0 1px 3px rgba(0,0,0,.7);pointer-events:auto}
 .jr-credit a{color:inherit}
 .jr:not(.sat) .jr-credit{display:none}
@@ -791,7 +791,7 @@ html.is-night .jr-tour:hover{background:#1f2f2b}
 .jr-look{display:flex;flex-wrap:wrap;gap:.45rem;margin:0 0 .8rem}
 .jr-lookbtn,.jr-svbtn{display:inline-flex;align-items:center;gap:.45rem;font:600 .82rem var(--sans);border-radius:99px;padding:.5rem .85rem;text-decoration:none;cursor:pointer;min-height:38px}
 .jr-lookbtn{background:#272838;color:#fff;border:0}
-.jr-lookbtn svg{width:16px;height:16px;color:#fcec52}
+.jr-lookbtn svg{width:16px;height:16px;color:#48e5c2}
 .jr-svbtn{background:var(--paper);color:var(--ink);border:1px solid var(--line)}
 .jr-svbtn b{font:800 .7rem var(--sans);background:#c8271c;color:#fff;border-radius:6px;padding:.15rem .35rem;letter-spacing:.02em}
 .jr:not(.js) .jr-lookbtn{display:none}
@@ -1178,3 +1178,16 @@ html.is-night .filters a[href="#on-request"]{--c:#a59fbd!important}
 }
 @container (max-width:340px){.fstep[data-fstep="2"] .two{grid-template-columns:1fr 1fr}}
 @media (max-width:759px){.filters-wrap.stuck .filters{gap:.1rem}.filters-wrap.stuck .filters a:not(.on){width:24px;height:28px}.filters-wrap.stuck .filters a:not(.on) i{box-shadow:0 0 0 2px color-mix(in srgb,var(--c) 25%,transparent)}.filters-wrap.stuck .filters a.on{font-size:.76rem;padding:.38rem .65rem .38rem .5rem}}
+
+/* calmer palette: mint = actions, red = "you are here", copper = details; the kilim keeps its colours in bands */
+.mly-map .road,.mly-map .spoke{stroke:#c8271c}
+.jr.sat .mly-map .road,.jr.sat .mly-map .spoke{stroke:#48e5c2}
+.sheet nav a[aria-current=page]{background:linear-gradient(90deg,rgba(200,39,28,.18),transparent)}
+.sheet nav a[aria-current=page] .st b{color:#ff8f82}
+.sheet nav a[aria-current=page] .sn{color:#ff8f82}
+html.is-night .filters a[href="#city"]{--c:#c98a52!important}
+html.is-night .filters a[href="#food"]{--c:#dca06c!important}
+html.is-night .filters a[href="#daytrip"]{--c:#d27b5c!important}
+html.is-night .filters a[href="#experience"]{--c:#e8b98a!important}
+html.is-night .filters a[href="#on-request"]{--c:#a8968a!important}
+html.is-night .cat#city{--c:#c98a52!important}html.is-night .cat#food{--c:#dca06c!important}html.is-night .cat#daytrip{--c:#d27b5c!important}html.is-night .cat#experience{--c:#e8b98a!important}
