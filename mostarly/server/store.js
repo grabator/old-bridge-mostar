@@ -42,7 +42,8 @@ export function mergeSite(base, o) {
   if (o.contact) { S_CONTACT.forEach((k) => { if (typeof o.contact[k] === 'string') S.contact[k] = o.contact[k]; }); if (Array.isArray(o.contact.notes)) S.contact.notes = o.contact.notes; }
   if (o.about) { ['short', 'experience'].forEach((k) => { if (typeof o.about[k] === 'string') S.about[k] = o.about[k]; }); ['paragraphs', 'notes'].forEach((k) => { if (Array.isArray(o.about[k])) S.about[k] = o.about[k]; }); }
   ['why', 'services', 'faq', 'onRequest'].forEach((k) => { if (Array.isArray(o[k])) S[k] = o[k]; });
-  if (o.company && typeof o.company === 'object') S.company = Object.assign({}, S.company || {}, o.company);
+  // company details: an empty field in the admin keeps the value from site.json
+  if (o.company && typeof o.company === 'object') { S.company = Object.assign({}, S.company || {}); Object.keys(o.company).forEach((k) => { if (o.company[k]) S.company[k] = o.company[k]; }); }
   if (o.policy && typeof o.policy === 'object') S.policy = Object.assign({}, S.policy || {}, o.policy);
   if (Array.isArray(o.tickets)) S.tickets = S.tickets.map((t) => { const x = o.tickets.find((y) => y && y.id === t.id); return x ? Object.assign({}, t, { label: x.label || t.label, price: x.price }) : t; });
   if (Array.isArray(o.categories)) S.categories = S.categories.map((c) => { const x = o.categories.find((y) => y && y.id === c.id); return x ? Object.assign({}, c, { name: x.name || c.name, intro: x.intro }) : c; });
