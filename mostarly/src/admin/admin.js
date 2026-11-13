@@ -49,26 +49,72 @@
     var tabs = [['planer', 'Planer', n ? '<i class="dot">' + n + '</i>' : ''], ['ture', 'Ture', '<span>' + t + '</span>'], ['recenzije', 'Recenzije', '<span>' + r + '</span>'], ['slike', 'Slike', '<span>' + m + '</span>']];
     var icons = { planer: 'cal', ture: 'tours', recenzije: 'star', slike: 'photo' };
     var editing = /^#\/(planer|ture|recenzije)\/.+/.test(location.hash);
-    app.innerHTML = '<header class="top"><a class="brand" href="#/planer">Mostarly <small>Admin</small></a>' +
+    app.innerHTML = '<header class="top"><a class="brand" href="#/planer" aria-label="Mostarly admin, početna"><img src="/img/logo-light.png" alt="Mostarly Guide" width="137" height="28"><small>Admin</small></a>' +
       '<nav class="tabs" aria-label="Dijelovi">' + tabs.map(function (x) { return '<a href="#/' + x[0] + '"' + (tab === x[0] ? ' class="on"' : '') + '>' + x[1] + x[2] + '</a>'; }).join('') + '</nav>' +
-      '<div class="who"><span class="em">' + esc(S.email) + '</span><a href="/" target="_blank" rel="noopener">Sajt ↗</a></div></header><main class="v-' + tab + '">' + inner + '</main>' +
+      '<div class="who"><span class="em">' + esc(S.email) + '</span><button type="button" class="tbtn round" data-theme-toggle aria-label="Svijetla ili tamna tema" title="Svijetla ili tamna tema">' + IC.moon + IC.sun + '</button><a class="tbtn" href="/" target="_blank" rel="noopener" title="Otvori sajt">' + IC.ext + '<span class="lbl">Sajt</span></a></div></header><main class="v-' + tab + '">' + inner + '</main>' +
       (editing ? '' : '<nav class="bnav" aria-label="Dijelovi">' + tabs.map(function (x) { return '<a href="#/' + x[0] + '"' + (tab === x[0] ? ' class="on" aria-current="page"' : '') + '>' + IC[icons[x[0]]] + '<span>' + x[1] + '</span>' + (x[0] === 'planer' && n ? '<i>' + n + '</i>' : '') + '</a>'; }).join('') + '</nav>');
     document.body.classList.toggle('has-bnav', !editing);
+    document.documentElement.classList.remove('locked');
+    enhanceSelects();
   }
+  function phead(title, sub, action) { return '<div class="phead"><h1>' + title + '</h1>' + (action || '') + '<p class="sub">' + sub + '</p></div>'; }
+  function ehead(href, label, title) { return '<div class="ehead"><a class="back" href="' + href + '" aria-label="' + esc(label) + '" title="' + esc(label) + '">' + IC.back + '</a><h1>' + title + '</h1></div>'; }
+  function reorder(i, n, a, b) { return '<div class="ord"><button type="button" ' + a + '="' + i + '" aria-label="Pomjeri gore"' + (i === 0 ? ' disabled' : '') + '>' + IC.up + '</button><button type="button" ' + b + '="' + i + '" aria-label="Pomjeri dole"' + (i === n - 1 ? ' disabled' : '') + '>' + IC.down + '</button></div>'; }
+
+  /* ---------- bottom sheet: one component for photos and dropdowns. The page behind it does not scroll. ---------- */
+  function sheet(title, body) {
+    var wrap = document.createElement('div'); wrap.className = 'modal'; wrap.setAttribute('role', 'dialog'); wrap.setAttribute('aria-modal', 'true'); wrap.setAttribute('aria-label', title);
+    wrap.innerHTML = '<div class="box"><div class="mh"><h2>' + esc(title) + '</h2><button type="button" class="icon" data-close aria-label="Zatvori">' + IC.x + '</button></div><div class="mb">' + body + '</div></div>';
+    document.body.appendChild(wrap); document.documentElement.classList.add('locked');
+    function close() { wrap.remove(); if (!$('.modal')) document.documentElement.classList.remove('locked'); document.removeEventListener('keydown', esc_); }
+    function esc_(e) { if (e.key === 'Escape') close(); }
+    document.addEventListener('keydown', esc_);
+    wrap.addEventListener('click', function (e) { if (e.target === wrap || e.target.closest('[data-close]')) close(); });
+    // touches on the dark backdrop must not scroll the page (iOS)
+    wrap.addEventListener('touchmove', function (e) { if (!e.target.closest('.mb')) e.preventDefault(); }, { passive: false });
+    var f = $('[data-close]', wrap); if (f) f.focus({ preventScroll: true });
+    return { el: wrap, close: close };
+  }
+  // every <select> in a form becomes a button that opens a clear list from the bottom
+  function enhanceSelects() {
+    $$('#ed select').forEach(function (sel) {
+      if (sel.classList.contains('dd-native')) return;
+      sel.classList.add('dd-native');
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'dd';
+      var lab = sel.closest('.f'), title = lab && lab.querySelector('span') ? lab.querySelector('span').textContent : 'Izaberite';
+      var show = function () { var o = sel.options[sel.selectedIndex]; b.innerHTML = '<span>' + esc(o ? o.text : '') + '</span>' + IC.chevd; };
+      show(); sel.after(b);
+      b.addEventListener('click', function (e) {
+        e.preventDefault();
+        var sh = sheet(title, '<div class="opts">' + Array.prototype.map.call(sel.options, function (o, i) { return '<button type="button" data-i="' + i + '" class="' + (i === sel.selectedIndex ? 'on' : '') + '"><span>' + esc(o.text) + '</span>' + IC.check + '</button>'; }).join('') + '</div>');
+        sh.el.addEventListener('click', function (ev) {
+          var x = ev.target.closest('[data-i]'); if (!x) return;
+          sel.selectedIndex = +x.getAttribute('data-i'); show(); sh.close();
+          sel.dispatchEvent(new Event('input', { bubbles: true })); sel.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+      });
+    });
+  }
+  // light or dark theme, remembered on this device
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest('[data-theme-toggle]')) return;
+    var root = document.documentElement, cur = root.getAttribute('data-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'), next = cur === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next); try { localStorage.setItem('mly-admin-theme', next); } catch (er) {}
+  });
 
   /* ---------- tours list ---------- */
   function toursList() {
     var rows = S.tours.map(function (t, i) {
       var d = t.data;
-      return '<div class="item' + (t.hidden ? ' hid' : '') + '" data-slug="' + esc(t.slug) + '">' +
+      var badges = (t.hidden ? '<span class="badge">Skrivena</span>' : '') + (d.featured ? '<span class="badge ok">Na početnoj</span>' : '') + (d.price && !d.price.confirmed ? '<span class="badge warn">Potvrdi cijenu</span>' : '') +
+        ((d.notes || []).length ? '<span class="badge warn">' + d.notes.length + ' napomen' + (d.notes.length === 1 ? 'a' : 'e') + '</span>' : '');
+      return '<div class="item' + (t.hidden ? ' hid' : '') + '" data-slug="' + esc(t.slug) + '"><a class="ilink" href="#/ture/' + esc(t.slug) + '">' +
         '<div class="th">' + (d.image ? '<img src="' + esc(imgUrl(d.image)) + '" alt="" loading="lazy">' : esc((d.name || '?').charAt(0))) + '</div>' +
-        '<div><b>' + esc(d.name) + '</b><div class="meta"><span>' + esc(catName(d.category)) + '</span><span>' + esc(priceText(d.price)) + '</span>' +
-        (t.hidden ? '<span class="badge">Skrivena</span>' : '') + (d.featured ? '<span class="badge ok">Na početnoj</span>' : '') + (d.price && !d.price.confirmed ? '<span class="badge warn">Cijena za potvrdu</span>' : '') +
-        ((d.notes || []).length ? '<span class="badge warn">' + d.notes.length + ' napomen' + (d.notes.length === 1 ? 'a' : 'e') + '</span>' : '') + '</div></div>' +
-        '<div class="acts"><button class="icon" data-up="' + i + '" aria-label="Pomjeri gore"' + (i === 0 ? ' disabled' : '') + '>↑</button><button class="icon" data-down="' + i + '" aria-label="Pomjeri dole"' + (i === S.tours.length - 1 ? ' disabled' : '') + '>↓</button><a class="btn sm" href="#/ture/' + esc(t.slug) + '">Uredi</a></div></div>';
+        '<div class="ib"><b>' + esc(d.name) + '</b><div class="meta"><span>' + esc(catName(d.category)) + '</span><span>·</span><span>' + esc(priceText(d.price)) + '</span></div>' + (badges ? '<div class="badges">' + badges + '</div>' : '') + '</div>' +
+        '<span class="chev">' + IC.chev + '</span></a>' + reorder(i, S.tours.length, 'data-up', 'data-down') + '</div>';
     }).join('');
-    shell('ture', '<div class="row"><div><h1>Ture</h1><p class="sub">Redoslijed ovdje je redoslijed na sajtu. Promjene se objavljuju odmah.</p></div><span class="spacer"></span><a class="btn mint" href="#/ture/nova">+ Nova tura</a></div>' +
-      '<div class="list">' + (rows || '<p class="empty">Još nema tura.</p>') + '</div>');
+    shell('ture', phead('Ture', 'Dodirnite turu da je uredite. Strelicama mijenjate redoslijed na sajtu.', '<a class="btn mint sm" href="#/ture/nova">' + IC.plus + 'Nova tura</a>') +
+      '<div class="list">' + (rows || '<p class="empty">' + IC.tours + 'Još nema tura.</p>') + '</div>');
     $$('[data-up],[data-down]').forEach(function (b) {
       b.addEventListener('click', function () {
         var i = +(b.getAttribute('data-up') || b.getAttribute('data-down')), j = b.hasAttribute('data-up') ? i - 1 : i + 1;
@@ -95,11 +141,11 @@
     var arr = get(draft, path) || [];
     var rows = arr.map(function (it, i) {
       var text = withOptional ? it.text : it;
-      return '<div class="li"><textarea data-path="' + path + '.' + i + (withOptional ? '.text' : '') + '" rows="1" placeholder="' + esc(ph) + '">' + esc(text) + '</textarea>' +
-        '<div class="ctl">' + (withOptional ? '<label class="opt"><input type="checkbox" data-path="' + path + '.' + i + '.optional" data-bool' + (it.optional ? ' checked' : '') + '>opc.</label>' : '') +
-        '<button type="button" class="icon" data-lmove="' + path + '|' + i + '|-1" aria-label="Gore"' + (i === 0 ? ' disabled' : '') + '>↑</button><button type="button" class="icon" data-lmove="' + path + '|' + i + '|1" aria-label="Dole"' + (i === arr.length - 1 ? ' disabled' : '') + '>↓</button><button type="button" class="icon" data-ldel="' + path + '|' + i + '" aria-label="Obriši">×</button></div></div>';
+      return '<div class="li"><span class="n">' + (i + 1) + '</span><textarea data-path="' + path + '.' + i + (withOptional ? '.text' : '') + '" rows="1" placeholder="' + esc(ph) + '" aria-label="' + esc(title) + ' ' + (i + 1) + '">' + esc(text) + '</textarea>' +
+        '<div class="ctl">' + (withOptional ? '<label class="opt"><input type="checkbox" data-path="' + path + '.' + i + '.optional" data-bool' + (it.optional ? ' checked' : '') + '><span>Opcionalno</span></label>' : '') + '<span class="spacer"></span>' +
+        '<button type="button" class="icon" data-lmove="' + path + '|' + i + '|-1" aria-label="Pomjeri gore"' + (i === 0 ? ' disabled' : '') + '>' + IC.up + '</button><button type="button" class="icon" data-lmove="' + path + '|' + i + '|1" aria-label="Pomjeri dole"' + (i === arr.length - 1 ? ' disabled' : '') + '>' + IC.down + '</button><button type="button" class="icon del" data-ldel="' + path + '|' + i + '" aria-label="Obriši">' + IC.trash + '</button></div></div>';
     }).join('');
-    return '<div class="f"><span>' + esc(title) + '</span><div class="le" data-list="' + path + '">' + rows + '<button type="button" class="add" data-ladd="' + path + '|' + (withOptional ? 1 : 0) + '">+ Dodaj</button></div></div>';
+    return '<div class="f"><span>' + esc(title) + '</span><div class="le" data-list="' + path + '">' + rows + '<button type="button" class="add" data-ladd="' + path + '|' + (withOptional ? 1 : 0) + '">' + IC.plus + 'Dodaj</button></div></div>';
   }
 
   /* ---------- tour editor ---------- */
@@ -118,8 +164,8 @@
     var cats = S.categories.map(function (c) { return '<option value="' + esc(c.id) + '"' + (d.category === c.id ? ' selected' : '') + '>' + esc(c.name) + '</option>'; }).join('');
     var notes = (d.notes || []).length ? '<div class="notes"><b>Napomene za provjeru</b><ul>' + d.notes.map(function (n, i) { return '<li><span>' + esc(n) + '</span><button type="button" class="btn sm line" data-note="' + i + '">Riješeno ✓</button></li>'; }).join('') + '</ul><small>Kad nešto riješite, kliknite "Riješeno" pa sačuvajte. Žuta napomena tada nestaje i sa sajta.</small></div>' : '';
     var tickets = S.tickets.map(function (k) { return '<label><input type="checkbox" data-ticket="' + esc(k.id) + '"' + ((d.tickets || []).indexOf(k.id) > -1 ? ' checked' : '') + '>' + esc(k.label) + '<em>€' + k.price + '</em></label>'; }).join('');
-    var gal = (d.gallery || []).map(function (g, i) { return '<div class="g"><img src="' + esc(imgUrl(g.src)) + '" alt=""><button type="button" class="mv" data-gmain="' + i + '" title="Postavi kao glavnu" aria-label="Postavi kao glavnu">★</button><button type="button" data-gdel="' + i + '" aria-label="Ukloni">×</button></div>'; }).join('');
-    shell('ture', '<a class="back" href="#/ture">← Sve ture</a><h1>' + (isNew ? 'Nova tura' : esc(d.name)) + '</h1><p class="sub">' + (isNew ? 'Popunite osnovno i sačuvajte. Ostalo možete dodati kasnije.' : 'Tekst na sajtu pišite na engleskom. Nakon snimanja, promjena je odmah na sajtu.') + '</p>' + notes +
+    var gal = (d.gallery || []).map(function (g, i) { return '<div class="g"><img src="' + esc(imgUrl(g.src)) + '" alt=""><button type="button" class="mv" data-gmain="' + i + '" title="Postavi kao glavnu" aria-label="Postavi kao glavnu">' + IC.star + '</button><button type="button" data-gdel="' + i + '" aria-label="Ukloni">' + IC.x + '</button></div>'; }).join('');
+    shell('ture', ehead('#/ture', 'Nazad na sve ture', isNew ? 'Nova tura' : esc(d.name)) + '<p class="sub esub">' + (isNew ? 'Popunite osnovno i sačuvajte. Ostalo možete dodati kasnije.' : 'Tekst na sajtu pišite na engleskom. Nakon snimanja, promjena je odmah na sajtu.') + '</p>' + notes +
       '<form id="ed" autocomplete="off" novalidate>' +
       '<section class="card"><h2>Osnovno</h2>' + field('Naziv ture', 'data.name', { max: 160, ph: 'e.g. Mostar City Tour – Highlights of the Old Town' }) +
       '<label class="f"><span>Kategorija</span><select data-path="data.category">' + cats + '</select></label>' +
@@ -132,7 +178,7 @@
       '<section class="card"><h2>Slike</h2><div class="photo"><div class="pv">' + (d.image ? '<img src="' + esc(imgUrl(d.image)) + '" alt="">' : 'Nema glavne slike<br>(prikazuje se ćilim šara)') + '</div><div>' +
       '<div class="row"><button type="button" class="btn sm" data-pickmain>' + (d.image ? 'Promijeni glavnu sliku' : 'Dodaj glavnu sliku') + '</button>' + (d.image ? '<button type="button" class="btn sm line" data-nomain>Ukloni</button>' : '') + '</div>' +
       field('Opis slike (za slijepe i za Google)', 'data.imageAlt', { ph: 'e.g. The Old Bridge at sunset', max: 200 }) + '</div></div>' +
-      '<div class="f" style="margin-top:.8rem"><span>Galerija na stranici ture</span><div class="gal">' + gal + '<button type="button" class="addg" data-pickgal>+ Dodaj slike</button></div><small>★ postavlja sliku kao glavnu.</small></div></section>' +
+      '<div class="f" style="margin-top:1.1rem"><span>Galerija na stranici ture</span><div class="gal">' + gal + '<button type="button" class="addg" data-pickgal>' + IC.plus + 'Dodaj slike</button></div><small>Zvjezdica na slici je postavlja kao glavnu.</small></div></section>' +
       '<section class="card"><h2>Detalji</h2><div class="two">' + field('Trajanje', 'data.duration', { ph: 'About 2 hours' }) + field('Lokacija', 'data.location', { ph: 'Old Town, Mostar' }) + field('Veličina grupe', 'data.groupSize', { ph: '2–20 people' }) + field('Jezici', 'data.languages', { ph: 'English' }) + '</div>' +
       field('Težina hodanja', 'data.level', { ph: 'Easy: uneven cobblestones and some steps' }) + field('Dostupnost', 'data.availability', { ph: 'Daily, by prior arrangement' }) + field('Mjesto sastanka', 'data.meetingPoint', { ph: 'In front of the Hamam, Old Town' }) + '</section>' +
       '<section class="card"><h2>Program ture</h2><p class="help">Redom kako gosti obilaze. "opc." znači da stanica ovisi o sezoni ili željama.</p>' + listEditor('Stanice', 'data.itinerary', 'e.g. Meet in front of the Hamam.', true) + '</section>' +
@@ -140,8 +186,8 @@
       '<section class="card"><h2>Ulaznice u formi za upit</h2><p class="help">Gosti ih mogu označiti kad šalju upit za ovu turu.</p><div class="ticks">' + tickets + '</div></section>' +
       '<section class="card"><h2>Prikaz</h2>' + toggle('Prikaži turu na sajtu', 'hidden', 'Isključeno: tura je sakrivena, ali ostaje ovdje sačuvana.', true) + toggle('Istakni na početnoj stranici', 'data.featured', 'Među "Featured tours" na vrhu početne.') + '</section>' +
       '<section class="card"><details class="adv"' + (d.seoTitle || d.seoDescription ? '' : '') + '><summary>Za Google (naslov i opis u pretrazi)</summary>' + field('Naslov u Googleu', 'data.seoTitle', { max: 65, hint: 'Do 60 znakova. Ako je prazno, koristi se naziv ture.' }) + field('Opis u Googleu', 'data.seoDescription', { area: true, rows: 3, max: 160, hint: 'Do 155 znakova: šta gost dobije, gdje i koliko traje.' }) + '</details></section>' +
-      (isNew ? '' : '<section class="card"><h2>Brisanje</h2><p class="help">Ako turu samo želite skloniti sa sajta, isključite "Prikaži turu na sajtu". Brisanje se ne može vratiti.</p><button type="button" class="btn danger" data-deltour>Obriši turu</button></section>') +
-      '</form><div class="savebar"><div class="in"><span class="st">Sve je sačuvano</span><span class="spacer"></span>' + (isNew ? '' : '<a class="btn line sm" href="/tours/' + esc(slug) + '/" target="_blank" rel="noopener">Pogledaj ↗</a>') + '<button class="btn mint" data-save>' + (isNew ? 'Sačuvaj i objavi' : 'Sačuvaj') + '</button></div></div>');
+      (isNew ? '' : '<section class="card"><h2>Brisanje</h2><p class="help">Ako turu samo želite skloniti sa sajta, isključite "Prikaži turu na sajtu". Brisanje se ne može vratiti.</p><button type="button" class="btn danger" data-deltour>' + IC.trash + 'Obriši turu</button></section>') +
+      '</form><div class="savebar"><div class="in"><span class="st">Sve je sačuvano</span><span class="spacer"></span>' + (isNew ? '' : '<a class="btn line sm" href="/tours/' + esc(slug) + '/" target="_blank" rel="noopener" title="Pogledaj na sajtu">' + IC.ext + 'Sajt</a>') + '<button class="btn mint" data-save>' + (isNew ? 'Sačuvaj i objavi' : 'Sačuvaj') + '</button></div></div>');
     bindForm(function () { renderTour(isNew, slug); }, function () { return saveTour(isNew, slug); });
     $$('[name=basis]').forEach(function (r) { r.addEventListener('change', function () { draft.data.price.basis = r.value; if (r.value !== 'request' && draft.data.price.amount == null) draft.data.price.amount = 0; setDirty(true); renderTour(isNew, slug); setDirty(true); }); });
     $$('[data-ticket]').forEach(function (c) { c.addEventListener('change', function () { var id = c.getAttribute('data-ticket'), a = (draft.data.tickets || []).filter(function (x) { return x !== id; }); if (c.checked) a.push(id); draft.data.tickets = a; setDirty(true); }); });
@@ -212,13 +258,11 @@
   }
   function picker(multi, done) {
     var lib = S.media.map(function (m) { return '/media/' + m.key; }).concat(S.bundledImages || []);
-    var wrap = document.createElement('div'); wrap.className = 'modal'; wrap.setAttribute('role', 'dialog'); wrap.setAttribute('aria-label', 'Izaberi sliku');
-    wrap.innerHTML = '<div class="box"><div class="row"><h2>' + (multi ? 'Dodaj slike' : 'Izaberi sliku') + '</h2><span class="spacer"></span><button class="icon" data-close aria-label="Zatvori">×</button></div>' +
-      (S.mediaReady ? '<label class="upl"><input type="file" accept="image/*"' + (multi ? ' multiple' : '') + '>📷 <span>Učitaj ' + (multi ? 'slike' : 'sliku') + ' sa telefona ili računara</span></label>' : '<p class="empty">Učitavanje slika još nije uključeno (R2). Izaberite jednu od postojećih.</p>') +
-      '<p class="sub" style="margin:1rem 0 0">Ili izaberite postojeću:</p><div class="pick">' + lib.map(function (s) { return '<button type="button" data-src="' + esc(s) + '"><img src="' + esc(imgUrl(s)) + '" alt="" loading="lazy"></button>'; }).join('') + '</div></div>';
-    document.body.appendChild(wrap);
-    function close() { wrap.remove(); }
-    wrap.addEventListener('click', function (e) { if (e.target === wrap || e.target.closest('[data-close]')) close(); var b = e.target.closest('[data-src]'); if (b) { close(); done([b.getAttribute('data-src')]); } });
+    var sh = sheet(multi ? 'Dodaj slike' : 'Izaberi sliku',
+      (S.mediaReady ? '<label class="upl"><input type="file" accept="image/*"' + (multi ? ' multiple' : '') + '>' + IC.camera + '<span>Učitaj ' + (multi ? 'slike' : 'sliku') + ' sa telefona</span></label>' : '<p class="empty">Učitavanje slika još nije uključeno (R2). Izaberite jednu od postojećih.</p>') +
+      '<p class="mlabel">Ili izaberite postojeću</p><div class="pick">' + lib.map(function (s) { return '<button type="button" data-src="' + esc(s) + '"><img src="' + esc(imgUrl(s)) + '" alt="" loading="lazy"></button>'; }).join('') + '</div>');
+    var wrap = sh.el, close = sh.close;
+    wrap.addEventListener('click', function (e) { var b = e.target.closest('[data-src]'); if (b) { close(); done([b.getAttribute('data-src')]); } });
     var inp = $('input[type=file]', wrap);
     if (inp) inp.addEventListener('change', function () {
       var files = Array.prototype.slice.call(inp.files || []); if (!files.length) return;
@@ -236,10 +280,10 @@
   function reviewsList() {
     var rows = S.reviews.map(function (r, i) {
       var d = r.data;
-      return '<div class="item' + (r.hidden ? ' hid' : '') + '"><div class="th">' + '★'.repeat(1) + '</div><div><b>' + esc(d.name) + (d.country ? ' · ' + esc(d.country) : '') + '</b><div class="meta"><span>' + '★'.repeat(d.rating || 5) + '</span><span>' + esc((d.text || '').slice(0, 70)) + (d.text && d.text.length > 70 ? '…' : '') + '</span>' + (r.hidden ? '<span class="badge">Skrivena</span>' : '') + '</div></div>' +
-        '<div class="acts"><button class="icon" data-rup="' + i + '" aria-label="Gore"' + (i === 0 ? ' disabled' : '') + '>↑</button><button class="icon" data-rdown="' + i + '" aria-label="Dole"' + (i === S.reviews.length - 1 ? ' disabled' : '') + '>↓</button><a class="btn sm" href="#/recenzije/' + esc(r.id) + '">Uredi</a></div></div>';
+      return '<div class="item' + (r.hidden ? ' hid' : '') + '"><a class="ilink" href="#/recenzije/' + esc(r.id) + '"><div class="th star">' + IC.star + '</div><div class="ib"><b>' + esc(d.name) + (d.country ? ' · ' + esc(d.country) : '') + '</b><div class="meta"><span style="color:var(--copper)">' + '★'.repeat(d.rating || 5) + '</span><span>' + esc(d.source || '') + '</span>' + (r.hidden ? '<span class="badge">Skrivena</span>' : '') + '</div><div class="meta"><span class="q">' + esc((d.text || '').slice(0, 90)) + '</span></div></div><span class="chev">' + IC.chev + '</span></a>' +
+        reorder(i, S.reviews.length, 'data-rup', 'data-rdown') + '</div>';
     }).join('');
-    shell('recenzije', '<div class="row"><div><h1>Recenzije</h1><p class="sub">Prepišite prave recenzije gostiju (npr. sa Tripadvisora), riječ po riječ.</p></div><span class="spacer"></span><a class="btn mint" href="#/recenzije/nova">+ Nova recenzija</a></div><div class="list">' + (rows || '<p class="empty">Još nema recenzija. Dok ih nema, na sajtu stoje prazna mjesta.</p>') + '</div>');
+    shell('recenzije', phead('Recenzije', 'Prepišite prave recenzije gostiju (npr. sa Tripadvisora), riječ po riječ.', '<a class="btn mint sm" href="#/recenzije/nova">' + IC.plus + 'Nova</a>') + '<div class="list">' + (rows || '<p class="empty">' + IC.star + 'Još nema recenzija. Dok ih nema, na sajtu stoje prazna mjesta.</p>') + '</div>');
     $$('[data-rup],[data-rdown]').forEach(function (b) {
       b.addEventListener('click', function () {
         var i = +(b.getAttribute('data-rup') || b.getAttribute('data-rdown')), j = b.hasAttribute('data-rup') ? i - 1 : i + 1;
@@ -256,12 +300,12 @@
   }
   function renderReview(isNew, id) {
     var d = draft.data;
-    shell('recenzije', '<a class="back" href="#/recenzije">← Sve recenzije</a><h1>' + (isNew ? 'Nova recenzija' : esc(d.name)) + '</h1><p class="sub">Tekst prepišite tačno kako ga je gost napisao.</p><form id="ed" autocomplete="off" novalidate><section class="card">' +
+    shell('recenzije', ehead('#/recenzije', 'Nazad na recenzije', isNew ? 'Nova recenzija' : esc(d.name)) + '<p class="sub esub">Tekst prepišite tačno kako ga je gost napisao.</p><form id="ed" autocomplete="off" novalidate><section class="card">' +
       '<div class="two">' + field('Ime gosta', 'data.name', { ph: 'e.g. Anna K.' }) + field('Zemlja', 'data.country', { ph: 'e.g. Germany' }) + field('Datum', 'data.date', { ph: 'e.g. October 2026' }) +
       '<label class="f"><span>Izvor</span><select data-path="data.source">' + SOURCES.map(function (s) { return '<option' + (d.source === s ? ' selected' : '') + '>' + esc(s) + '</option>'; }).join('') + '</select></label></div>' +
       '<div class="f"><span>Ocjena</span><div class="stars" role="radiogroup" aria-label="Ocjena">' + [1, 2, 3, 4, 5].map(function (n) { return '<button type="button" data-star="' + n + '" class="' + (n <= d.rating ? 'on' : '') + '" aria-label="' + n + ' od 5">★</button>'; }).join('') + '</div></div>' +
       field('Naslov recenzije (ako postoji)', 'data.title', { max: 140 }) + field('Tekst recenzije', 'data.text', { area: true, rows: 7, max: 2500 }) +
-      toggle('Prikaži na sajtu', 'hidden', '', true) + '</section>' + (isNew ? '' : '<section class="card"><button type="button" class="btn danger" data-delrev>Obriši recenziju</button></section>') +
+      toggle('Prikaži na sajtu', 'hidden', '', true) + '</section>' + (isNew ? '' : '<section class="card"><button type="button" class="btn danger" data-delrev>' + IC.trash + 'Obriši recenziju</button></section>') +
       '</form><div class="savebar"><div class="in"><span class="st">Sve je sačuvano</span><span class="spacer"></span><button class="btn mint" data-save>' + (isNew ? 'Sačuvaj i objavi' : 'Sačuvaj') + '</button></div></div>');
     bindForm(function () { renderReview(isNew, id); }, function () {
       if (!String(d.name).trim() || !String(d.text).trim()) { toast('Upišite ime i tekst recenzije.', true); return Promise.resolve(); }
@@ -277,8 +321,8 @@
   /* ---------- photos library ---------- */
   function mediaList() {
     var kb = function (n) { return n > 1048576 ? (n / 1048576).toFixed(1) + ' MB' : Math.round(n / 1024) + ' KB'; };
-    shell('slike', '<div class="row"><div><h1>Slike</h1><p class="sub">Sve učitane slike. Prije učitavanja se same smanje, da sajt ostane brz.</p></div><span class="spacer"></span>' + (S.mediaReady ? '<label class="btn mint">+ Učitaj slike<input type="file" accept="image/*" multiple hidden id="mup"></label>' : '') + '</div>' +
-      (S.media.length ? '<div class="media-grid">' + S.media.map(function (m) { return '<div class="m"><img src="/media/' + esc(m.key) + '" alt="" loading="lazy"><div><span title="' + esc(m.name) + '">' + esc(m.name) + ' · ' + kb(m.size) + '</span><button class="icon" data-mdel="' + esc(m.key) + '" aria-label="Obriši">×</button></div></div>'; }).join('') + '</div>' : '<p class="empty">Još nema učitanih slika. Slike dodajete i direktno iz ture.</p>'));
+    shell('slike', phead('Slike', 'Sve učitane slike. Prije učitavanja se same smanje, da sajt ostane brz.', S.mediaReady ? '<label class="btn mint sm">' + IC.plus + 'Učitaj<input type="file" accept="image/*" multiple hidden id="mup"></label>' : '') +
+      (S.media.length ? '<div class="media-grid">' + S.media.map(function (m) { return '<div class="m"><img src="/media/' + esc(m.key) + '" alt="" loading="lazy"><div><span title="' + esc(m.name) + '">' + esc(m.name) + ' · ' + kb(m.size) + '</span><button class="icon" data-mdel="' + esc(m.key) + '" aria-label="Obriši">' + IC.trash + '</button></div></div>'; }).join('') + '</div>' : '<p class="empty">' + IC.photo + 'Još nema učitanih slika. Slike dodajete i direktno iz ture.</p>'));
     var up = $('#mup'); if (up) up.addEventListener('change', function () {
       var files = Array.prototype.slice.call(up.files || []), i = 0; if (!files.length) return;
       (function next() { if (i >= files.length) { load().then(function () { mediaList(); toast('Učitano ✓'); }); return; } toast('Učitavam ' + (i + 1) + ' od ' + files.length + '…'); upload(files[i]).then(function () { i++; next(); }).catch(function (e) { toast(e.message, true); }); })();
@@ -320,6 +364,20 @@
     plan: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14M5 12h14M5 18h9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
     tours: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18c3-6 6-9 9-9s6 3 9 9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M3 18h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M8 18c1-2.6 2.6-4 4-4s3 1.4 4 4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>',
     star: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3.8 2.5 5.2 5.6.7-4.1 3.9 1 5.6-5-2.7-5 2.7 1-5.6-4.1-3.9 5.6-.7z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>',
+    back: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    chev: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    chevd: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    up: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 14l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    down: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 10l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    x: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+    plus: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>',
+    check: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    moon: '<svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>',
+    sun: '<svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+    ext: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    camera: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8.5A2.5 2.5 0 0 1 6.5 6h1.8l1.5-2h4.4l1.5 2h1.8A2.5 2.5 0 0 1 20 8.5v8a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 16.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="12.5" r="3.3" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>',
+    search: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m20 20-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+    trash: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     photo: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="3" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="9" cy="10" r="1.8" fill="currentColor"/><path d="m4.5 17 4.5-4 3 2.5 3-3 4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>'
   };
   var SRC_IC = { 'site-email': 'globe', 'site-whatsapp': 'globe', instagram: 'ig', whatsapp: 'wa', phone: 'phone', email: 'mail', agency: 'brief', walkin: 'walk', other: 'dots' };
@@ -364,9 +422,9 @@
     var view = PV.view === 'kalendar' ? calView() : PV.view === 'plan' ? planView() : inboxView();
     shell('planer', '<section class="hello"><p class="hello-d">' + esc(cap(DAYS[dObj(t).getUTCDay()])) + ', ' + dObj(t).getUTCDate() + '. ' + MONTHS[dObj(t).getUTCMonth()] + '</p><h1>' + hi + ', Mirna</h1></section>' +
       '<div class="kpis"><button type="button" class="kpi' + (nNew ? ' hot' : '') + '" data-kpi="new"><b>' + nNew + '</b><span>' + (nNew === 1 ? 'novi upit' : 'novih upita') + '</span></button><button type="button" class="kpi" data-kpi="week"><b>' + nWeek + '</b><span>potvrđeno<br>ove sedmice</span></button><button type="button" class="kpi" data-kpi="month"><b>' + gMonth + '</b><span>gostiju<br>ovaj mjesec</span></button></div>' +
-      (next ? '<a class="next" href="#/planer/' + esc(next.id) + '"><div class="next-d"><b>' + dObj(next.date).getUTCDate() + '</b><span>' + MONTHS[dObj(next.date).getUTCMonth()].slice(0, 3) + '</span></div><div class="next-b"><small>Sljedeća tura · ' + esc(relDay(next.date).indexOf(',') > 0 ? cap(DAYS[dObj(next.date).getUTCDay()]) : relDay(next.date)) + (next.data.time ? ' · ' + esc(timeText(next.data.time)) : '') + '</small><b>' + esc(shortTour(next.data)) + '</b><span>' + IC.users + esc(next.data.name) + ' · ' + guests(next.data) + (next.data.meeting ? ' · ' + esc(next.data.meeting) : '') + '</span></div><span class="next-go">›</span></a>' : '') +
+      (next ? '<a class="next" href="#/planer/' + esc(next.id) + '"><div class="next-d"><b>' + dObj(next.date).getUTCDate() + '</b><span>' + MONTHS[dObj(next.date).getUTCMonth()].slice(0, 3) + '</span></div><div class="next-b"><small>Sljedeća tura · ' + esc(relDay(next.date).indexOf(',') > 0 ? cap(DAYS[dObj(next.date).getUTCDay()]) : relDay(next.date)) + (next.data.time ? ' · ' + esc(timeText(next.data.time)) : '') + '</small><b>' + esc(shortTour(next.data)) + '</b><span>' + IC.users + esc(next.data.name) + ' · ' + guests(next.data) + (next.data.meeting ? ' · ' + esc(next.data.meeting) : '') + '</span></div><span class="next-go">' + IC.chev + '</span></a>' : '') +
       '<div class="pseg" role="tablist"><button type="button" role="tab" data-pv="upiti" aria-selected="' + (PV.view === 'upiti') + '">' + IC.mail + 'Upiti' + (nNew ? '<i>' + nNew + '</i>' : '') + '</button><button type="button" role="tab" data-pv="kalendar" aria-selected="' + (PV.view === 'kalendar') + '">' + IC.cal + 'Kalendar</button><button type="button" role="tab" data-pv="plan" aria-selected="' + (PV.view === 'plan') + '">' + IC.plan + 'Plan</button></div>' +
-      '<div class="pview">' + view + '</div><a class="fab" href="#/planer/novi' + (PV.view === 'kalendar' && PV.day ? '?d=' + PV.day : '') + '" aria-label="Dodaj upit ili turu">+</a>');
+      '<div class="pview">' + view + '</div><a class="fab" href="#/planer/novi' + (PV.view === 'kalendar' && PV.day ? '?d=' + PV.day : '') + '" aria-label="Dodaj upit ili turu">' + IC.plus + '</a>');
     $$('[data-pv]').forEach(function (b) { b.addEventListener('click', function () { PV.view = b.getAttribute('data-pv'); plannerHome(); }); });
     $$('[data-kpi]').forEach(function (b) { b.addEventListener('click', function () { var k = b.getAttribute('data-kpi'); if (k === 'new') { PV.view = 'upiti'; PV.filter = 'new'; } else { PV.view = 'plan'; } plannerHome(); }); });
     $$('[data-f]').forEach(function (b) { b.addEventListener('click', function () { PV.filter = b.getAttribute('data-f'); plannerHome(); }); });
@@ -390,7 +448,7 @@
   }
   function inboxView() {
     var count = function (f) { return B.filter(function (b) { return f === 'all' ? true : f === 'open' ? (b.status === 'new' || b.status === 'replied' || b.status === 'confirmed') : b.status === f; }).length; };
-    return '<div class="psearch">' + '<input id="pq" type="search" placeholder="Traži ime, turu, telefon…" value="' + esc(PV.q) + '" aria-label="Pretraga"></div>' +
+    return '<div class="psearch">' + IC.search + '<input id="pq" type="search" placeholder="Traži ime, turu, telefon…" value="' + esc(PV.q) + '" aria-label="Pretraga"></div>' +
       '<div class="pchips">' + FILTERS.map(function (f) { return '<button type="button" data-f="' + f[0] + '" class="' + (PV.filter === f[0] ? 'on' : '') + (f[0] !== 'open' && f[0] !== 'all' ? ' st-' + f[0] : '') + '">' + f[1] + '<i>' + count(f[0]) + '</i></button>'; }).join('') + '</div>' +
       '<div class="plist" id="plist">' + inboxList() + '</div>';
   }
@@ -406,9 +464,9 @@
     var dayList = '';
     if (PV.day) {
       var l2 = B.filter(function (b) { return b.date === PV.day; }).sort(function (a, b) { return String(a.data.time).localeCompare(String(b.data.time)); });
-      dayList = '<div class="dayl" id="dayl"><div class="row"><h3>' + esc(relDay(PV.day)) + '</h3><span class="spacer"></span><a class="btn sm mint" href="#/planer/novi?d=' + PV.day + '">+ Dodaj za ovaj dan</a></div>' + (l2.length ? l2.map(bkCard).join('') : '<p class="pempty"><span>Ovaj dan je slobodan.</span></p>') + '</div>';
+      dayList = '<div class="dayl" id="dayl"><div class="row"><h3>' + esc(relDay(PV.day)) + '</h3><span class="spacer"></span><a class="btn sm mint" href="#/planer/novi?d=' + PV.day + '">' + IC.plus + 'Dodaj</a></div>' + (l2.length ? l2.map(bkCard).join('') : '<p class="pempty"><span>Ovaj dan je slobodan.</span></p>') + '</div>';
     }
-    return '<div class="cal"><div class="cal-h"><button type="button" class="icon" data-mon="-1" aria-label="Prethodni mjesec">‹</button><b>' + cap(MONTHS[mo]) + ' ' + y + '</b><button type="button" class="icon" data-mon="1" aria-label="Sljedeći mjesec">›</button><span class="spacer"></span><button type="button" class="btn sm line" data-today>Danas</button></div>' +
+    return '<div class="cal"><div class="cal-h"><button type="button" class="icon" data-mon="-1" aria-label="Prethodni mjesec">' + IC.back + '</button><b>' + cap(MONTHS[mo]) + ' ' + y + '</b><button type="button" class="icon" data-mon="1" aria-label="Sljedeći mjesec">' + IC.chev + '</button><span class="spacer"></span><button type="button" class="btn sm line" data-today>Danas</button></div>' +
       '<div class="cal-g">' + ['P', 'U', 'S', 'Č', 'P', 'S', 'N'].map(function (x) { return '<span class="cw">' + x + '</span>'; }).join('') + cells + '</div>' +
       '<div class="legend">' + ['new', 'replied', 'confirmed', 'done'].map(function (s) { return '<span><i class="st-' + s + '"></i>' + ST[s] + '</span>'; }).join('') + '</div></div>' + dayList;
   }
@@ -467,8 +525,8 @@
     if (draft.date) acts.push('<a class="qa" href="' + esc(gcalUrl(draft)) + '" target="_blank" rel="noopener">' + IC.gcal + '<span>U kalendar</span></a>');
     acts.push('<button type="button" class="qa" data-copy>' + IC.copy + '<span>Kopiraj</span></button>');
     var fromTime = d.time && !/^\d{1,2}:\d{2}$/.test(d.time) ? '<small>Gost je izabrao: <b>' + esc(timeText(d.time)) + '</b>. Kad dogovorite tačno vrijeme, upišite ga.</small>' : '';
-    shell('planer', '<a class="back" href="#/planer">← Planer</a>' +
-      '<div class="bk-head"><h1>' + (isNew ? 'Novi upit' : esc(d.name || 'Upit')) + '</h1>' + (isNew ? '<p class="sub">Dodajte upit ili dogovorenu turu koja je stigla preko Instagrama, telefona, uživo…</p>' : '<p class="sub">' + IC[SRC_IC[draft.source] || 'dots'] + ' ' + esc(SRC[draft.source] || '') + ' · stiglo ' + esc(ago(draft.created_at)) + '</p>') + '</div>' +
+    shell('planer', ehead('#/planer', 'Nazad na planer', isNew ? 'Novi upit' : esc(d.name || 'Upit')) +
+      '<div class="bk-head">' + (isNew ? '<p class="sub esub">Dodajte upit ili dogovorenu turu koja je stigla preko Instagrama, telefona, uživo…</p>' : '<p class="sub esub">' + IC[SRC_IC[draft.source] || 'dots'] + ' ' + esc(SRC[draft.source] || '') + ' · stiglo ' + esc(ago(draft.created_at)) + '</p>') + '</div>' +
       '<div class="stsel" role="radiogroup" aria-label="Status">' + Object.keys(ST).map(function (s) { return '<label class="st-' + s + '"><input type="radio" name="bst" value="' + s + '"' + (draft.status === s ? ' checked' : '') + '><span>' + ST[s] + '</span></label>'; }).join('') + '</div>' +
       (acts.length > 1 || !isNew ? '<div class="qas">' + acts.join('') + '</div>' : '') +
       '<form id="ed" autocomplete="off" novalidate>' +
@@ -480,7 +538,7 @@
       '<section class="card"><h2>Gosti</h2><div class="two">' + stepper('Odrasli', 'data.adults') + stepper('Djeca', 'data.children') + '</div>' + (d.children ? field('Godine djece', 'data.ages', { ph: 'npr. 6 i 9' }) : '') + '<div class="f"><span>Ulaznice</span><div class="ticks">' + tk + '</div></div></section>' +
       '<section class="card"><h2>Novac</h2><div class="two">' + field('Dogovorena cijena (€)', 'data.price', { num: true, ph: 'npr. 80' }) + '<div>' + toggle('Plaćeno', 'data.paid') + '</div></div></section>' +
       '<section class="card"><h2>Poruke</h2>' + field('Poruka gosta', 'data.message', { area: true, rows: 3 }) + field('Moja bilješka (vidim samo ja)', 'data.note', { area: true, rows: 3, ph: 'npr. dogovoreno 10h, platit će na licu mjesta' }) + '</section>' +
-      (isNew ? '' : '<section class="card"><button type="button" class="btn danger" data-delbk>Obriši</button></section>') +
+      (isNew ? '' : '<section class="card"><button type="button" class="btn danger" data-delbk>' + IC.trash + 'Obriši upit</button></section>') +
       '</form><div class="savebar"><div class="in"><span class="st">Sve je sačuvano</span><span class="spacer"></span><button class="btn mint" data-save>' + (isNew ? 'Dodaj' : 'Sačuvaj') + '</button></div></div>');
     bindForm(function () { renderBooking(isNew, id); }, function () {
       if (!String(draft.data.name || '').trim()) { toast('Upišite ime gosta.', true); return Promise.resolve(); }
