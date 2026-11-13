@@ -366,7 +366,7 @@
     function onScroll() {
       var y = innerHeight * .35, cur = -1;
       secs.forEach(function (s, i) { if (s && s.getBoundingClientRect().top < y) cur = i; });
-      links.forEach(function (a, i) { var on = i === cur; if (on !== a.classList.contains('on')) { a.classList.toggle('on', on); if (on) a.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' }); } });
+      links.forEach(function (a, i) { var on = i === cur; if (on !== a.classList.contains('on')) { a.classList.toggle('on', on); if (on && bar.scrollWidth > bar.clientWidth) bar.scrollTo({ left: a.offsetLeft - (bar.clientWidth - a.offsetWidth) / 2, behavior: 'smooth' }); } });
       bar.parentNode.classList.toggle('stuck', bar.getBoundingClientRect().top <= 80);
     }
     addEventListener('scroll', onScroll, { passive: true }); onScroll();
