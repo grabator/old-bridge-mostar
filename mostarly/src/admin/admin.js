@@ -33,7 +33,7 @@
     return (p.from ? 'from ' : '') + '€' + (p.amount || 0) + ' ' + (BASIS_EN[p.basis] || '');
   }
   function catName(id) { var c = (S.categories || []).filter(function (x) { return x.id === id; })[0]; return c ? c.name : ''; }
-  function setDirty(v) { dirty = v; var st = $('.savebar .st'); if (st) { st.textContent = v ? 'Ima nesačuvanih izmjena' : 'Sve je sačuvano'; st.classList.toggle('dirty', v); } }
+  function setDirty(v) { dirty = v; var b = $('.savebar'); if (b && !b.classList.contains('new')) b.classList.toggle('show', !!v); }
   function load() { return api('GET', '/state').then(function (j) { S = j; }); }
 
   window.addEventListener('beforeunload', function (e) { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
@@ -45,6 +45,7 @@
 
   /* ---------- layout ---------- */
   function shell(tab, inner) {
+    if (typeof OPEN !== 'undefined') document.querySelectorAll('details[data-sec]').forEach(function (d) { OPEN[(location.hash.split('?')[0]) + '|' + d.getAttribute('data-sec')] = d.open; });
     var t = S.tours.length, r = S.reviews.length, m = S.media.length, n = (typeof newCount === 'function') ? newCount() : 0;
     var tabs = [['planer', 'Planer', n ? '<i class="dot">' + n + '</i>' : ''], ['ture', 'Ture', '<span>' + t + '</span>'], ['recenzije', 'Recenzije', '<span>' + r + '</span>'], ['slike', 'Slike', '<span>' + m + '</span>']];
     var icons = { planer: 'cal', ture: 'tours', recenzije: 'star', slike: 'photo' };
@@ -57,8 +58,19 @@
     document.documentElement.classList.remove('locked');
     enhanceSelects();
   }
+  // a section of a form that opens and closes; it remembers what was open while you edit
+  var OPEN = {};
+  function sec(id, title, summary, open) {
+    var k = (location.hash.split('?')[0]) + '|' + id; if (k in OPEN) open = OPEN[k];
+    return '<details class="card sec" data-sec="' + id + '"' + (open ? ' open' : '') + '><summary><span class="sh"><h2>' + title + '</h2><small>' + summary + '</small></span><span class="sx">' + IC.chevd + '</span></summary><div class="sb">';
+  }
+  document.addEventListener('toggle', function (e) { var d = e.target; if (d.matches && d.matches('details[data-sec]')) OPEN[(location.hash.split('?')[0]) + '|' + d.getAttribute('data-sec')] = d.open; }, true);
+  // save bar: for something new it is always there (Odustani / Dodaj); for an existing item it slides up only after a change (Otkaži / Sačuvaj)
+  function savebar(isNew, label) {
+    return '<div class="savebar' + (isNew || dirty ? ' show' : '') + (isNew ? ' new' : '') + '"><div class="in"><span class="st">' + (isNew ? '' : 'Nesačuvane izmjene') + '</span><span class="spacer"></span><button type="button" class="btn line" data-cancel>' + (isNew ? 'Odustani' : 'Otkaži') + '</button><button type="button" class="btn mint" data-save>' + label + '</button></div></div>';
+  }
   function phead(title, sub, action) { return '<div class="phead"><h1>' + title + '</h1>' + (action || '') + '<p class="sub">' + sub + '</p></div>'; }
-  function ehead(href, label, title) { return '<div class="ehead"><a class="back" href="' + href + '" aria-label="' + esc(label) + '" title="' + esc(label) + '">' + IC.back + '</a><h1>' + title + '</h1></div>'; }
+  function ehead(href, label, title, extra) { return '<div class="ehead"><a class="back" href="' + href + '" aria-label="' + esc(label) + '" title="' + esc(label) + '">' + IC.back + '</a><h1>' + title + '</h1>' + (extra || '') + '</div>'; }
   function reorder(i, n, a, b) { return '<div class="ord"><button type="button" ' + a + '="' + i + '" aria-label="Pomjeri gore"' + (i === 0 ? ' disabled' : '') + '>' + IC.up + '</button><button type="button" ' + b + '="' + i + '" aria-label="Pomjeri dole"' + (i === n - 1 ? ' disabled' : '') + '>' + IC.down + '</button></div>'; }
 
   /* ---------- bottom sheet: one component for photos and dropdowns. The page behind it does not scroll. ---------- */
@@ -162,32 +174,32 @@
   function renderTour(isNew, slug) {
     var d = draft.data, p = d.price;
     var cats = S.categories.map(function (c) { return '<option value="' + esc(c.id) + '"' + (d.category === c.id ? ' selected' : '') + '>' + esc(c.name) + '</option>'; }).join('');
-    var notes = (d.notes || []).length ? '<div class="notes"><b>Napomene za provjeru</b><ul>' + d.notes.map(function (n, i) { return '<li><span>' + esc(n) + '</span><button type="button" class="btn sm line" data-note="' + i + '">Riješeno ✓</button></li>'; }).join('') + '</ul><small>Kad nešto riješite, kliknite "Riješeno" pa sačuvajte. Žuta napomena tada nestaje i sa sajta.</small></div>' : '';
+    var notes = (d.notes || []).length ? sec('notes', d.notes.length + (d.notes.length === 1 ? ' napomena' : ' napomene') + ' za provjeru', 'Dodirnite da vidite šta treba potvrditi', false).replace('card sec', 'card sec notes') + '<ul>' + d.notes.map(function (n, i) { return '<li><span>' + esc(n) + '</span><button type="button" class="btn sm line" data-note="' + i + '">Riješeno ✓</button></li>'; }).join('') + '</ul><small>Kad nešto riješite, kliknite "Riješeno" pa sačuvajte. Žuta napomena tada nestaje i sa sajta.</small></div></details>' : '';
     var tickets = S.tickets.map(function (k) { return '<label><input type="checkbox" data-ticket="' + esc(k.id) + '"' + ((d.tickets || []).indexOf(k.id) > -1 ? ' checked' : '') + '>' + esc(k.label) + '<em>€' + k.price + '</em></label>'; }).join('');
     var gal = (d.gallery || []).map(function (g, i) { return '<div class="g"><img src="' + esc(imgUrl(g.src)) + '" alt=""><button type="button" class="mv" data-gmain="' + i + '" title="Postavi kao glavnu" aria-label="Postavi kao glavnu">' + IC.star + '</button><button type="button" data-gdel="' + i + '" aria-label="Ukloni">' + IC.x + '</button></div>'; }).join('');
-    shell('ture', ehead('#/ture', 'Nazad na sve ture', isNew ? 'Nova tura' : esc(d.name)) + '<p class="sub esub">' + (isNew ? 'Popunite osnovno i sačuvajte. Ostalo možete dodati kasnije.' : 'Tekst na sajtu pišite na engleskom. Nakon snimanja, promjena je odmah na sajtu.') + '</p>' + notes +
+    shell('ture', ehead('#/ture', 'Nazad na sve ture', isNew ? 'Nova tura' : esc(d.name), isNew ? '' : '<a class="back" href="/tours/' + esc(slug) + '/" target="_blank" rel="noopener" aria-label="Pogledaj turu na sajtu" title="Pogledaj na sajtu">' + IC.ext + '</a>') + '<p class="sub esub">' + (isNew ? 'Popunite osnovno i sačuvajte. Ostalo možete dodati kasnije.' : 'Tekst na sajtu pišite na engleskom. Nakon snimanja, promjena je odmah na sajtu.') + '</p>' + notes +
       '<form id="ed" autocomplete="off" novalidate>' +
-      '<section class="card"><h2>Osnovno</h2>' + field('Naziv ture', 'data.name', { max: 160, ph: 'e.g. Mostar City Tour – Highlights of the Old Town' }) +
+      sec('osnovno', 'Osnovno', esc(catName(d.category) || 'Bez kategorije'), isNew) + '' + field('Naziv ture', 'data.name', { max: 160, ph: 'e.g. Mostar City Tour – Highlights of the Old Town' }) +
       '<label class="f"><span>Kategorija</span><select data-path="data.category">' + cats + '</select></label>' +
-      field('Kratki opis (ispod naslova i na kartici)', 'data.tagline', { area: true, rows: 2, max: 400 }) + field('Opis ture', 'data.description', { area: true, rows: 6, max: 5000 }) + '</section>' +
-      '<section class="card"><h2>Cijena</h2><p class="help">Svaka cijena mora reći da li je po osobi ili po grupi.</p>' +
+      field('Kratki opis (ispod naslova i na kartici)', 'data.tagline', { area: true, rows: 2, max: 400 }) + field('Opis ture', 'data.description', { area: true, rows: 6, max: 5000 }) + '' + '</div></details>' +
+      sec('cijena', 'Cijena', esc(priceText(p)) + (p.confirmed === false ? ' · za potvrdu' : ''), isNew) + '<p class="help">Svaka cijena mora reći da li je po osobi ili po grupi.</p>' +
       '<div class="f"><span>Kako se plaća</span><div class="seg">' + ['person', 'group', 'request'].map(function (b) { return '<label><input type="radio" name="basis" value="' + b + '"' + (p.basis === b ? ' checked' : '') + '><span>' + BASIS[b] + '</span></label>'; }).join('') + '</div></div>' +
       (p.basis !== 'request' ? '<div class="two">' + field('Iznos u eurima', 'data.price.amount', { num: true }) + '<div>' + toggle('Prikaži kao "od"', 'data.price.from', 'npr. "from €40 per person"') + '</div></div>' : '') +
       toggle('Cijena je potvrđena', 'data.price.confirmed', 'Dok nije, na sajtu stoji oznaka "to confirm".') +
-      '<div class="preview" id="pprev">Na sajtu: <b>' + esc(priceText(p)) + '</b></div></section>' +
-      '<section class="card"><h2>Slike</h2><div class="photo"><div class="pv">' + (d.image ? '<img src="' + esc(imgUrl(d.image)) + '" alt="">' : 'Nema glavne slike<br>(prikazuje se ćilim šara)') + '</div><div>' +
+      '<div class="preview" id="pprev">Na sajtu: <b>' + esc(priceText(p)) + '</b></div>' + '</div></details>' +
+      sec('slike', 'Slike', (d.image ? 'Glavna slika' : 'Bez glavne slike') + ' · ' + (d.gallery || []).length + ' u galeriji', false) + '<div class="photo"><div class="pv">' + (d.image ? '<img src="' + esc(imgUrl(d.image)) + '" alt="">' : 'Nema glavne slike<br>(prikazuje se ćilim šara)') + '</div><div>' +
       '<div class="row"><button type="button" class="btn sm" data-pickmain>' + (d.image ? 'Promijeni glavnu sliku' : 'Dodaj glavnu sliku') + '</button>' + (d.image ? '<button type="button" class="btn sm line" data-nomain>Ukloni</button>' : '') + '</div>' +
       field('Opis slike (za slijepe i za Google)', 'data.imageAlt', { ph: 'e.g. The Old Bridge at sunset', max: 200 }) + '</div></div>' +
-      '<div class="f" style="margin-top:1.1rem"><span>Galerija na stranici ture</span><div class="gal">' + gal + '<button type="button" class="addg" data-pickgal>' + IC.plus + 'Dodaj slike</button></div><small>Zvjezdica na slici je postavlja kao glavnu.</small></div></section>' +
-      '<section class="card"><h2>Detalji</h2><div class="two">' + field('Trajanje', 'data.duration', { ph: 'About 2 hours' }) + field('Lokacija', 'data.location', { ph: 'Old Town, Mostar' }) + field('Veličina grupe', 'data.groupSize', { ph: '2–20 people' }) + field('Jezici', 'data.languages', { ph: 'English' }) + '</div>' +
-      field('Težina hodanja', 'data.level', { ph: 'Easy: uneven cobblestones and some steps' }) + field('Dostupnost', 'data.availability', { ph: 'Daily, by prior arrangement' }) + field('Mjesto sastanka', 'data.meetingPoint', { ph: 'In front of the Hamam, Old Town' }) + '</section>' +
-      '<section class="card"><h2>Program ture</h2><p class="help">Redom kako gosti obilaze. "opc." znači da stanica ovisi o sezoni ili željama.</p>' + listEditor('Stanice', 'data.itinerary', 'e.g. Meet in front of the Hamam.', true) + '</section>' +
-      '<section class="card"><h2>Šta je uključeno</h2>' + listEditor('Uključeno', 'data.included', 'e.g. Licensed local guide') + listEditor('Nije uključeno / plaća se posebno', 'data.notIncluded', 'e.g. Entrance tickets') + listEditor('Dobro je znati', 'data.practical', 'e.g. Wear comfortable shoes.') + '</section>' +
-      '<section class="card"><h2>Ulaznice u formi za upit</h2><p class="help">Gosti ih mogu označiti kad šalju upit za ovu turu.</p><div class="ticks">' + tickets + '</div></section>' +
-      '<section class="card"><h2>Prikaz</h2>' + toggle('Prikaži turu na sajtu', 'hidden', 'Isključeno: tura je sakrivena, ali ostaje ovdje sačuvana.', true) + toggle('Istakni na početnoj stranici', 'data.featured', 'Među "Featured tours" na vrhu početne.') + '</section>' +
-      '<section class="card"><details class="adv"' + (d.seoTitle || d.seoDescription ? '' : '') + '><summary>Za Google (naslov i opis u pretrazi)</summary>' + field('Naslov u Googleu', 'data.seoTitle', { max: 65, hint: 'Do 60 znakova. Ako je prazno, koristi se naziv ture.' }) + field('Opis u Googleu', 'data.seoDescription', { area: true, rows: 3, max: 160, hint: 'Do 155 znakova: šta gost dobije, gdje i koliko traje.' }) + '</details></section>' +
-      (isNew ? '' : '<section class="card"><h2>Brisanje</h2><p class="help">Ako turu samo želite skloniti sa sajta, isključite "Prikaži turu na sajtu". Brisanje se ne može vratiti.</p><button type="button" class="btn danger" data-deltour>' + IC.trash + 'Obriši turu</button></section>') +
-      '</form><div class="savebar"><div class="in"><span class="st">Sve je sačuvano</span><span class="spacer"></span>' + (isNew ? '' : '<a class="btn line sm" href="/tours/' + esc(slug) + '/" target="_blank" rel="noopener" title="Pogledaj na sajtu">' + IC.ext + 'Sajt</a>') + '<button class="btn mint" data-save>' + (isNew ? 'Sačuvaj i objavi' : 'Sačuvaj') + '</button></div></div>');
+      '<div class="f" style="margin-top:1.1rem"><span>Galerija na stranici ture</span><div class="gal">' + gal + '<button type="button" class="addg" data-pickgal>' + IC.plus + 'Dodaj slike</button></div><small>Zvjezdica na slici je postavlja kao glavnu.</small></div>' + '</div></details>' +
+      sec('detalji', 'Detalji', esc([d.duration, d.location].filter(Boolean).join(' · ') || 'Nije popunjeno'), false) + '<div class="two">' + field('Trajanje', 'data.duration', { ph: 'About 2 hours' }) + field('Lokacija', 'data.location', { ph: 'Old Town, Mostar' }) + field('Veličina grupe', 'data.groupSize', { ph: '2–20 people' }) + field('Jezici', 'data.languages', { ph: 'English' }) + '</div>' +
+      field('Težina hodanja', 'data.level', { ph: 'Easy: uneven cobblestones and some steps' }) + field('Dostupnost', 'data.availability', { ph: 'Daily, by prior arrangement' }) + field('Mjesto sastanka', 'data.meetingPoint', { ph: 'In front of the Hamam, Old Town' }) + '' + '</div></details>' +
+      sec('program', 'Program ture', (d.itinerary || []).length + ' stanica', false) + '<p class="help">Redom kako gosti obilaze. "opc." znači da stanica ovisi o sezoni ili željama.</p>' + listEditor('Stanice', 'data.itinerary', 'e.g. Meet in front of the Hamam.', true) + '' + '</div></details>' +
+      sec('ukljuceno', 'Šta je uključeno', (d.included || []).length + ' uključeno · ' + (d.notIncluded || []).length + ' posebno · ' + (d.practical || []).length + ' savjeta', false) + '' + listEditor('Uključeno', 'data.included', 'e.g. Licensed local guide') + listEditor('Nije uključeno / plaća se posebno', 'data.notIncluded', 'e.g. Entrance tickets') + listEditor('Dobro je znati', 'data.practical', 'e.g. Wear comfortable shoes.') + '' + '</div></details>' +
+      sec('ulaznice', 'Ulaznice u formi za upit', (d.tickets || []).length + ' izabrano', false) + '<p class="help">Gosti ih mogu označiti kad šalju upit za ovu turu.</p><div class="ticks">' + tickets + '</div>' + '</div></details>' +
+      sec('prikaz', 'Prikaz', (draft.hidden ? 'Sakrivena' : 'Vidljiva na sajtu') + (d.featured ? ' · na početnoj' : ''), false) + '' + toggle('Prikaži turu na sajtu', 'hidden', 'Isključeno: tura je sakrivena, ali ostaje ovdje sačuvana.', true) + toggle('Istakni na početnoj stranici', 'data.featured', 'Među "Featured tours" na vrhu početne.') + '' + '</div></details>' +
+      sec('google', 'Za Google', d.seoTitle || d.seoDescription ? 'Naslov i opis su upisani' : 'Nije popunjeno: koristi se naziv ture', false) + '<p class="help">Kako tura izgleda u Google pretrazi.</p>' + field('Naslov u Googleu', 'data.seoTitle', { max: 65, hint: 'Do 60 znakova. Ako je prazno, koristi se naziv ture.' }) + field('Opis u Googleu', 'data.seoDescription', { area: true, rows: 3, max: 160, hint: 'Do 155 znakova: šta gost dobije, gdje i koliko traje.' }) + '</div></details>' +
+      (isNew ? '' : sec('brisanje', 'Brisanje', 'Trajno brisanje ture', false) + '<p class="help">Ako turu samo želite skloniti sa sajta, isključite "Prikaži turu na sajtu". Brisanje se ne može vratiti.</p><button type="button" class="btn danger" data-deltour>' + IC.trash + 'Obriši turu</button>' + '</div></details>') +
+      '</form>' + savebar(isNew, isNew ? 'Objavi' : 'Sačuvaj'));
     bindForm(function () { renderTour(isNew, slug); }, function () { return saveTour(isNew, slug); });
     $$('[name=basis]').forEach(function (r) { r.addEventListener('change', function () { draft.data.price.basis = r.value; if (r.value !== 'request' && draft.data.price.amount == null) draft.data.price.amount = 0; setDirty(true); renderTour(isNew, slug); setDirty(true); }); });
     $$('[data-ticket]').forEach(function (c) { c.addEventListener('change', function () { var id = c.getAttribute('data-ticket'), a = (draft.data.tickets || []).filter(function (x) { return x !== id; }); if (c.checked) a.push(id); draft.data.tickets = a; setDirty(true); }); });
@@ -227,10 +239,16 @@
     $$('[data-ladd]').forEach(function (b) { b.addEventListener('click', function () { var a = b.getAttribute('data-ladd').split('|'), arr = get(draft, a[0]) || []; arr.push(a[1] === '1' ? { text: '', optional: false } : ''); set(draft, a[0], arr); rerender(); setDirty(true); var all = $$('[data-list="' + a[0] + '"] textarea'); if (all.length) all[all.length - 1].focus(); }); });
     $$('[data-ldel]').forEach(function (b) { b.addEventListener('click', function () { var a = b.getAttribute('data-ldel').split('|'); get(draft, a[0]).splice(+a[1], 1); rerender(); setDirty(true); }); });
     $$('[data-lmove]').forEach(function (b) { b.addEventListener('click', function () { var a = b.getAttribute('data-lmove').split('|'), arr = get(draft, a[0]), i = +a[1], j = i + (+a[2]); var x = arr[i]; arr[i] = arr[j]; arr[j] = x; rerender(); setDirty(true); }); });
-    var sb = $('[data-save]');
+    var cb = $('[data-cancel]');
+    if (cb) cb.addEventListener('click', function () {
+      var bar = $('.savebar'), back = $('.ehead .back');
+      if (bar && bar.classList.contains('new')) { setDirty(false); location.hash = back ? back.getAttribute('href') : '#/planer'; return; }
+      var y = scrollY; setDirty(false); route(); window.scrollTo(0, y); toast('Izmjene otkazane');
+    });
+    var sb = $('[data-save]'), sbLabel = sb.textContent;
     sb.addEventListener('click', function () {
       if (saving) return; saving = true; sb.disabled = true; sb.textContent = 'Snimam…';
-      Promise.resolve(save()).catch(function (e) { toast(e.message, true); }).then(function () { saving = false; var b = $('[data-save]'); if (b) { b.disabled = false; b.textContent = 'Sačuvaj'; } });
+      Promise.resolve(save()).catch(function (e) { toast(e.message, true); }).then(function () { saving = false; var b = $('[data-save]'); if (b) { b.disabled = false; b.textContent = sbLabel; } });
     });
   }
   // checkboxes fire "change", not always "input": treat them the same
@@ -306,7 +324,7 @@
       '<div class="f"><span>Ocjena</span><div class="stars" role="radiogroup" aria-label="Ocjena">' + [1, 2, 3, 4, 5].map(function (n) { return '<button type="button" data-star="' + n + '" class="' + (n <= d.rating ? 'on' : '') + '" aria-label="' + n + ' od 5">★</button>'; }).join('') + '</div></div>' +
       field('Naslov recenzije (ako postoji)', 'data.title', { max: 140 }) + field('Tekst recenzije', 'data.text', { area: true, rows: 7, max: 2500 }) +
       toggle('Prikaži na sajtu', 'hidden', '', true) + '</section>' + (isNew ? '' : '<section class="card"><button type="button" class="btn danger" data-delrev>' + IC.trash + 'Obriši recenziju</button></section>') +
-      '</form><div class="savebar"><div class="in"><span class="st">Sve je sačuvano</span><span class="spacer"></span><button class="btn mint" data-save>' + (isNew ? 'Sačuvaj i objavi' : 'Sačuvaj') + '</button></div></div>');
+      '</form>' + savebar(isNew, isNew ? 'Objavi' : 'Sačuvaj'));
     bindForm(function () { renderReview(isNew, id); }, function () {
       if (!String(d.name).trim() || !String(d.text).trim()) { toast('Upišite ime i tekst recenzije.', true); return Promise.resolve(); }
       return (isNew ? api('POST', '/reviews', draft) : api('PUT', '/reviews/' + id, draft)).then(function (j) { setDirty(false); toast('Sačuvano i objavljeno na sajtu ✓'); return load().then(function () { location.hash = '#/recenzije'; }); });
@@ -530,16 +548,16 @@
       '<div class="stsel" role="radiogroup" aria-label="Status">' + Object.keys(ST).map(function (s) { return '<label class="st-' + s + '"><input type="radio" name="bst" value="' + s + '"' + (draft.status === s ? ' checked' : '') + '><span>' + ST[s] + '</span></label>'; }).join('') + '</div>' +
       (acts.length > 1 || !isNew ? '<div class="qas">' + acts.join('') + '</div>' : '') +
       '<form id="ed" autocomplete="off" novalidate>' +
-      '<section class="card"><h2>Gost</h2>' + field('Ime i prezime', 'data.name', { ph: 'npr. Anna Müller' }) + '<div class="two">' + field('Telefon / WhatsApp', 'data.phone', { ph: '+49 170 1234567' }) + field('Email', 'data.email', { ph: 'ime@email.com' }) + field('Instagram', 'data.instagram', { ph: '@korisnik' }) + field('Jezik', 'data.lang', { ph: 'English, Deutsch…' }) + '</div>' +
-      (site ? '' : '<div class="f"><span>Odakle je stiglo</span><div class="seg src-seg">' + ['instagram', 'whatsapp', 'phone', 'email', 'agency', 'walkin', 'other'].map(function (s) { return '<label><input type="radio" name="bsrc" value="' + s + '"' + (draft.source === s ? ' checked' : '') + '><span>' + IC[SRC_IC[s]] + SRC[s] + '</span></label>'; }).join('') + '</div></div>') + '</section>' +
-      '<section class="card"><h2>Tura</h2><label class="f"><span>Koja tura</span><select data-path="data.tourSlug">' + tourOpts + '</select></label>' + (d.tourSlug ? '' : field('Opis ture (ako nije sa liste)', 'data.tour', { ph: 'npr. Sarajevo day trip' })) +
+      sec('gost', 'Gost', esc([d.name, d.phone || d.email || (d.instagram ? '@' + d.instagram : '')].filter(Boolean).join(' · ') || 'Nije popunjeno'), isNew) + '' + field('Ime i prezime', 'data.name', { ph: 'npr. Anna Müller' }) + '<div class="two">' + field('Telefon / WhatsApp', 'data.phone', { ph: '+49 170 1234567' }) + field('Email', 'data.email', { ph: 'ime@email.com' }) + field('Instagram', 'data.instagram', { ph: '@korisnik' }) + field('Jezik', 'data.lang', { ph: 'English, Deutsch…' }) + '</div>' +
+      (site ? '' : '<div class="f"><span>Odakle je stiglo</span><div class="seg src-seg">' + ['instagram', 'whatsapp', 'phone', 'email', 'agency', 'walkin', 'other'].map(function (s) { return '<label><input type="radio" name="bsrc" value="' + s + '"' + (draft.source === s ? ' checked' : '') + '><span>' + IC[SRC_IC[s]] + SRC[s] + '</span></label>'; }).join('') + '</div></div>') + '' + '</div></details>' +
+      sec('tura', 'Tura', esc(shortTour(d)) + ' · ' + (draft.date ? esc(fmtDay(draft.date)) : 'datum fleksibilan'), isNew) + '<label class="f"><span>Koja tura</span><select data-path="data.tourSlug">' + tourOpts + '</select></label>' + (d.tourSlug ? '' : field('Opis ture (ako nije sa liste)', 'data.tour', { ph: 'npr. Sarajevo day trip' })) +
       '<div class="two"><label class="f"><span>Datum</span><input type="date" data-path="date" value="' + esc(draft.date || '') + '"></label><label class="f"><span>Vrijeme</span><input type="time" data-path="data.time" value="' + (/^\d{1,2}:\d{2}$/.test(d.time) ? esc(d.time.padStart(5, '0')) : '') + '">' + fromTime + '</label></div>' +
-      field('Mjesto sastanka', 'data.meeting', { ph: 'npr. ispred Hamama' }) + '</section>' +
-      '<section class="card"><h2>Gosti</h2><div class="two">' + stepper('Odrasli', 'data.adults') + stepper('Djeca', 'data.children') + '</div>' + (d.children ? field('Godine djece', 'data.ages', { ph: 'npr. 6 i 9' }) : '') + '<div class="f"><span>Ulaznice</span><div class="ticks">' + tk + '</div></div></section>' +
-      '<section class="card"><h2>Novac</h2><div class="two">' + field('Dogovorena cijena (€)', 'data.price', { num: true, ph: 'npr. 80' }) + '<div>' + toggle('Plaćeno', 'data.paid') + '</div></div></section>' +
-      '<section class="card"><h2>Poruke</h2>' + field('Poruka gosta', 'data.message', { area: true, rows: 3 }) + field('Moja bilješka (vidim samo ja)', 'data.note', { area: true, rows: 3, ph: 'npr. dogovoreno 10h, platit će na licu mjesta' }) + '</section>' +
+      field('Mjesto sastanka', 'data.meeting', { ph: 'npr. ispred Hamama' }) + '' + '</div></details>' +
+      sec('gosti', 'Gosti', guests(d) + ' gostiju' + ((d.tickets || []).length ? ' · ' + d.tickets.length + ' ulaz.' : ''), isNew) + '<div class="two">' + stepper('Odrasli', 'data.adults') + stepper('Djeca', 'data.children') + '</div>' + (d.children ? field('Godine djece', 'data.ages', { ph: 'npr. 6 i 9' }) : '') + '<div class="f"><span>Ulaznice</span><div class="ticks">' + tk + '</div></div>' + '</div></details>' +
+      sec('novac', 'Novac', d.price != null && d.price !== '' ? '€' + esc(d.price) + (d.paid ? ' · plaćeno' : ' · nije plaćeno') : 'Cijena nije upisana', false) + '<div class="two">' + field('Dogovorena cijena (€)', 'data.price', { num: true, ph: 'npr. 80' }) + '<div>' + toggle('Plaćeno', 'data.paid') + '</div></div>' + '</div></details>' +
+      sec('poruke', 'Poruke', esc(String(d.message || d.note || 'Nema poruka').slice(0, 60)), false) + '' + field('Poruka gosta', 'data.message', { area: true, rows: 3 }) + field('Moja bilješka (vidim samo ja)', 'data.note', { area: true, rows: 3, ph: 'npr. dogovoreno 10h, platit će na licu mjesta' }) + '' + '</div></details>' +
       (isNew ? '' : '<section class="card"><button type="button" class="btn danger" data-delbk>' + IC.trash + 'Obriši upit</button></section>') +
-      '</form><div class="savebar"><div class="in"><span class="st">Sve je sačuvano</span><span class="spacer"></span><button class="btn mint" data-save>' + (isNew ? 'Dodaj' : 'Sačuvaj') + '</button></div></div>');
+      '</form>' + savebar(isNew, isNew ? 'Dodaj' : 'Sačuvaj'));
     bindForm(function () { renderBooking(isNew, id); }, function () {
       if (!String(draft.data.name || '').trim()) { toast('Upišite ime gosta.', true); return Promise.resolve(); }
       var body = { status: draft.status, source: draft.source, date: draft.date || null, data: draft.data };

@@ -378,3 +378,39 @@ details.adv[open]>summary{margin-bottom:.9rem}
   .ord button{width:42px}
   .badge{font-size:.56rem;padding:.08rem .4rem}
 }
+
+/* collapsible form sections */
+.sec{padding:0;overflow:hidden}
+.sec>summary{list-style:none;display:flex;align-items:center;gap:.8rem;padding:.9rem 1rem;cursor:pointer;user-select:none;-webkit-user-select:none}
+.sec>summary::-webkit-details-marker{display:none}
+.sec>summary:active{background:var(--soft)}
+.sec .sh{flex:1;min-width:0;display:grid;gap:.12rem}
+.sec .sh h2{margin:0;font:400 1.15rem/1.2 var(--serif);color:var(--strong)}
+.sec .sh small{font-size:.8rem;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sec .sx{flex:none;width:32px;height:32px;border-radius:50%;background:var(--soft);display:grid;place-items:center;color:var(--ink2);transition:transform .25s}
+.sec .sx svg{width:18px;height:18px}
+.sec[open] .sx{transform:rotate(180deg)}
+.sec[open]>summary{border-bottom:1px solid var(--line)}
+.sec .sb{padding:1rem 1rem 1.1rem;animation:secin .2s ease}
+@keyframes secin{from{opacity:0;transform:translateY(-4px)}}
+.ehead .back+h1+.back{width:40px;height:40px}
+.ehead .back+h1+.back svg{width:18px;height:18px}
+/* fields inside a two column row keep their space below */
+.two>.f,.two>div{margin-bottom:1rem}
+.sb>.two:last-child>:last-child{margin-bottom:0}
+@media (min-width:640px){.sb>.two:last-child>:nth-last-child(2){margin-bottom:0}}
+/* save bar only after a change */
+.savebar{transform:translateY(110%);transition:transform .28s cubic-bezier(.2,.8,.2,1);box-shadow:0 -12px 30px -18px rgba(0,0,0,.45)}
+.savebar.show{transform:none}
+.savebar .st{color:var(--copper);font-weight:600}
+.savebar .st:empty{display:none}
+.savebar .st::before{background:var(--copper)}
+.savebar .btn{min-height:44px}
+
+.sec.notes{background:var(--warn);border-color:var(--warnb);padding:0}
+.sec.notes .sh h2{font:700 .98rem var(--sans);color:var(--warnt)}
+.sec.notes .sh small{color:var(--warnt);opacity:.8}
+.sec.notes .sx{background:color-mix(in srgb,var(--warnt) 14%,transparent);color:var(--warnt)}
+.sec.notes[open]>summary{border-bottom-color:var(--warnb)}
+.sec.notes .sb{padding:.3rem 1rem .9rem}
+.sec.notes>summary:active{background:color-mix(in srgb,var(--warnt) 8%,transparent)}
