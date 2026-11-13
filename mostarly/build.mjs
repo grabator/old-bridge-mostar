@@ -46,7 +46,9 @@ fs.writeFileSync(path.join(DIST, '_headers'), `/*\n  X-Content-Type-Options: nos
 
 /* ---------- content for the Worker: the starting tours and reviews, and the asset versions ---------- */
 fs.mkdirSync(path.join(ROOT, '.gen'), { recursive: true });
-fs.writeFileSync(path.join(ROOT, '.gen/content.json'), JSON.stringify({ S, TOURS, PL, PHOTOS, V, DRAFT, BASE }));
+// BUILD changes with every build: after a deploy the Worker sees a new value and renders the pages in D1 again
+const BUILD = Date.now().toString(36) + '-' + V.css + V.js;
+fs.writeFileSync(path.join(ROOT, '.gen/content.json'), JSON.stringify({ S, TOURS, PL, PHOTOS, V, DRAFT, BASE, BUILD }));
 
 console.log(`Mostarly: ${pages.length} pages${DRAFT ? ' (draft)' : ''} -> dist/`);
 if (problems.length) { console.log(problems.join('\n')); process.exitCode = 1; }

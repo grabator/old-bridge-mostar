@@ -11,6 +11,7 @@ import { adminEmail } from './server/auth.js';
 import { adminApi, serveMedia } from './server/api.js';
 import { icsFeed, publicBlocked, eveningReminder } from './server/extra.js';
 import { payApi } from './server/pay.js';
+import { publish, BASE_CONTENT } from './server/store.js';
 
 const SEC = { 'x-content-type-options': 'nosniff', 'referrer-policy': 'strict-origin-when-cross-origin', 'permissions-policy': 'camera=(), microphone=(), geolocation=()' };
 
@@ -22,14 +23,28 @@ function denied() {
 <body style="font-family:system-ui,sans-serif;background:#272838;color:#f6f0e6;display:grid;place-items:center;min-height:100vh;margin:0;padding:1.5rem;text-align:center"><div><h1 style="font-weight:400">Mostarly admin</h1><p>Za ulaz je potrebna prijava sa odobrenim emailom.</p><p style="opacity:.7;font-size:.9rem">Ako se prijava ne pojavi, Cloudflare Access još nije podešen za /admin.</p><p><a href="/" style="color:#48e5c2">Nazad na sajt</a></p></div></body></html>`, { status: 403, headers: Object.assign({ 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' }, SEC) });
 }
 
-// a page from D1, or null when the admin has never published
+// after a new deploy (new code, new pages such as /pay/) the pages in D1 are rendered again once,
+// so the site never shows an old version or a 404 for a page that is new in the code
+let freshBuild = null;
+async function ensureFresh(env) {
+  const build = BASE_CONTENT.BUILD || '';
+  if (!build || freshBuild === build) return;
+  const r = await env.DB.prepare("SELECT value FROM meta WHERE key = 'build'").first();
+  if (!r || r.value !== build) {
+    const seeded = await env.DB.prepare("SELECT value FROM meta WHERE key = 'seeded'").first();
+    if (seeded) await publish(env); // only when the admin is in use; otherwise the built files are served
+    await env.DB.prepare("INSERT OR REPLACE INTO meta (key, value) VALUES ('build', ?)").bind(build).run();
+  }
+  freshBuild = build;
+}
+
+// a page from D1, or null: then the built files (dist/) answer, including their 404 page
 async function page(env, path) {
   if (!env.DB) return null;
   let row;
+  try { await ensureFresh(env); } catch (e) { console.error('refresh after deploy', e); }
   try { row = await env.DB.prepare('SELECT body, type FROM pages WHERE url = ?').bind(path).first(); } catch { return null; }
   if (row) return new Response(row.body, { headers: Object.assign({ 'content-type': row.type, 'cache-control': 'public, max-age=0, must-revalidate' }, SEC, path === '/pay/' ? PAYSEC : {}) });
-  const nf = await env.DB.prepare("SELECT body FROM pages WHERE url = '/404'").first();
-  if (nf && path !== '/sitemap.xml' && path !== '/robots.txt') return new Response(nf.body, { status: 404, headers: Object.assign({ 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' }, SEC) });
   return null;
 }
 
