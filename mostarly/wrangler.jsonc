@@ -23,5 +23,7 @@
     "ACCESS_AUD": "02faa1f931da7bd4746846d8183e51f195aac883053171081067b1e88ccbbdae",
     "ADMIN_EMAILS": ""
   },
+  // every evening at 17:00 UTC (18:00 or 19:00 in Mostar): a phone notification with tomorrow's tours
+  "triggers": { "crons": ["0 17 * * *"] },
   "observability": { "enabled": true }
 }

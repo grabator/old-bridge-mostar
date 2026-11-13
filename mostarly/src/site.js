@@ -277,6 +277,9 @@
     sel.addEventListener('change', sync); sync();
   });
   var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  // days Mirna marked as busy in the admin cannot be chosen
+  var BUSY = {};
+  if ($('[data-dp]') && window.fetch) fetch('/api/blocked').then(function (r) { return r.ok ? r.json() : { dates: [] }; }).then(function (j) { (j.dates || []).forEach(function (d) { BUSY[d] = 1; }); $$('[data-dp]').forEach(function (dp) { if (dp._render) dp._render(); }); }).catch(function () {});
   $$('[data-dp]').forEach(function (dp) {
     var inp = $('input', dp), btn = $('.dd-btn', dp), pop = $('.dp-pop', dp), label = $('span', btn);
     var today = new Date(); today.setHours(0, 0, 0, 0);
@@ -289,12 +292,13 @@
       ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].forEach(function (d) { h += '<span class="dp-dow">' + d + '</span>'; });
       for (var i = 0; i < first; i++) h += '<span></span>';
       for (var d = 1; d <= days; d++) {
-        var dt = new Date(y, m, d), v = iso(dt), past = dt < today;
-        h += '<button type="button" class="dp-day' + (v === iso(today) ? ' today' : '') + (v === inp.value ? ' on' : '') + '" data-d="' + v + '"' + (past ? ' disabled' : '') + ' aria-label="' + d + ' ' + MONTHS[m] + ' ' + y + '">' + d + '</button>';
+        var dt = new Date(y, m, d), v = iso(dt), past = dt < today, busy = !past && BUSY[v];
+        h += '<button type="button" class="dp-day' + (v === iso(today) ? ' today' : '') + (v === inp.value ? ' on' : '') + (busy ? ' busy' : '') + '" data-d="' + v + '"' + (past || busy ? ' disabled' : '') + ' aria-label="' + d + ' ' + MONTHS[m] + ' ' + y + (busy ? ', fully booked' : '') + '"' + (busy ? ' title="Fully booked"' : '') + '>' + d + '</button>';
       }
       h += '</div><div class="dp-foot"><button type="button" class="dp-flex">Flexible / not sure</button></div>';
       pop.innerHTML = h;
     }
+    dp._render = function () { if (!pop.hidden) render(); };
     function set(v) {
       inp.value = v; dp.classList.toggle('has', !!v);
       label.textContent = v ? new Date(v + 'T12:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' }) : 'Choose a date';

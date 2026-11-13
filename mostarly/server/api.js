@@ -1,5 +1,6 @@
 // /api/admin/* : what the admin page calls. Every change is saved and the site is published right away.
-import { seed, loadAll, publish, cleanTour, cleanReview, slugify, BASE_CONTENT as C } from './store.js';
+import { seed, loadAll, publish, cleanTour, cleanReview, slugify, siteContent, BASE_CONTENT as C } from './store.js';
+import { extraApi } from './extra.js';
 
 const J = (o, status = 200) => new Response(JSON.stringify(o), { status, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' } });
 const now = () => new Date().toISOString().replace('T', ' ').slice(0, 19);
@@ -22,8 +23,12 @@ export async function adminApi(request, env, email) {
     const { tours, reviews } = await loadAll(env);
     const media = (await env.DB.prepare('SELECT key, name, type, size, w, h, created_at FROM media ORDER BY created_at DESC LIMIT 500').all()).results;
     const pub = await env.DB.prepare("SELECT value FROM meta WHERE key = 'published'").first();
-    return J({ email, tours, reviews, media, publishedAt: pub && pub.value, categories: C.S.categories, tickets: C.S.tickets, bundledImages: imagesFromContent(), mediaReady: !!env.MEDIA, siteUrl: C.BASE });
+    const site = await siteContent(env);
+    return J({ email, tours, reviews, media, publishedAt: pub && pub.value, categories: site.S.categories, tickets: site.S.tickets, contact: site.S.contact, bundledImages: imagesFromContent(), mediaReady: !!env.MEDIA, siteUrl: C.BASE });
   }
+
+  const ex = await extraApi(p, m, request, env, url);
+  if (ex) return ex;
 
   /* ----- tours ----- */
   if (p === '/tours' && m === 'POST') {
@@ -192,7 +197,7 @@ function cleanBooking(b) {
       adults: int(d.adults), children: int(d.children), ages: s(d.ages, 60),
       tickets: (Array.isArray(d.tickets) ? d.tickets : []).map((t) => s(t, 80)).filter(Boolean).slice(0, 10),
       price: num(d.price), paid: !!d.paid, meeting: s(d.meeting, 200), lang: s(d.lang, 40),
-      message: s(d.message, 3000), note: s(d.note, 3000)
+      message: s(d.message, 3000), note: s(d.note, 3000), reviewAsked: !!d.reviewAsked
     }
   };
 }

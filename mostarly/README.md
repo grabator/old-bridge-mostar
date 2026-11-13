@@ -62,15 +62,19 @@ Add the GA4 measurement ID to `analytics.ga4` in `content/site.json`. A cookie n
 
 ## Admin (Mirna edits without a developer)
 
-`/admin` is Mirna's own admin, in Bosnian and made for a phone. Phase 1:
+`/admin` is Mirna's own admin, in Bosnian and made for a phone (light and dark theme, installable as an app):
 
 - **Tours:** add, edit, hide, delete and reorder; name, texts, category, price (per person, per group or on request, "from", confirmed), details, itinerary with optional stops, included / not included, good to know, entrance tickets for the enquiry form, featured on the home page, Google title and description; the yellow notes can be marked as done.
 - **Photos:** main photo and gallery per tour. Photos are made smaller in the browser (max 2000 px, WebP) before upload, stored in R2 and served at `/media/...`.
 - **Reviews:** add, edit, hide, reorder; name, country, date, rating, title, text, source.
+- **Planer:** every enquiry from the site (email and WhatsApp) is saved; Mirna adds the ones from Instagram, phone or walk-ins herself. Status (new, replied, confirmed, done, cancelled), calendar, day plan, reminders (tomorrow's tours, tours to mark as done, review requests) and messages from templates sent on WhatsApp, by email or copied for Instagram.
+- **Više:** business overview (enquiries, tours, guests, money per month, sources, top tours), guests list with CSV export for Excel, message templates (EN/DE and more, with `{ime}`, `{tura}`, `{datum}`... filled in), busy days (the site's date picker does not offer them, `GET /api/blocked`), site texts (contact, about, why, services, FAQ, on request, ticket prices, category intros, the draft switch).
+- **Calendar feed:** a private link `/cal/<token>.ics` with confirmed tours, for Google Calendar or the iPhone calendar. A new link can be made at any time (the old one stops working).
+- **Phone notifications:** Web Push for every new enquiry and, every evening (cron in `wrangler.jsonc`, 17:00 UTC), for tomorrow's tours. The VAPID keys are created by the Worker and kept in D1, nothing to set up. On an iPhone it works when the admin is added to the home screen.
 
 Every save is published at once: the Worker renders the whole site with the same code as the build (`src/render.mjs`) and stores the pages in D1. Until the first save, the site is served from the built files. The first time the admin opens, the tours from `content/tours/` are copied into the database; after that the database is the source for tours and reviews (the content files are still used for everything else).
 
-How it is built: `worker.js` (routing), `server/auth.js` (sign-in check), `server/api.js` (admin API, photos), `server/store.js` (database, publishing), `src/admin/` (the admin page), `migrations/` (tables).
+How it is built: `worker.js` (routing), `server/auth.js` (sign-in check), `server/api.js` (admin API, photos), `server/store.js` (database, publishing, site texts), `server/extra.js` (templates, busy days, calendar feed, push), `src/admin/` (the admin page), `migrations/` (tables).
 
 ### Setup (once)
 
@@ -106,6 +110,7 @@ From a computer (once: `npx wrangler login` and `node scripts/cf-setup.mjs`, see
 ```
 cd mostarly
 node build.mjs
+npx wrangler d1 migrations apply mostarly --remote   # only when migrations/ has a new file
 npx wrangler deploy
 ```
 

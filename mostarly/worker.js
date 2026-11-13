@@ -3,10 +3,13 @@
 //    the files built into dist/ (static assets)
 //  - /admin and /api/admin: Mirna's admin, behind Cloudflare Access (see server/auth.js)
 //  - /media/*: photos uploaded in the admin (R2)
-//  - POST /api/enquiry: the enquiry form (email through Resend)
+//  - POST /api/enquiry: the enquiry form (saved in the planner, phone notification, email through Resend)
+//  - GET /api/blocked: busy days for the date picker; GET /cal/<token>.ics: private calendar feed
+//  - every evening (cron): a phone notification with tomorrow's tours
 import { onRequestPost as enquiry } from './functions/api/enquiry.js';
 import { adminEmail } from './server/auth.js';
 import { adminApi, serveMedia } from './server/api.js';
+import { icsFeed, publicBlocked, eveningReminder } from './server/extra.js';
 
 const SEC = { 'x-content-type-options': 'nosniff', 'referrer-policy': 'strict-origin-when-cross-origin', 'permissions-policy': 'camera=(), microphone=(), geolocation=()' };
 
@@ -27,15 +30,17 @@ async function page(env, path) {
 }
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const path = url.pathname;
     const method = request.method;
     try {
       if (path === '/api/enquiry') {
-        if (method === 'POST') return enquiry({ request, env });
+        if (method === 'POST') return enquiry({ request, env, ctx });
         return new Response('Method not allowed', { status: 405, headers: { allow: 'POST' } });
       }
+      if (path === '/api/blocked' && method === 'GET') return publicBlocked(env);
+      if (path.startsWith('/cal/') && path.endsWith('.ics') && method === 'GET') return icsFeed(env, path.slice(5, -4));
       if (path.startsWith('/media/')) return (method === 'GET' || method === 'HEAD') ? serveMedia(request, env) : new Response('Method not allowed', { status: 405 });
       if (path === '/admin' || path.startsWith('/admin/') || path.startsWith('/api/admin')) {
         const email = await adminEmail(request, env);
@@ -58,5 +63,8 @@ export default {
       console.error(e);
       return new Response('Something went wrong', { status: 500 });
     }
+  },
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(eveningReminder(env).catch((e) => console.error('reminder', e)));
   }
 };

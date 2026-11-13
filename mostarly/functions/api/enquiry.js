@@ -3,10 +3,12 @@
 //    (channel: 'whatsapp'), so nothing is lost. At most 6 enquiries per visitor per 10 minutes.
 // 2. For email enquiries, sends them to the inbox through Resend (RESEND_API_KEY, MAIL_TO, MAIL_FROM).
 //    Without RESEND_API_KEY it answers 501 and the site opens the visitor's email app instead.
+import { notifyNew } from '../../server/extra.js';
+
 const clean = (v, n = 500) => String(v ?? '').replace(/[\u0000-\u001f\u007f]/g, ' ').trim().slice(0, n);
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-export async function onRequestPost({ request, env }) {
+export async function onRequestPost({ request, env, ctx }) {
   const json = (o, status = 200) => new Response(JSON.stringify(o), { status, headers: { 'content-type': 'application/json' } });
   let d;
   try { d = await request.json(); } catch { return json({ ok: false, error: 'bad request' }, 400); }
@@ -39,6 +41,9 @@ export async function onRequestPost({ request, env }) {
       const id = crypto.randomUUID().replace(/-/g, '').slice(0, 12);
       await env.DB.prepare("INSERT INTO bookings (id, status, source, date, data, ip_hash, created_at, updated_at) VALUES (?, 'new', ?, ?, ?, ?, datetime('now'), datetime('now'))").bind(id, 'site-' + channel, date, JSON.stringify(data), ipHash).run();
       saved = true;
+      // a notification on Mirna's phone (does not slow down the answer to the visitor)
+      const n = notifyNew(env, data, date).catch((e) => console.error('notify', e));
+      if (ctx && ctx.waitUntil) ctx.waitUntil(n);
     } catch (e) { console.error('enquiry save', e); }
   }
   if (channel === 'whatsapp') return json({ ok: true, saved });

@@ -39,9 +39,10 @@ fs.cpSync(path.join(ROOT, 'src/img'), path.join(DIST, 'img'), { recursive: true 
 fs.cpSync(path.join(ROOT, 'src/geo'), path.join(DIST, 'geo'), { recursive: true });
 fs.writeFileSync(path.join(DIST, 'maps.js'), MAPJS);
 fs.cpSync(path.join(ROOT, 'src/admin'), path.join(DIST, 'admin'), { recursive: true });
+fs.copyFileSync(path.join(ROOT, 'src/admin.webmanifest'), path.join(DIST, 'admin.webmanifest')); // outside /admin so it loads without the sign-in cookie
 fs.writeFileSync(path.join(DIST, 'sitemap.xml'), sitemap);
 fs.writeFileSync(path.join(DIST, 'robots.txt'), robots);
-fs.writeFileSync(path.join(DIST, '_headers'), `/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n  Permissions-Policy: camera=(), microphone=(), geolocation=()\n/img/*\n  Cache-Control: public, max-age=2592000\n/site.*\n  Cache-Control: public, max-age=31536000, immutable\n/admin/*\n  Cache-Control: no-store\n  X-Robots-Tag: noindex\n`);
+fs.writeFileSync(path.join(DIST, '_headers'), `/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n  Permissions-Policy: camera=(), microphone=(), geolocation=()\n/img/*\n  Cache-Control: public, max-age=2592000\n/site.*\n  Cache-Control: public, max-age=31536000, immutable\n/admin/*\n  Cache-Control: no-store\n  X-Robots-Tag: noindex\n/admin.webmanifest\n  Content-Type: application/manifest+json\n  Cache-Control: public, max-age=3600\n`);
 
 /* ---------- content for the Worker: the starting tours and reviews, and the asset versions ---------- */
 fs.mkdirSync(path.join(ROOT, '.gen'), { recursive: true });
