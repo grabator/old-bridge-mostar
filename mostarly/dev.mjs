@@ -10,7 +10,7 @@ const DIST = path.join(ROOT, 'dist');
 const PORT = Number(process.argv[2]) || 8090;
 execFileSync(process.execPath, [path.join(ROOT, 'build.mjs')], { stdio: 'inherit' });
 
-const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.svg': 'image/svg+xml', '.jpg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp', '.xml': 'application/xml', '.txt': 'text/plain', '.yml': 'text/yaml' };
+const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.svg': 'image/svg+xml', '.jpg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp', '.xml': 'application/xml', '.txt': 'text/plain', '.yml': 'text/yaml', '.pdf': 'application/pdf' };
 
 http.createServer((req, res) => {
   let p = decodeURIComponent(new URL(req.url, 'http://x').pathname);

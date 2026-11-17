@@ -4,9 +4,11 @@
 //  - /admin and /api/admin: Mirna's admin, behind Cloudflare Access (see server/auth.js)
 //  - /media/*: photos uploaded in the admin (R2)
 //  - POST /api/enquiry: the enquiry form (saved in the planner, phone notification, email through Resend)
+//  - POST /api/subscribe, /api/unsubscribe: the free guide and the mailing list (functions/api/subscribe.js)
 //  - GET /api/blocked: busy days for the date picker; GET /cal/<token>.ics: private calendar feed
 //  - every evening (cron): a phone notification with tomorrow's tours
 import { onRequestPost as enquiry } from './functions/api/enquiry.js';
+import { subscribe, unsubscribe } from './functions/api/subscribe.js';
 import { adminEmail } from './server/auth.js';
 import { adminApi, serveMedia } from './server/api.js';
 import { icsFeed, publicBlocked, eveningReminder } from './server/extra.js';
@@ -58,6 +60,11 @@ export default {
         if (method === 'POST') return enquiry({ request, env, ctx });
         return new Response('Method not allowed', { status: 405, headers: { allow: 'POST' } });
       }
+      if (path === '/api/subscribe') {
+        if (method === 'POST') return subscribe({ request, env, ctx, site: BASE_CONTENT.S });
+        return new Response('Method not allowed', { status: 405, headers: { allow: 'POST' } });
+      }
+      if (path === '/api/unsubscribe' && (method === 'GET' || method === 'POST')) return unsubscribe(request, env);
       if (path === '/api/blocked' && method === 'GET') return publicBlocked(env);
       if (path.startsWith('/api/pay/')) return payApi(request, env, path);
       if (path.startsWith('/cal/') && path.endsWith('.ics') && method === 'GET') return icsFeed(env, path.slice(5, -4));

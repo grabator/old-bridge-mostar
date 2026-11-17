@@ -37,12 +37,14 @@ fs.writeFileSync(path.join(DIST, 'site.css'), CSS);
 fs.writeFileSync(path.join(DIST, 'site.js'), JS);
 fs.cpSync(path.join(ROOT, 'src/img'), path.join(DIST, 'img'), { recursive: true });
 fs.cpSync(path.join(ROOT, 'src/geo'), path.join(DIST, 'geo'), { recursive: true });
+// the free guide as a PDF (made by scripts/guide-pdf.mjs)
+if (fs.existsSync(path.join(ROOT, 'src/guide'))) fs.cpSync(path.join(ROOT, 'src/guide'), path.join(DIST, 'guide'), { recursive: true });
 fs.writeFileSync(path.join(DIST, 'maps.js'), MAPJS);
 fs.cpSync(path.join(ROOT, 'src/admin'), path.join(DIST, 'admin'), { recursive: true });
 fs.copyFileSync(path.join(ROOT, 'src/admin.webmanifest'), path.join(DIST, 'admin.webmanifest')); // outside /admin so it loads without the sign-in cookie
 fs.writeFileSync(path.join(DIST, 'sitemap.xml'), sitemap);
 fs.writeFileSync(path.join(DIST, 'robots.txt'), robots);
-fs.writeFileSync(path.join(DIST, '_headers'), `/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n  Permissions-Policy: camera=(), microphone=(), geolocation=()\n/img/*\n  Cache-Control: public, max-age=2592000\n/site.*\n  Cache-Control: public, max-age=31536000, immutable\n/admin/*\n  Cache-Control: no-store\n  X-Robots-Tag: noindex\n/pay/*\n  Cache-Control: no-store\n  X-Frame-Options: DENY\n  Content-Security-Policy: frame-ancestors 'none'; form-action 'self' https://ipg.monri.com https://ipgtest.monri.com; base-uri 'self'; object-src 'none'\n/admin.webmanifest\n  Content-Type: application/manifest+json\n  Cache-Control: public, max-age=3600\n`);
+fs.writeFileSync(path.join(DIST, '_headers'), `/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n  Permissions-Policy: camera=(), microphone=(), geolocation=()\n/img/*\n  Cache-Control: public, max-age=2592000\n/guide/*.pdf\n  Cache-Control: public, max-age=3600\n  X-Robots-Tag: noindex\n/site.*\n  Cache-Control: public, max-age=31536000, immutable\n/admin/*\n  Cache-Control: no-store\n  X-Robots-Tag: noindex\n/pay/*\n  Cache-Control: no-store\n  X-Frame-Options: DENY\n  Content-Security-Policy: frame-ancestors 'none'; form-action 'self' https://ipg.monri.com https://ipgtest.monri.com; base-uri 'self'; object-src 'none'\n/admin.webmanifest\n  Content-Type: application/manifest+json\n  Cache-Control: public, max-age=3600\n`);
 
 /* ---------- content for the Worker: the starting tours and reviews, and the asset versions ---------- */
 fs.mkdirSync(path.join(ROOT, '.gen'), { recursive: true });

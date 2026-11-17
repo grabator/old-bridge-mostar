@@ -625,6 +625,7 @@
     var tiles = [
       ['pregled', 'chart', 'Pregled posla', 'Upiti, ture, gosti i zarada po mjesecima'],
       ['gosti', 'users', 'Gosti', g + (g === 1 ? ' gost' : ' gostiju') + ' · izvoz u Excel'],
+      ['pretplatnici', 'mail', 'Pretplatnici', 'Prijave za besplatni vodič · mailing lista'],
       ['sabloni', 'chat', 'Šabloni poruka', (X.templates || []).length + ' poruka za WhatsApp i email'],
       ['zauzeto', 'block', 'Zauzeti dani', up ? up + (up === 1 ? ' dan' : ' dana') + ' koje gosti ne mogu izabrati' : 'Dani kad ne radite'],
       ['tekstovi', 'text', 'Tekstovi sajta', 'Kontakt, o meni, česta pitanja, ulaznice'],
@@ -707,6 +708,44 @@
     var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' })); a.download = 'mostarly-upiti-' + todayISO() + '.csv';
     document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
     toast('Preuzeto: ' + B.length + (B.length === 1 ? ' upit' : ' upita'));
+  }
+
+  /* ---------- pretplatnici: besplatni vodič / mailing lista ---------- */
+  var SQ = '';
+  function subsView() {
+    shell('vise', ehead('#/vise', 'Nazad na Više', 'Pretplatnici') + '<p class="sub esub">Ljudi koji su na sajtu tražili besplatni vodič i pristali da primaju savjete mailom. Ovo je lista za budući newsletter.</p><div id="subs"><p class="sub">Učitavam…</p></div>');
+    api('GET', '/subscribers').then(function (j) {
+      var all = j.subscribers || [];
+      if (j.missingTable) { $('#subs').innerHTML = '<div class="pempty"><b>Lista još nije uključena</b><span>Baza nema tabelu za pretplatnike. Nakon sljedećeg deploya (migracija 0006) ovdje se pojavljuju prijave.</span></div>'; return; }
+      var active = all.filter(function (x) { return !x.unsubscribed_at; });
+      var week = active.filter(function (x) { return x.created_at >= new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10); }).length;
+      $('#subs').innerHTML = '<div class="kpis k3"><div class="kpi"><b>' + active.length + '</b><span>aktivnih</span></div><div class="kpi"><b>' + week + '</b><span>zadnjih 7 dana</span></div><div class="kpi"><b>' + (all.length - active.length) + '</b><span>odjavljenih</span></div></div>' +
+        (j.mailReady ? '' : '<p class="help">Slanje mailova (Resend) još nije podešeno: gosti vodič dobiju odmah na sajtu, a mail sa vodičem kreće kad se podesi.</p>') +
+        '<div class="row gtools"><div class="psearch">' + IC.search + '<input id="sq" type="search" placeholder="Traži email ili ime…" value="' + esc(SQ) + '" aria-label="Pretraga pretplatnika"></div><button type="button" class="btn line sm" data-scsv>' + IC.download + 'Excel</button></div><div class="glist" id="slist"></div>';
+      function src(x) { var s = String(x.source || ''); return s === 'guide' ? 'stranica vodiča' : s === 'home' ? 'početna' : s === 'mostar-herzegovina' ? 'Mostar & Herzegovina' : s.indexOf('tour/') === 0 ? 'tura: ' + s.slice(5) : s; }
+      function draw() {
+        var q = SQ.trim().toLowerCase(), l = all.filter(function (x) { return !q || (x.email + ' ' + (x.name || '')).toLowerCase().indexOf(q) > -1; });
+        $('#slist').innerHTML = l.length ? l.map(function (x) {
+          return '<div class="guest' + (x.unsubscribed_at ? ' off' : '') + '"><span class="av">' + esc(String(x.name || x.email).charAt(0).toUpperCase()) + '</span><span class="gb"><b>' + esc(x.name || x.email) + (x.unsubscribed_at ? ' <span class="badge">Odjavljen</span>' : '') + '</b><small>' + esc((x.name ? x.email + ' · ' : '') + src(x) + ' · ' + ago(x.created_at)) + '</small></span><button type="button" class="ibtn" data-sdel="' + esc(x.id) + '" aria-label="Obriši" title="Obriši">' + IC.trash + '</button></div>';
+        }).join('') : '<div class="pempty"><b>' + (q ? 'Nema takvog pretplatnika' : 'Još nema prijava') + '</b><span>Prijave stižu sa stranice /guide/ i okvira na početnoj, turama i stranici Mostar & Herzegovina.</span></div>';
+      }
+      draw();
+      $('#sq').addEventListener('input', function (e) { SQ = e.target.value; draw(); });
+      $('#slist').addEventListener('click', function (e) {
+        var b = e.target.closest('[data-sdel]'); if (!b) return;
+        var x = all.filter(function (y) { return y.id === b.getAttribute('data-sdel'); })[0]; if (!x) return;
+        if (!confirm('Obrisati ' + x.email + ' sa liste? Ovo se ne može vratiti.')) return;
+        api('DELETE', '/subscribers/' + x.id).then(function () { all = all.filter(function (y) { return y.id !== x.id; }); toast('Obrisano'); subsView(); }).catch(function (er) { toast(er.message, true); });
+      });
+      $('[data-scsv]').addEventListener('click', function () {
+        var q = function (v) { v = v == null ? '' : String(v); return /[";\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+        var rows = active.map(function (x) { return [x.email, x.name, src(x), x.created_at].map(q).join(';'); });
+        var csv = '﻿' + ['Email;Ime;Izvor;Prijavljen'].concat(rows).join('\r\n');
+        var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' })); a.download = 'mostarly-pretplatnici-' + todayISO() + '.csv';
+        document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+        toast('Preuzeto: ' + active.length + ' aktivnih');
+      });
+    }).catch(function (er) { $('#subs').innerHTML = '<p class="sub">' + esc(er.message) + '</p>'; });
   }
 
   /* ---------- šabloni poruka ---------- */
@@ -967,7 +1006,7 @@
     if (parts[0] === 'recenzije' && parts[1]) return reviewEditor(decodeURIComponent(parts[1]));
     if (parts[0] === 'recenzije') return reviewsList();
     if (parts[0] === 'slike') return mediaList();
-    if (parts[0] === 'vise') { var V = { pregled: statsView, gosti: guestsView, sabloni: templatesView, zauzeto: blockedView, tekstovi: siteView, postavke: settingsView }; return (V[parts[1]] || viseHome)(); }
+    if (parts[0] === 'vise') { var V = { pregled: statsView, gosti: guestsView, pretplatnici: subsView, sabloni: templatesView, zauzeto: blockedView, tekstovi: siteView, postavke: settingsView }; return (V[parts[1]] || viseHome)(); }
     if (parts[0] === 'ture') return toursList();
     return plannerHome();
   }

@@ -537,3 +537,9 @@ details.adv[open]>summary{margin-bottom:.9rem}
 .mbox b{color:var(--strong)}
 .mbox b.ok{color:var(--okt)}
 .mbox .rest b{font-size:1.05rem}
+
+/* pretplatnici (besplatni vodič) */
+.kpis.k3{grid-template-columns:repeat(3,minmax(0,1fr))}.kpis.k3 .kpi{cursor:default}
+.glist .guest .ibtn{margin-left:auto;flex:none;width:40px;height:40px;display:grid;place-items:center;border-radius:12px;border:1px solid var(--line);background:none;color:var(--ink2);cursor:pointer}
+.glist .guest .ibtn svg{width:18px;height:18px}
+.glist .guest.off{opacity:.55}

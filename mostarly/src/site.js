@@ -532,6 +532,32 @@
 
   // pre-select a tour from ?tour= on the contact page
   (function () { var p = new URLSearchParams(location.search).get('tour'); var s = $('[data-enq] [name=tour]'); if (p && s && tourBy(p)) { s.value = p; s.dispatchEvent(new Event('change')); } })();
+  /* ---------- free guide / mailing list: the guide opens right away, and is also emailed when Resend is set up ---------- */
+  $$('[data-sub]').forEach(function (wrap) {
+    var f = $('form', wrap), err = $('.formerr', f), btn = $('[type=submit]', f), btnHtml = btn.innerHTML;
+    f.addEventListener('submit', function (e) {
+      e.preventDefault(); err.textContent = '';
+      var email = f.email.value.trim(), name = f.name.value.trim();
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(email)) { err.textContent = 'Please enter a valid email address.'; f.email.focus(); return; }
+      if (!f.consent.checked) { err.textContent = 'Please tick the box so we may send you the guide.'; return; }
+      if (f.website.value) return; // honeypot
+      btn.disabled = true; btn.textContent = 'Sending…';
+      fetch('/api/subscribe', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ email: email, name: name, consent: true, source: wrap.getAttribute('data-source') || 'guide', website: f.website.value }) })
+        .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok) { var x = new Error(j.error || r.status); x.status = r.status; throw x; } return j; }); })
+        .then(function (j) {
+          track('guide_signup', { source: wrap.getAttribute('data-source') || 'guide' });
+          $('.sub-how', wrap).textContent = j.mailed ? 'We have also sent it to ' + email + '. Open it now, or save the PDF on your phone.' : 'Open it now, or save the PDF on your phone.';
+          wrap.classList.add('sent');
+          try { localStorage.setItem('mly-guide', '1'); } catch (x) {}
+        })
+        .catch(function (x) {
+          if (x.status === 429) err.textContent = 'Too many attempts. Please try again in a few minutes.';
+          else if (x.status === 422) err.textContent = 'Please check your email address.';
+          else wrap.classList.add('sent'); // the server is not reachable (e.g. a local preview): still give the guide
+        })
+        .then(function () { btn.disabled = false; btn.innerHTML = btnHtml; });
+    });
+  });
   /* ---------- /pay/: online payment (Monri). The server signs the amount; card details only on Monri's page. ---------- */
   (function () {
     var box = $('[data-pay]'); if (!box) return;

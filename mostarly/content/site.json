@@ -216,5 +216,91 @@
   "policy": {
     "depositPercent": 50,
     "freeCancelHours": 48
+  },
+  "guide": {
+    "title": "Mostar & Herzegovina, the local way",
+    "subtitle": "12 tips from Mirna, a licensed local guide",
+    "pdf": "/guide/mostarly-mostar-herzegovina-guide.pdf",
+    "intro": "I was born and raised in Mostar, and these are the things I tell my friends before they visit: when to see the Old Bridge without the crowds, what to eat, how to plan a day around Herzegovina and the small mistakes most visitors make. Save it on your phone and enjoy Mostar like a local.",
+    "notes": [
+      "Draft written from facts already on the site and well-known basics. Please read every tip, change anything that is not how you would say it, and add your own insider tips (places, times, small secrets). Those make the guide worth an email address."
+    ],
+    "sections": [
+      {
+        "title": "Before you arrive",
+        "tips": [
+          {
+            "t": "Stay one night if you can",
+            "d": "Many visitors come for a few hours from the Croatian coast, arriving late in the morning and leaving in the afternoon. If you stay a night, you see the Old Town in the quiet of the early morning and in the evening, when the bridge is lit."
+          },
+          {
+            "t": "Carry some cash in convertible marks (KM)",
+            "d": "The local currency is the convertible mark (KM, BAM), fixed at 1 EUR = 1.95583 KM. Euros are often accepted in tourist places, but change usually comes back in KM, and small cafés, market stalls and parking may only take cash.",
+            "note": "Check: where cards work in the Old Town, and your advice on ATMs."
+          },
+          {
+            "t": "Plan around the summer heat",
+            "d": "July and August in Mostar are very hot, often close to 40 °C. Walk the Old Town early in the morning or in the evening, carry water and keep the middle of the day for a long lunch in the shade."
+          }
+        ]
+      },
+      {
+        "title": "In Mostar",
+        "tips": [
+          {
+            "t": "See Stari Most twice: early and after dark",
+            "d": "Midday is the busiest time on the bridge. Come once at sunrise, when you may have it almost to yourself, and once after dark, when it is lit above the Neretva."
+          },
+          {
+            "t": "Wait for a bridge jump",
+            "d": "Jumping from the Old Bridge is a tradition recorded since 1664. The divers usually collect money from the crowd before they jump, so a jump can take a while. Find a spot on the riverbank or a terrace with a view and be patient.",
+            "note": "Add your favourite spot to watch the jumps."
+          },
+          {
+            "t": "Wear shoes with good grip",
+            "d": "The cobblestones in the Old Town and on the bridge are polished smooth by centuries of footsteps and get slippery, especially when wet. Flip-flops are a bad idea here."
+          },
+          {
+            "t": "Go up for the view",
+            "d": "For the classic photo of the bridge, climb the minaret of the Koski Mehmed-pasha Mosque (entrance fee) or walk down to the riverbank below the bridge.",
+            "note": "Add other viewpoints you like."
+          },
+          {
+            "t": "Kujundžiluk, the coppersmiths’ street",
+            "d": "The old bazaar street is named after the coppersmiths who worked here. Look for workshops where copper is still engraved by hand: a džezva or a small plate makes a real souvenir.",
+            "note": "Workshops or shops you recommend?"
+          }
+        ]
+      },
+      {
+        "title": "Eat and drink",
+        "tips": [
+          {
+            "t": "Order Bosnian coffee the local way",
+            "d": "Bosnian coffee comes in a copper džezva with a small cup, sugar cubes and often a piece of rahat lokum. It is not drunk in a hurry: sit down, take your time and enjoy the ćejf."
+          },
+          {
+            "t": "Taste the classics",
+            "d": "Try ćevapi in somun bread with onion, and burek (in Bosnia, burek always means the one with meat; with cheese it is sirnica). Finish with a glass of Herzegovinian wine: white Žilavka or red Blatina, both local grapes.",
+            "note": "Add the places where you would send a friend."
+          }
+        ]
+      },
+      {
+        "title": "Around Herzegovina",
+        "tips": [
+          {
+            "t": "Combine Blagaj, Počitelj and Kravice in one day",
+            "d": "The Dervish Tekke at the Buna spring in Blagaj, the stone village of Počitelj above the Neretva and the Kravice Waterfalls are all south of Mostar and fit in one day. Start early to enjoy them before the tour buses arrive."
+          },
+          {
+            "t": "Kravice changes with the seasons",
+            "d": "In spring the waterfalls carry the most water and are at their most powerful; in summer the area around the falls is busy, so the morning is the best time. Entrance is paid on site.",
+            "note": "Check: swimming rules this season and your favourite time to go."
+          }
+        ]
+      }
+    ],
+    "outro": "Want to see all of this with someone who grew up here? Mirna plans every tour personally, at your pace."
   }
 }

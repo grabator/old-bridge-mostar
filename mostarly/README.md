@@ -53,11 +53,30 @@ Variables on the Worker:
 
 Spam protection: a hidden honeypot field, and server-side validation.
 
+## Free guide and mailing list
+
+A lead magnet that builds the mailing list for a future newsletter:
+
+- **`/guide/`**: landing page (in the sitemap) with the sign-up form. The same form is a box on the home page, every tour page and Mostar & Herzegovina; the footer links to it.
+- **`/guide/mostar-herzegovina-tips/`**: the guide itself (not indexed), opened right after signing up, with a PDF download.
+- **Content**: `guide` in `content/site.json` (title, intro, chapters with tips, `note` per tip for Mirna, shown only in the draft). After changing the text, run `node scripts/guide-pdf.mjs` to make the PDF again (`src/guide/…pdf`, needs Playwright on your computer).
+- **`POST /api/subscribe`** (`functions/api/subscribe.js`): email, optional first name and a required consent box (the wording is in `src/consent.mjs` and saved with every sign-up). Honeypot, at most 5 sign-ups per visitor per 10 minutes, the same email twice stays one row. Saved in D1 (`subscribers`, migration `0006`), a phone notification for Mirna, and, if Resend is set up, an email with the guide links and an unsubscribe link (also as `List-Unsubscribe` one-click).
+- **`/api/unsubscribe?t=…`**: one click, no login. Signing up again later counts as a new consent.
+- **Admin**: Više > Pretplatnici: active, last 7 days, unsubscribed, search, delete, export to Excel (CSV for Mailchimp, Brevo and similar).
+- **Privacy policy**: has a section on the guide and newsletter (`/privacy/#newsletter`).
+
+To switch it on fully:
+
+1. `npx wrangler d1 migrations apply mostarly --remote` (creates the `subscribers` table), then deploy.
+2. Resend: verify the sending domain and set `RESEND_API_KEY` (secret). The guide email is sent from `NEWS_FROM`, else `MAIL_FROM` (e.g. `Mostarly Guide <hello@mostarlyguide.com>`); replies go to `MAIL_TO`. Without Resend the guide still opens on the site and every sign-up is saved; only the email is not sent.
+3. Mirna reads the guide (yellow notes in the draft), adds her own tips, then `node scripts/guide-pdf.mjs`.
+
 ## Analytics
 
 Add the GA4 measurement ID to `analytics.ga4` in `content/site.json`. A cookie notice then appears and GA4 loads only after the visitor accepts. These events are sent:
 
 - `enquiry_submit`, `enquiry_whatsapp`, `enquiry_mailto` (with the tour)
+- `guide_signup` (with where the form was: guide, home, tour/…, mostar-herzegovina)
 - `whatsapp_click`, `email_click`, `phone_click`
 
 ## Admin (Mirna edits without a developer)

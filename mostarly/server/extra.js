@@ -45,6 +45,18 @@ async function blockedDates(env) { return (await getJSON(env, 'blocked', [])).fi
 
 /* ---------- /api/admin/... extras ---------- */
 export async function extraApi(p, m, request, env, url) {
+  /* ----- the free guide / mailing list ----- */
+  if (p === '/subscribers' && m === 'GET') {
+    let rows = [];
+    try { rows = (await env.DB.prepare('SELECT id, email, name, source, mailed, created_at, unsubscribed_at FROM subscribers ORDER BY created_at DESC LIMIT 5000').all()).results; }
+    catch (e) { return J({ subscribers: [], missingTable: true }); }
+    return J({ subscribers: rows, mailReady: !!env.RESEND_API_KEY });
+  }
+  const ms = /^\/subscribers\/([a-f0-9]{6,32})$/.exec(p);
+  if (ms && m === 'DELETE') {
+    await env.DB.prepare('DELETE FROM subscribers WHERE id = ?').bind(ms[1]).run();
+    return J({ ok: true });
+  }
   if (p === '/settings' && m === 'GET') {
     const site = await siteContent(env);
     const token = await getMeta(env, 'ical_token');
@@ -237,6 +249,13 @@ export async function notifyNew(env, d, date) {
   const when = date ? (+date.slice(8)) + '. ' + MJESECI[+date.slice(5, 7) - 1] : 'datum fleksibilan';
   const g = (d.adults || 0) + (d.children || 0);
   return pushAll(env, { title: 'Novi upit: ' + (d.name || 'gost'), body: SHORT(TOUR_NAME(d, tours)) + ' · ' + when + (g ? ' · ' + g + (g === 1 ? ' osoba' : ' osobe') : ''), url: '/admin/#/planer', tag: 'enquiry' });
+}
+
+// a new sign-up for the free guide
+export async function notifySub(env, d) {
+  if (!env.DB) return;
+  const n = (await env.DB.prepare('SELECT COUNT(*) AS n FROM subscribers WHERE unsubscribed_at IS NULL').first()) || { n: 0 };
+  return pushAll(env, { title: 'Nova prijava za vodič', body: (d.name ? d.name + ' · ' : '') + d.email + ' · ukupno ' + n.n, url: '/admin/#/vise/pretplatnici', tag: 'subscriber' });
 }
 
 // every evening: tomorrow's tours

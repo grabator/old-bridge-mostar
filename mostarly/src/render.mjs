@@ -1,3 +1,4 @@
+import { CONSENT } from './consent.mjs';
 // Mostarly Guide: every page of the site, built from the content. Pure JavaScript with no file access,
 // so the same code runs in the build (node build.mjs) and in the Worker when Mirna saves in the admin.
 export function render({ S, TOURS, PL, PHOTOS = {}, V, DRAFT, BASE }) {
@@ -142,7 +143,7 @@ function foot() {
   return `<section class="bridge-sign" aria-label="Stari Most">${bridge('signature')}<p>Stari Most · 1566</p></section><footer class="foot"><div class="band" data-band="1" style="--bh:44px" aria-hidden="true"></div><div class="fringe down" aria-hidden="true"></div><div class="wrap">
 <div><img class="flogo" src="/img/logo-light.png" alt="Mostarly Guide" width="196" height="40" loading="lazy"><p>Licensed local guide in Mostar,<br>Bosnia and Herzegovina.</p></div>
 <div><h4>Tours</h4><ul>${S.categories.map((c) => `<li><a href="/tours/#${c.id}">${esc(c.name)}</a></li>`).join('')}</ul></div>
-<div><h4>Plan</h4><ul><li><a href="/pay/">Pay for your tour</a></li><li><a href="/mostar-herzegovina/">Mostar &amp; Herzegovina</a></li><li><a href="/faq/">Practical information</a></li><li><a href="/travel-professionals/">For travel professionals</a></li><li><a href="/about/">About Mirna</a></li></ul></div>
+<div><h4>Plan</h4><ul><li><a href="/guide/">Free Mostar guide</a></li><li><a href="/pay/">Pay for your tour</a></li><li><a href="/mostar-herzegovina/">Mostar &amp; Herzegovina</a></li><li><a href="/faq/">Practical information</a></li><li><a href="/travel-professionals/">For travel professionals</a></li><li><a href="/about/">About Mirna</a></li></ul></div>
 <div><h4>Contact</h4><ul><li><a href="${tel}">${esc(S.contact.phone)}</a></li><li><a href="${wa('Hello Mirna, I would like to ask about a tour in Mostar.')}">WhatsApp</a></li><li><a href="mailto:${S.contact.email}">${S.contact.email}</a></li><li><a href="https://instagram.com/${S.contact.instagram}">Instagram @${S.contact.instagram}</a></li></ul></div>
 <div class="legal">${PAYMARKS}<span>© ${YEAR} Mostarly Guide, Mostar${CO().name ? ` · ${esc(CO().name)}${CO().address ? ', ' + esc(CO().address) : ''}${CO().idNumber ? ' · ID ' + esc(CO().idNumber) : ''}` : ''}</span><span><a href="/privacy/">Privacy</a> · <a href="/terms/">Terms</a> · <a href="/cancellation-policy/">Cancellation policy</a></span></div>
 </div></footer>`;
@@ -204,6 +205,35 @@ function enquiryForm(selected = '') {
 </form>
 <div class="done" role="status" aria-live="polite">${I.check}<h3>Thank you</h3><p class="done-how"></p><p style="margin-top:.6rem"><b>Your tour is not confirmed yet.</b> Mirna will reply personally to confirm availability, the final price and arrangements.</p><p style="margin-top:1rem"><button type="button" class="btn sm line" data-again>Send another enquiry</button></p></div>
 </div>`;
+}
+/* ---------- free guide (mailing list): cover, form, box ---------- */
+const GUIDE = () => S.guide || null;
+const GUIDE_URL = '/guide/mostar-herzegovina-tips/';
+const guidePdf = () => (GUIDE() && GUIDE().pdf) || '/guide/mostarly-mostar-herzegovina-guide.pdf';
+const guideCount = () => (GUIDE() ? GUIDE().sections.reduce((n, s) => n + s.tips.length, 0) : 0);
+function guideCover(cls = '') {
+  const G = GUIDE();
+  return `<div class="gcover ${cls}" aria-hidden="true"><div class="gc-band"></div><img class="gc-logo" src="/img/logo-light.png" alt="" width="120" height="24"><p class="gc-kick">Free guide</p><p class="gc-title">${esc(G.title)}</p>${bridge('gc-bridge')}<p class="gc-sub">${guideCount()} tips from a licensed local guide</p></div>`;
+}
+function subForm(source) {
+  return `<div class="sub-wrap" data-sub data-source="${esc(source)}">
+<form class="form subform" novalidate>
+  <div class="two"><label><span>First name <span class="opt">(optional)</span></span><input name="name" autocomplete="given-name" maxlength="80"></label><label><span>Email</span><input type="email" name="email" autocomplete="email" inputmode="email" required maxlength="160"></label></div>
+  <label class="agree"><input type="checkbox" name="consent" required><span>${esc(CONSENT)} <a href="/privacy/#newsletter">Privacy policy</a></span></label>
+  <div class="hp" aria-hidden="true"><label>Website<input name="website" tabindex="-1" autocomplete="off"></label></div>
+  <p class="formerr" role="alert"></p>
+  <button type="submit" class="btn mint block">Send me the free guide ${I.arrow}</button>
+  <p class="tiny">Free. No spam: a few emails a year with seasonal tips, and you can unsubscribe with one click.</p>
+</form>
+<div class="sub-done" role="status" aria-live="polite">${I.check}<h3>Your guide is ready</h3><p class="sub-how">Open it now, or save the PDF on your phone.</p><p class="sub-acts"><a class="btn mint" href="${GUIDE_URL}" data-glink>Read the guide ${I.arrow}</a><a class="btn line" href="${esc(guidePdf())}" data-gpdf download>Download the PDF</a></p></div>
+</div>`;
+}
+function guideBox(source) {
+  const G = GUIDE(); if (!G) return '';
+  return `<section class="sec gbox-sec"><div class="wrap"><div class="gbox rv">
+  <div class="gbox-cover">${guideCover()}</div>
+  <div class="gbox-body"><p class="eyebrow">${mini}Free guide</p><h2>${esc(G.title.split(',')[0])}, <em>${esc((G.title.split(',')[1] || '').trim())}</em></h2><p class="lead">${esc(G.subtitle)}: the Old Bridge without crowds, what to eat and how to plan a day around Herzegovina.</p>${subForm(source)}</div>
+</div></div></section>`;
 }
 /* A Bosnian coffee set on an engraved copper tray. site.js animates the pour (data-coffee). */
 function coffeeScene() {
@@ -489,6 +519,8 @@ const emit = (url, html) => out.push([url, html]);
   ${reviewsBlock()}
 </div></section>
 
+${guideBox('home')}
+
 <section class="sec"><div class="wrap">
   <p class="eyebrow rv">${mini}Planning your visit?</p><h2 class="rv d1">Before you <em>come</em></h2>
   <div class="tiles">
@@ -557,6 +589,7 @@ for (const t of TOURS) {
 </article>
 <aside class="aside" id="enquire"><div class="enq-card"><p class="eyebrow">${mini}Enquire</p><h2>${esc(t.name.split(' – ')[0])}</h2><p>${esc(p.text)} · ${esc(t.duration)}</p>${enquiryForm(t.slug)}</div></aside>
 </div>
+${guideBox('tour/' + t.slug)}
 <section class="sec related"><div class="wrap"><div class="head-row"><h2 class="rv">You may also like</h2><a class="btn line sm" href="/tours/">All tours ${I.arrow}</a></div><div class="cards three">${related.map(card).join('')}</div></div></section>`;
   const ld = [crumbLd(c), Object.assign({ '@context': 'https://schema.org', '@type': 'TouristTrip', name: t.name, description: t.description, url: BASE + '/tours/' + t.slug + '/', touristType: ['Independent travellers', 'Families', 'Small groups'], provider: { '@id': BASE + '/#business' }, itinerary: { '@type': 'ItemList', itemListElement: t.itinerary.map((s, i) => ({ '@type': 'ListItem', position: i + 1, name: s.text })) } },
     t.image ? { image: (/^https?:/.test(t.image) ? '' : BASE) + imgSrc(t.image) } : {},
@@ -602,6 +635,8 @@ ${notes(['Destination texts use facts we verified (Old Bridge dates, UNESCO). Kr
 <h2 class="rv" id="getting-here" style="margin-top:3.4rem">Getting to Mostar</h2>
 <div class="prose"><p class="rv">Mostar is about 130 km by road from Sarajevo, about 140 km from Dubrovnik and about 170 km from Split. Many visitors come for a day from the Croatian coast; staying a night lets you see the Old Town in the quiet of the early morning and in the evening, when the bridge is lit.</p>${notes(['Distances are approximate road distances: confirm or adjust, and add your own advice on buses, trains, parking and border crossings.'])}</div>
 </div></section>
+
+${guideBox('mostar-herzegovina')}
 
 <section class="sec alt" id="speak"><div class="wrap speak-grid">
   <div class="coffee rv">${coffeeScene()}</div>
@@ -686,10 +721,11 @@ ${dep ? `<h2>Deposit and payment</h2><p>To secure your date, a deposit of ${dep}
 <h2>Contact</h2><p>${contactLine}</p>`],
     ['/privacy/', 'Privacy policy', 'How Mostarly Guide handles the information you send us.', `
 <h2>Who is responsible</h2><p>${who}. Contact: ${contactLine}.</p>
-<h2>What we collect</h2><ul><li><b>Enquiries:</b> name, email or phone number, preferred tour, date, number of guests and your message.</li><li><b>Payments:</b> name, email, tour, date and amount. Card details are entered only on the secure page of our payment processor Monri and are never seen or stored by us.</li><li><b>Messages</b> you send us on WhatsApp, Instagram or by email.</li></ul>
+<h2>What we collect</h2><ul><li><b>Enquiries:</b> name, email or phone number, preferred tour, date, number of guests and your message.</li><li><b>Payments:</b> name, email, tour, date and amount. Card details are entered only on the secure page of our payment processor Monri and are never seen or stored by us.</li><li><b>Messages</b> you send us on WhatsApp, Instagram or by email.</li><li><b>Free guide and newsletter:</b> your email address, your first name if you give it, and the date and wording of your consent.</li></ul>
 <h2>Why</h2><p>Only to answer your enquiry, organise and confirm your tour, take payment and keep the records the law requires. We do not sell your details and do not use them for advertising.</p>
-<h2>Who else processes data</h2><p>Monri (card payments), Cloudflare (hosting of this website) and, if you choose them, WhatsApp, Instagram and your email provider.</p>
-<h2>How long</h2><p>Enquiries that do not become a booking are deleted within 12 months. Booking and payment records are kept as long as accounting law requires.</p>
+<h2 id="newsletter">Free guide and newsletter</h2><p>If you ask for the free guide, we save your email address (and first name, if you give it) together with your consent, to send you the guide and occasional travel tips about Mostar and Herzegovina. You only get these emails if you ticked the consent box. Every email has a link to unsubscribe with one click, and you can ask us to delete your details at any time.</p>
+<h2>Who else processes data</h2><p>Monri (card payments), Cloudflare (hosting of this website and the database), Resend (sending emails) and, if you choose them, WhatsApp, Instagram and your email provider.</p>
+<h2>How long</h2><p>Enquiries that do not become a booking are deleted within 12 months. Booking and payment records are kept as long as accounting law requires. Newsletter details are kept until you unsubscribe or ask us to delete them.</p>
 <h2>Your rights</h2><p>You can ask to see, correct or delete your data at any time: ${contactLine}.</p>
 <h2>Cookies</h2><p>This website does not use advertising cookies. Your choice of day or night theme is saved only in your browser.</p>`]
   ];
@@ -734,10 +770,50 @@ ${dep ? `<h2>Deposit and payment</h2><p>To secure your date, a deposit of ${dep}
   emit('/pay/', head({ title: 'Pay for your tour · Mostarly Guide', desc: 'Secure online payment for tours with Mostarly Guide in Mostar.', url: '/pay/', noindex: true }) + page({ body }));
 }
 
+// FREE GUIDE: landing page (in the sitemap) and the guide itself (not indexed, opened after signing up)
+if (GUIDE()) {
+  const G = GUIDE();
+  const c = [['/', 'Home'], ['/guide/', 'Free guide']];
+  const body = `<section class="ghero"><div class="wrap ghero-in">
+  <div class="ghero-txt">${crumbs(c)}<p class="eyebrow">${mini}Free guide · PDF</p><h1>${esc(G.title.split(',')[0])}, <em>${esc((G.title.split(',')[1] || '').trim())}</em></h1>
+    <p class="lead">${esc(G.subtitle)}. When to see the Old Bridge without the crowds, what to eat, how to plan Blagaj, Počitelj and Kravice, and the small mistakes most visitors make.</p>
+    <ul class="gchecks"><li>${I.yes}${guideCount()} practical tips from a licensed guide</li><li>${I.yes}The Old Town, food and day trips</li><li>${I.yes}Read online or save the PDF on your phone</li></ul>
+    <div class="ghero-cover">${guideCover('lg')}</div></div>
+  <div class="ghero-form"><div class="gcard"><h2>Get the guide <em>free</em></h2><p>Enter your email and the guide opens right away.</p>${subForm('guide')}</div></div>
+</div></section>
+<section class="sec alt"><div class="wrap">
+  <p class="eyebrow rv">${mini}What is inside</p><h2 class="rv d1">${guideCount()} tips, <em>${G.sections.length} chapters</em></h2>
+  <div class="gtoc">${G.sections.map((sec, i) => `<div class="gtoc-c rv d${i % 4}"><span class="gtoc-n">${String(i + 1).padStart(2, '0')}</span><h3>${esc(sec.title)}</h3><ul>${sec.tips.map((tp) => `<li>${esc(tp.t)}</li>`).join('')}</ul></div>`).join('')}</div>
+</div></section>
+<section class="sec"><div class="wrap narrow gfrom">
+  <p class="eyebrow rv">${mini}From Mirna</p><blockquote class="rv d1">“${esc(G.intro)}”</blockquote><p class="rv d2"><a href="/about/">About Mirna ${I.arrow}</a></p>
+  ${notes(G.notes)}
+</div></section>
+<section class="sec alt"><div class="wrap narrow"><h2 class="rv">Questions</h2><div class="faq">
+  <details class="rv"><summary>Is the guide really free?</summary><p>Yes. You only need to enter your email address, and the guide opens right away.</p></details>
+  <details class="rv"><summary>Will you send me a lot of emails?</summary><p>No. At most a few emails a year with seasonal tips about Mostar and Herzegovina. Every email has a one-click unsubscribe link.</p></details>
+  <details class="rv"><summary>Do I need to book a tour?</summary><p>No. The guide is for everyone visiting Mostar. If you would like to see it all with a local, you can always <a href="/contact/">ask Mirna about a tour</a>.</p></details>
+</div></div></section>`;
+  emit('/guide/', head({ title: 'Free Mostar & Herzegovina Travel Guide: 12 Local Tips · Mostarly Guide', desc: 'Free guide from a licensed local guide: when to see the Old Bridge without crowds, what to eat in Mostar and how to plan Blagaj, Počitelj and Kravice. Free PDF.', url: '/guide/' }) + page({ current: '', body }));
+
+  // the guide itself
+  let n = 0;
+  const gc = [['/', 'Home'], ['/guide/', 'Free guide'], [GUIDE_URL, 'The guide']];
+  const doc = `<header class="phead gdoc-head"><div class="wrap">${crumbs(gc)}<p class="eyebrow">${mini}Free guide</p><h1>${esc(G.title.split(',')[0])}, <em>${esc((G.title.split(',')[1] || '').trim())}</em></h1><p class="lead">${esc(G.subtitle)}</p><p class="gdoc-acts"><a class="btn mint" href="${esc(guidePdf())}" download>Download the PDF</a></p></div></header><div class="band weave" data-band="0" style="--bh:22px" aria-hidden="true"></div>
+<section class="sec gdoc"><div class="wrap narrow">
+  <div class="gdoc-cover">${guideCover('lg')}</div>
+  <p class="gdoc-intro">${esc(G.intro)}</p><p class="gdoc-sign">Mirna, Mostarly Guide</p>
+  ${notes(G.notes)}
+  ${G.sections.map((sec) => `<h2 class="gdoc-sec">${esc(sec.title)}</h2>${sec.tips.map((tp) => `<article class="gtip"><span class="gtip-n">${String(++n).padStart(2, '0')}</span><div><h3>${esc(tp.t)}</h3><p>${esc(tp.d)}</p>${tp.note ? notes([tp.note]) : ''}</div></article>`).join('')}`).join('')}
+  <div class="gdoc-end"><p>${esc(G.outro)}</p><p><a class="btn mint" href="/tours/">See the tours</a> <a class="btn line" href="/contact/">Ask Mirna</a></p><p class="gdoc-contact">${esc(S.contact.phone)} · ${esc(S.contact.email)} · Instagram @${esc(S.contact.instagram)} · mostarlyguide.com</p></div>
+</div></section>`;
+  emit(GUIDE_URL, head({ title: G.title + ' · Free guide · Mostarly Guide', desc: G.subtitle + ': the Old Bridge, food, day trips and practical tips for Mostar and Herzegovina.', url: GUIDE_URL, noindex: true }) + page({ body: doc }).replace('<body', '<body class="gdoc-page"'));
+}
+
 // 404
 emit('/404', head({ title: 'Page not found · Mostarly Guide', desc: 'This page does not exist.', url: '/404', noindex: true }) + page({ body: `<section class="sec"><div class="wrap narrow" style="text-align:center"><p class="eyebrow" style="justify-content:center">${mini}404</p><h1>This street <em>ends here</em></h1><p class="lead" style="margin:1rem auto 2rem">The page you were looking for does not exist. The Old Bridge is still where it was.</p><a class="btn" href="/">Back home</a> <a class="btn line" href="/tours/">See the tours</a></div></section>` }));
 
-const urls = out.map(([u]) => u).filter((u) => u !== '/404' && !['/privacy/', '/terms/', '/cancellation-policy/', '/pay/'].includes(u));
+const urls = out.map(([u]) => u).filter((u) => u !== '/404' && !['/privacy/', '/terms/', '/cancellation-policy/', '/pay/', GUIDE_URL].includes(u));
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((u) => `<url><loc>${BASE}${u}</loc></url>`).join('\n')}\n</urlset>\n`;
 const robots = DRAFT ? 'User-agent: *\nDisallow: /\n' : `User-agent: *\nAllow: /\nDisallow: /admin/\nSitemap: ${BASE}/sitemap.xml\n`;
 /* ---------- checks: internal links and banned phrases ---------- */
@@ -746,7 +822,7 @@ const problems = [];
 for (const [url, html] of out) {
   for (const m of html.matchAll(/href="(\/[^"#?]*)/g)) {
     const h = m[1];
-    if (/\.(css|js|svg|jpg|png|xml|txt)$/.test(h) || h.startsWith('/admin')) continue;
+    if (/\.(css|js|svg|jpg|png|xml|txt|pdf)$/.test(h) || h.startsWith('/admin')) continue;
     if (!have.has(h)) problems.push(`${url}: broken link ${h}`);
   }
   const text = html.replace(/<[^>]+>/g, ' ').toLowerCase();
