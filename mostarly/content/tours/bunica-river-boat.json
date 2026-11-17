@@ -1,0 +1,59 @@
+{
+  "slug": "bunica-river-boat",
+  "order": 12,
+  "featured": false,
+  "category": "experience",
+  "name": "Bunica River Boat Experience",
+  "tagline": "A relaxed boat outing on the Bunica River, in a quieter setting outside the city.",
+  "image": "",
+  "imageAlt": "",
+  "price": {
+    "amount": 35,
+    "basis": "person",
+    "from": false,
+    "confirmed": false
+  },
+  "duration": "About 2 hours",
+  "location": "Bunica River, near Mostar",
+  "groupSize": "2–20 people",
+  "level": "Easy; boarding access depends on the location",
+  "languages": "English",
+  "meetingPoint": "Pickup in Mostar or an agreed location",
+  "availability": "Depends on weather and the operator",
+  "description": "Spend time on the Bunica River in a quieter natural setting outside the city. The boat outing heads towards the river spring and the surrounding landscape. When available and agreed in advance, the experience can include a taste of local seasonal fruit.",
+  "itinerary": [
+    {
+      "text": "Meet in Mostar or at the agreed departure point.",
+      "optional": false
+    },
+    {
+      "text": "Travel to the river and board the boat.",
+      "optional": false
+    },
+    {
+      "text": "Enjoy the boat outing and the views of the surroundings.",
+      "optional": false
+    },
+    {
+      "text": "Taste seasonal local fruit, if available and included.",
+      "optional": true
+    }
+  ],
+  "included": [
+    "Boat experience",
+    "Fruit tasting only if confirmed by the operator"
+  ],
+  "notIncluded": [
+    "Transport from Mostar",
+    "Food and drinks beyond the agreed tasting"
+  ],
+  "practical": [
+    "Life jackets and weather policy are confirmed with your booking."
+  ],
+  "tickets": [],
+  "notes": [
+    "Confirm departure point, boat operator, passenger capacity, weather policy, life jackets, transport and current price."
+  ],
+  "seoTitle": "Bunica River Boat Trip near Mostar",
+  "seoDescription": "Relaxed boat outing on the Bunica River near Mostar, towards the river spring, with seasonal local fruit when available."
+}

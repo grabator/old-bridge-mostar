@@ -1,0 +1,35 @@
+{
+  // Cloudflare Workers. First time: node scripts/cf-setup.mjs (creates the database and the photo
+  // storage, then fills in database_id below). Every deploy: node build.mjs && npx wrangler deploy
+  "name": "mostarly-guide",
+  "main": "worker.js",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "404-page",
+    // the Worker runs first for pages, the admin and the API; images, CSS and JS go straight to the files
+    "run_worker_first": ["/*", "!/img/*", "!/geo/*", "!/site.css", "!/site.js", "!/maps.js"]
+  },
+  "d1_databases": [
+    { "binding": "DB", "database_name": "mostarly", "database_id": "b4272257-7302-412c-bec9-3c24306c6dc2", "migrations_dir": "migrations" }
+  ],
+  "r2_buckets": [
+    { "binding": "MEDIA", "bucket_name": "mostarly-media" }
+  ],
+  "vars": {
+    // Cloudflare Access (Zero Trust > Access > Applications), see README "Admin"
+    "ACCESS_TEAM": "mostarly.cloudflareaccess.com,falling-fog-be2e.cloudflareaccess.com",
+    "ACCESS_AUD": "02faa1f931da7bd4746846d8183e51f195aac883053171081067b1e88ccbbdae",
+    "ADMIN_EMAILS": "",
+    // Card payments on /pay/ (Monri), see README "Payments". off = page says payment is being set up;
+    // live = real payments (needs the secrets MONRI_MERCHANT_KEY and MONRI_AUTHENTICITY_TOKEN).
+    // Never use "test" here: it fakes payments. MONRI_ENV: "test" (Monri test system) or "prod".
+    "PAY_MODE": "off",
+    "PAY_CURRENCY": "EUR",
+    "MONRI_ENV": "test"
+  },
+  // every evening at 17:00 UTC (18:00 or 19:00 in Mostar): a phone notification with tomorrow's tours
+  "triggers": { "crons": ["0 17 * * *"] },
+  "observability": { "enabled": true }
+}

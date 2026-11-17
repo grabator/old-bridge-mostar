@@ -21,3 +21,7 @@ node serve.mjs
 Then open http://localhost:8080.
 
 Made by [Ahmed Grabus (Graba)](https://graba-portofolio.grabafaceit.workers.dev)
+
+## Mostarly Guide draft
+
+The website for Mostarly Guide, a licensed local guide in Mostar, lives in `mostarly/`. Run `node mostarly/dev.mjs` and open http://localhost:8090. Details in `mostarly/README.md`.

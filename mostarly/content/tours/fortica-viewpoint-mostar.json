@@ -1,0 +1,61 @@
+{
+  "slug": "fortica-viewpoint-mostar",
+  "order": 8,
+  "featured": false,
+  "category": "experience",
+  "name": "Fortica – Views of Mostar & Adventure Activities",
+  "tagline": "Mostar from above at the Fortica viewpoint and Skywalk, with the option of a traditional meal or adventure activities.",
+  "image": "",
+  "imageAlt": "",
+  "price": {
+    "amount": 60,
+    "basis": "person",
+    "from": false,
+    "confirmed": false
+  },
+  "duration": "About 2 hours; longer with activities",
+  "location": "Fortica, above Mostar",
+  "groupSize": "Up to 30 people",
+  "level": "Easy at the viewpoint; activities have their own requirements",
+  "languages": "English",
+  "meetingPoint": "Pickup in Mostar or another agreed location",
+  "availability": "Subject to operating conditions",
+  "description": "See Mostar from above at Fortica, where the viewpoint and Skywalk give a wide view over the city and the surrounding mountains. Keep the visit simple with sightseeing and a traditional meal, or ask about additional activities such as the adrenaline swing, zipline or quad rides.",
+  "itinerary": [
+    {
+      "text": "Travel from Mostar to Fortica.",
+      "optional": false
+    },
+    {
+      "text": "Visit the viewpoint and Skywalk, subject to operating conditions.",
+      "optional": false
+    },
+    {
+      "text": "Traditional meal, if included in the agreed package.",
+      "optional": true
+    },
+    {
+      "text": "Adventure activities, arranged separately.",
+      "optional": true
+    }
+  ],
+  "included": [
+    "Guiding and coordination as stated in the written offer"
+  ],
+  "notIncluded": [
+    "Adventure activities",
+    "Meals",
+    "Transport",
+    "Facility fees, unless explicitly included"
+  ],
+  "practical": [
+    "Activities have age and safety restrictions set by the operator."
+  ],
+  "tickets": [],
+  "notes": [
+    "Confirm what the €60 includes. Do not imply that zipline, swing, quads or a meal are included unless contracted.",
+    "Check operator availability and safety/age restrictions."
+  ],
+  "seoTitle": "Fortica Mostar: Skywalk Viewpoint Tour with a Local Guide",
+  "seoDescription": "Visit the Fortica viewpoint and Skywalk above Mostar with a local guide. Optional traditional meal and adventure activities on request."
+}

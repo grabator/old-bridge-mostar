@@ -1,0 +1,73 @@
+{
+  "slug": "taste-of-mostar-food-tour",
+  "order": 9,
+  "featured": false,
+  "category": "food",
+  "name": "Gastronomy Tour – Taste of Mostar",
+  "tagline": "A food walk through the Old Town with local tastings, traditional sweets and Bosnian coffee.",
+  "image": "",
+  "imageAlt": "",
+  "price": {
+    "amount": 100,
+    "basis": "group",
+    "from": false,
+    "confirmed": false
+  },
+  "duration": "About 2 hours",
+  "location": "Old Town, Mostar",
+  "groupSize": "2–20 people",
+  "level": "Easy: short walks on uneven streets",
+  "languages": "English",
+  "meetingPoint": "Parking area next to the Hamam",
+  "availability": "By prior arrangement",
+  "description": "Get to know Mostar through the food people prepare, share and serve. The route combines a guided walk with selected tastings, seasonal products and Bosnian coffee. Depending on the day and the agreed menu, you may try traditional sweets, local juices, market products and a traditional dish.",
+  "itinerary": [
+    {
+      "text": "Meet near the Hamam.",
+      "optional": false
+    },
+    {
+      "text": "A homemade seasonal juice, if arranged.",
+      "optional": true
+    },
+    {
+      "text": "Walk through the Old Town and stop for a traditional savoury bite.",
+      "optional": false
+    },
+    {
+      "text": "Continue through the historic area and Kujundžiluk with a tasting of Bosnian sweets.",
+      "optional": false
+    },
+    {
+      "text": "Visit the market when it is open and seasonal produce is available.",
+      "optional": true
+    },
+    {
+      "text": "Taste Bosnian coffee and learn about its preparation and customs.",
+      "optional": false
+    },
+    {
+      "text": "A traditional meal, as part of a longer version confirmed in advance.",
+      "optional": true
+    }
+  ],
+  "included": [
+    "Guided food walk",
+    "Tastings listed in your confirmed offer"
+  ],
+  "notIncluded": [
+    "Full meal",
+    "Additional drinks",
+    "Tastings not listed in the written offer"
+  ],
+  "practical": [
+    "Tell us about allergies and dietary needs when you enquire."
+  ],
+  "tickets": [],
+  "notes": [
+    "Is the Gastronomy Tour 2 hours (current offer) or about 4 hours (old document)?",
+    "Confirm whether €100 is per group and which tastings are included."
+  ],
+  "seoTitle": "Mostar Food Tour: Taste of Mostar with a Local Guide",
+  "seoDescription": "Food walk through Mostar’s Old Town: savoury bites, Bosnian sweets, seasonal products and Bosnian coffee with a local guide."
+}

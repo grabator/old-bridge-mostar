@@ -1,0 +1,97 @@
+// Cloudflare Worker for Mostarly Guide.
+//  - pages: served from D1 once Mirna has saved something in the admin (always up to date), otherwise
+//    the files built into dist/ (static assets)
+//  - /admin and /api/admin: Mirna's admin, behind Cloudflare Access (see server/auth.js)
+//  - /media/*: photos uploaded in the admin (R2)
+//  - POST /api/enquiry: the enquiry form (saved in the planner, phone notification, email through Resend)
+//  - POST /api/subscribe, /api/unsubscribe: the free guide and the mailing list (functions/api/subscribe.js)
+//  - GET /api/blocked: busy days for the date picker; GET /cal/<token>.ics: private calendar feed
+//  - every evening (cron): a phone notification with tomorrow's tours
+import { onRequestPost as enquiry } from './functions/api/enquiry.js';
+import { subscribe, unsubscribe } from './functions/api/subscribe.js';
+import { adminEmail } from './server/auth.js';
+import { adminApi, serveMedia } from './server/api.js';
+import { icsFeed, publicBlocked, eveningReminder } from './server/extra.js';
+import { payApi } from './server/pay.js';
+import { publish, BASE_CONTENT } from './server/store.js';
+
+const SEC = { 'x-content-type-options': 'nosniff', 'referrer-policy': 'strict-origin-when-cross-origin', 'permissions-policy': 'camera=(), microphone=(), geolocation=()' };
+
+// the payment page: never inside another site's frame, forms only to us or Monri, nothing cached
+const PAYSEC = { 'content-security-policy': "frame-ancestors 'none'; form-action 'self' https://ipg.monri.com https://ipgtest.monri.com; base-uri 'self'; object-src 'none'", 'x-frame-options': 'DENY', 'cache-control': 'no-store' };
+
+function denied() {
+  return new Response(`<!doctype html><html lang="bs"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Prijava · Mostarly admin</title>
+<body style="font-family:system-ui,sans-serif;background:#272838;color:#f6f0e6;display:grid;place-items:center;min-height:100vh;margin:0;padding:1.5rem;text-align:center"><div><h1 style="font-weight:400">Mostarly admin</h1><p>Za ulaz je potrebna prijava sa odobrenim emailom.</p><p style="opacity:.7;font-size:.9rem">Ako se prijava ne pojavi, Cloudflare Access još nije podešen za /admin.</p><p><a href="/" style="color:#48e5c2">Nazad na sajt</a></p></div></body></html>`, { status: 403, headers: Object.assign({ 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' }, SEC) });
+}
+
+// after a new deploy (new code, new pages such as /pay/) the pages in D1 are rendered again once,
+// so the site never shows an old version or a 404 for a page that is new in the code
+let freshBuild = null;
+async function ensureFresh(env) {
+  const build = BASE_CONTENT.BUILD || '';
+  if (!build || freshBuild === build) return;
+  const r = await env.DB.prepare("SELECT value FROM meta WHERE key = 'build'").first();
+  if (!r || r.value !== build) {
+    const seeded = await env.DB.prepare("SELECT value FROM meta WHERE key = 'seeded'").first();
+    if (seeded) await publish(env); // only when the admin is in use; otherwise the built files are served
+    await env.DB.prepare("INSERT OR REPLACE INTO meta (key, value) VALUES ('build', ?)").bind(build).run();
+  }
+  freshBuild = build;
+}
+
+// a page from D1, or null: then the built files (dist/) answer, including their 404 page
+async function page(env, path) {
+  if (!env.DB) return null;
+  let row;
+  try { await ensureFresh(env); } catch (e) { console.error('refresh after deploy', e); }
+  try { row = await env.DB.prepare('SELECT body, type FROM pages WHERE url = ?').bind(path).first(); } catch { return null; }
+  if (row) return new Response(row.body, { headers: Object.assign({ 'content-type': row.type, 'cache-control': 'public, max-age=0, must-revalidate' }, SEC, path === '/pay/' ? PAYSEC : {}) });
+  return null;
+}
+
+export default {
+  async fetch(request, env, ctx) {
+    const url = new URL(request.url);
+    const path = url.pathname;
+    const method = request.method;
+    try {
+      if (path === '/api/enquiry') {
+        if (method === 'POST') return enquiry({ request, env, ctx });
+        return new Response('Method not allowed', { status: 405, headers: { allow: 'POST' } });
+      }
+      if (path === '/api/subscribe') {
+        if (method === 'POST') return subscribe({ request, env, ctx, site: BASE_CONTENT.S });
+        return new Response('Method not allowed', { status: 405, headers: { allow: 'POST' } });
+      }
+      if (path === '/api/unsubscribe' && (method === 'GET' || method === 'POST')) return unsubscribe(request, env);
+      if (path === '/api/blocked' && method === 'GET') return publicBlocked(env);
+      if (path.startsWith('/api/pay/')) return payApi(request, env, path);
+      if (path.startsWith('/cal/') && path.endsWith('.ics') && method === 'GET') return icsFeed(env, path.slice(5, -4));
+      if (path.startsWith('/media/')) return (method === 'GET' || method === 'HEAD') ? serveMedia(request, env) : new Response('Method not allowed', { status: 405 });
+      if (path === '/admin' || path.startsWith('/admin/') || path.startsWith('/api/admin')) {
+        const email = await adminEmail(request, env);
+        if (!email) return path.startsWith('/api/') ? new Response(JSON.stringify({ error: 'Niste prijavljeni.' }), { status: 401, headers: { 'content-type': 'application/json' } }) : denied();
+        if (path.startsWith('/api/admin')) return adminApi(request, env, email);
+        if (path === '/admin') return Response.redirect(url.origin + '/admin/', 308);
+        return env.ASSETS.fetch(request);
+      }
+      if ((method === 'GET' || method === 'HEAD') && !path.startsWith('/api/')) {
+        const last = path.split('/').pop();
+        const isPage = path.endsWith('/') || !last.includes('.') || path === '/sitemap.xml' || path === '/robots.txt';
+        if (isPage) {
+          if (!path.endsWith('/') && !last.includes('.')) return Response.redirect(url.origin + path + '/' + url.search, 308);
+          const r = await page(env, path);
+          if (r) return method === 'HEAD' ? new Response(null, { status: r.status, headers: r.headers }) : r;
+        }
+      }
+      return env.ASSETS.fetch(request);
+    } catch (e) {
+      console.error(e);
+      return new Response('Something went wrong', { status: 500 });
+    }
+  },
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(eveningReminder(env).catch((e) => console.error('reminder', e)));
+  }
+};
