@@ -107,7 +107,7 @@ function priceInfo(p) {
 }
 
 /* ---------- layout ---------- */
-const NAV_SUB = { '/': 'Start here', '/tours/': 'City walks, food and day trips', '/about/': 'Mirna, your local guide', '/mostar-herzegovina/': 'Know before you go', '/travel-professionals/': 'Groups and tailor-made programmes', '/faq/': 'Meeting points, tickets, payment', '/contact/': 'Ask about a tour' };
+const NAV_SUB = { '/guide/': '12 local tips, free PDF', '/': 'Start here', '/tours/': 'City walks, food and day trips', '/about/': 'Mirna, your local guide', '/mostar-herzegovina/': 'Know before you go', '/travel-professionals/': 'Groups and tailor-made programmes', '/faq/': 'Meeting points, tickets, payment', '/contact/': 'Ask about a tour' };
 const NAV = [['/tours/', 'Tours'], ['/about/', 'About'], ['/mostar-herzegovina/', 'Mostar & Herzegovina'], ['/travel-professionals/', 'For agencies'], ['/faq/', 'FAQ'], ['/contact/', 'Contact']];
 function head({ title, desc, url, image = '/img/hero-d.jpg', ld = [], noindex = false }) {
   const full = BASE + url;
@@ -134,7 +134,7 @@ function nav(current, overHero) {
 <div class="sheet" id="sheet" aria-label="Menu" role="dialog" aria-modal="true"><div class="sheet-bg" aria-hidden="true"><svg data-medallion></svg></div>
 <div class="sheet-top"><a class="home" href="/" aria-label="Mostarly Guide home"><img src="/img/logo-light.png" alt="Mostarly Guide" width="167" height="34" style="height:34px;width:auto"></a><div class="sheet-tools"><div class="tswitch" role="group" aria-label="Day or night theme"><button type="button" data-t="day" aria-label="Day theme" aria-pressed="true">${I.sun}</button><button type="button" data-t="night" aria-label="Night theme" aria-pressed="false">${I.moon}</button></div><button class="menu-btn" type="button" data-menu aria-label="Close menu">${I.close}</button></div></div>
 <div class="sheet-band" aria-hidden="true"></div>
-<nav aria-label="Mobile">${[['/', 'Home']].concat(NAV).map(([h, l], i) => `<a href="${h}"${current === h ? ' aria-current="page"' : ''} style="--i:${i}"><span class="sn">${String(i + 1).padStart(2, '0')}</span><span class="st"><b>${l}</b><small>${esc(NAV_SUB[h] || '')}</small></span>${I.arrow}</a>`).join('')}</nav>
+<nav aria-label="Mobile">${[['/', 'Home']].concat(NAV, GUIDE() ? [['/guide/', 'Free guide']] : []).map(([h, l], i) => `<a href="${h}"${current === h ? ' aria-current="page"' : ''} style="--i:${i}"><span class="sn">${String(i + 1).padStart(2, '0')}</span><span class="st"><b>${l}</b><small>${esc(NAV_SUB[h] || '')}</small></span>${I.arrow}</a>`).join('')}</nav>
 <div class="sheet-foot">
   <div class="sheet-acts"><a class="sa wa" href="${wa('Hello Mirna, I would like to ask about a tour in Mostar.')}">${I.wa}<span>WhatsApp</span></a><a class="sa" href="${tel}">${I.phone}<span>Call</span></a><a class="sa" href="mailto:${S.contact.email}">${I.mail}<span>Email</span></a></div>
 </div></div>`;
@@ -154,7 +154,8 @@ function sticky(label, sub, href, waText) {
 function dataScript() {
   return `<script type="application/json" id="mly-data">${JSON.stringify({ tours: TOURS.map((t) => ({ slug: t.slug, name: t.name, tickets: t.tickets || [] })), tickets: S.tickets, places: PLACES.map(({ notes, ...p }) => p), whatsapp: S.contact.whatsapp, email: S.contact.email, ga4: S.analytics.ga4 || '' }).replace(/</g, '\\u003c')}</script>`;
 }
-function page({ current = '', hero = false, body, tour = '', stickyArgs, extraTop = '', maps = false }) {
+function page({ current = '', hero = false, body, tour = '', stickyArgs, extraTop = '', maps = false, bare = false }) {
+  if (bare) return bareShell(body);
   return `<body${tour ? ` data-tour="${esc(tour)}"` : ''}><a class="skip" href="#main">Skip to content</a>
 ${DRAFT ? '<div class="draftbar" title="Yellow notes and ‘to confirm’ labels are only visible in the draft">Draft</div>' : ''}
 ${extraTop}${nav(current, hero)}
@@ -163,6 +164,16 @@ ${foot()}
 ${stickyArgs ? sticky(...stickyArgs) : ''}
 <div class="rail" id="rail" aria-hidden="true"><svg></svg></div>
 ${dataScript()}<script src="/site.js?v=${V.js}" defer></script>${maps ? `<script src="/maps.js?v=${V.maps}" defer></script>` : ''}</body></html>`;
+}
+
+// landing pages (Instagram bio, ads, QR codes): only the logo on top and a small footer, so nothing leads away from the form
+function bareShell(body) {
+  return `<body class="bare"><a class="skip" href="#main">Skip to content</a>
+${DRAFT ? '<div class="draftbar" title="Yellow notes and ‘to confirm’ labels are only visible in the draft">Draft</div>' : ''}
+<header class="lnav"><a class="home" href="/" aria-label="Mostarly Guide home"><img src="/img/logo-light.png" alt="Mostarly Guide" width="167" height="34"></a><a class="lnav-site" href="/tours/">See the tours ${I.arrow}</a></header>
+<main id="main">${body}</main>
+<footer class="lfoot"><div class="wrap"><img src="/img/logo-light.png" alt="Mostarly Guide" width="140" height="28" loading="lazy"><p>Licensed local guide in Mostar, Bosnia and Herzegovina</p><p><a href="/">mostarlyguide.com</a> · <a href="/privacy/#newsletter">Privacy</a> · <a href="https://instagram.com/${esc(S.contact.instagram)}">Instagram</a></p><p class="lfoot-c">© ${YEAR} Mostarly Guide${CO().name ? ' · ' + esc(CO().name) : ''}</p></div></footer>
+${dataScript()}<script src="/site.js?v=${V.js}" defer></script></body></html>`;
 }
 
 /* ---------- reusable blocks ---------- */
@@ -482,6 +493,7 @@ const emit = (url, html) => out.push([url, html]);
   </div>
   <div class="fringe up" aria-hidden="true"></div><div class="band weave" data-band="1" style="--bh:56px" aria-hidden="true"></div>
 </section>
+${GUIDE() ? `<a class="gstrip" href="/guide/"><span class="gstrip-ic" aria-hidden="true"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 3.2c1.8-.8 3.9-.7 6 .6 2.1-1.3 4.2-1.4 6-.6v9.6c-1.8-.8-3.9-.7-6 .6-2.1-1.3-4.2-1.4-6-.6zM8 3.8v9.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg></span><span><b>Free guide:</b> ${guideCount()} local tips for Mostar &amp; Herzegovina</span>${I.arrow}</a>` : ''}
 
 <section class="sec tight"><div class="wrap intro">
   <div><p class="eyebrow rv">${mini}Mostarly Guide</p><div class="medal rv d1"><svg data-medallion aria-hidden="true"></svg></div></div>
@@ -493,6 +505,7 @@ const emit = (url, html) => out.push([url, html]);
   <div class="head-row"><div><p class="eyebrow rv">${mini}Featured tours</p><h2 class="rv d1">Start <em>here</em></h2></div><a class="btn line sm rv" href="/tours/">All tours ${I.arrow}</a></div>
   <div class="cards four">${featured.map(card).join('')}</div>
 </div></section>
+${guideBox('home')}
 
 <section class="sec explore"><div class="wrap">
   <div class="head-row"><div><p class="eyebrow rv">${mini}Where we go</p><h2 class="rv d1">From Mostar <em>to all of Herzegovina</em></h2></div></div>
@@ -518,8 +531,6 @@ const emit = (url, html) => out.push([url, html]);
   <p class="eyebrow rv">${mini}Guest reviews</p><h2 class="rv d1">What guests <em>say</em></h2>
   ${reviewsBlock()}
 </div></section>
-
-${guideBox('home')}
 
 <section class="sec"><div class="wrap">
   <p class="eyebrow rv">${mini}Planning your visit?</p><h2 class="rv d1">Before you <em>come</em></h2>
@@ -774,27 +785,36 @@ ${dep ? `<h2>Deposit and payment</h2><p>To secure your date, a deposit of ${dep}
 if (GUIDE()) {
   const G = GUIDE();
   const c = [['/', 'Home'], ['/guide/', 'Free guide']];
-  const body = `<section class="ghero"><div class="wrap ghero-in">
-  <div class="ghero-txt">${crumbs(c)}<p class="eyebrow">${mini}Free guide · PDF</p><h1>${esc(G.title.split(',')[0])}, <em>${esc((G.title.split(',')[1] || '').trim())}</em></h1>
-    <p class="lead">${esc(G.subtitle)}. When to see the Old Bridge without the crowds, what to eat, how to plan Blagaj, Počitelj and Kravice, and the small mistakes most visitors make.</p>
-    <ul class="gchecks"><li>${I.yes}${guideCount()} practical tips from a licensed guide</li><li>${I.yes}The Old Town, food and day trips</li><li>${I.yes}Read online or save the PDF on your phone</li></ul>
-    <div class="ghero-cover">${guideCover('lg')}</div></div>
-  <div class="ghero-form"><div class="gcard"><h2>Get the guide <em>free</em></h2><p>Enter your email and the guide opens right away.</p>${subForm('guide')}</div></div>
+  const body = `<section class="lhero" id="get">
+  <picture><source media="(min-width:900px)" srcset="/img/hero-d.jpg"><img src="/img/hero-m.jpg" alt="Stari Most over the Neretva in Mostar" fetchpriority="high"></picture>
+  <div class="lhero-shade" aria-hidden="true"></div>
+  <div class="wrap lhero-in">
+    <div class="lhero-txt"><p class="lkick">${I.check}Free guide · ${guideCount()} local tips</p><h1>${esc(G.title.split(',')[0])}, <em>${esc((G.title.split(',')[1] || '').trim())}</em></h1>
+      <p class="lsub">When to see the Old Bridge without the crowds, what to eat and how to plan Blagaj, Počitelj and Kravice. From Mirna, a licensed guide born in Mostar.</p></div>
+    <div class="lcard"><p class="lcard-h">Get the free guide</p>${subForm('guide')}</div>
+  </div>
+</section>
+<section class="sec lwhy"><div class="wrap lwhy-in">
+  <div class="lwhy-cover">${guideCover('lg')}</div>
+  <div><p class="eyebrow rv">${mini}What you get</p><h2 class="rv d1">A local’s guide, <em>free</em></h2>
+    <ul class="gchecks big rv d2"><li>${I.yes}<span><b>${guideCount()} practical tips</b> from a licensed guide who grew up here</span></li><li>${I.yes}<span><b>The Old Town, food and day trips</b>: what to see, when to go and what to skip</span></li><li>${I.yes}<span><b>Read online or save the PDF</b> on your phone for the trip</span></li><li>${I.yes}<span><b>No spam:</b> a few emails a year, unsubscribe with one click</span></li></ul>
+    <a class="btn mint rv d3" href="#get">Get the free guide ${I.arrow}</a></div>
 </div></section>
 <section class="sec alt"><div class="wrap">
   <p class="eyebrow rv">${mini}What is inside</p><h2 class="rv d1">${guideCount()} tips, <em>${G.sections.length} chapters</em></h2>
   <div class="gtoc">${G.sections.map((sec, i) => `<div class="gtoc-c rv d${i % 4}"><span class="gtoc-n">${String(i + 1).padStart(2, '0')}</span><h3>${esc(sec.title)}</h3><ul>${sec.tips.map((tp) => `<li>${esc(tp.t)}</li>`).join('')}</ul></div>`).join('')}</div>
 </div></section>
 <section class="sec"><div class="wrap narrow gfrom">
-  <p class="eyebrow rv">${mini}From Mirna</p><blockquote class="rv d1">“${esc(G.intro)}”</blockquote><p class="rv d2"><a href="/about/">About Mirna ${I.arrow}</a></p>
+  <p class="eyebrow rv">${mini}From Mirna</p><blockquote class="rv d1">“${esc(G.intro)}”</blockquote>
   ${notes(G.notes)}
 </div></section>
 <section class="sec alt"><div class="wrap narrow"><h2 class="rv">Questions</h2><div class="faq">
-  <details class="rv"><summary>Is the guide really free?</summary><p>Yes. You only need to enter your email address, and the guide opens right away.</p></details>
+  <details class="rv"><summary>Is the guide really free?</summary><p>Yes. Enter your email address and the guide opens right away.</p></details>
   <details class="rv"><summary>Will you send me a lot of emails?</summary><p>No. At most a few emails a year with seasonal tips about Mostar and Herzegovina. Every email has a one-click unsubscribe link.</p></details>
-  <details class="rv"><summary>Do I need to book a tour?</summary><p>No. The guide is for everyone visiting Mostar. If you would like to see it all with a local, you can always <a href="/contact/">ask Mirna about a tour</a>.</p></details>
-</div></div></section>`;
-  emit('/guide/', head({ title: 'Free Mostar & Herzegovina Travel Guide: 12 Local Tips · Mostarly Guide', desc: 'Free guide from a licensed local guide: when to see the Old Bridge without crowds, what to eat in Mostar and how to plan Blagaj, Počitelj and Kravice. Free PDF.', url: '/guide/' }) + page({ current: '', body }));
+  <details class="rv"><summary>Do I need to book a tour?</summary><p>No. The guide is for everyone visiting Mostar. If you would like to see it all with a local, you can always <a href="/tours/">look at the tours</a>.</p></details>
+</div></div></section>
+<section class="lend"><img src="/img/sumrak.jpg" alt="" loading="lazy"><div class="wrap"><h2>See you <em>in Mostar</em></h2><p>Get the free guide and plan your visit like a local.</p><a class="btn mint" href="#get">Get the free guide ${I.arrow}</a></div></section>`;
+  emit('/guide/', head({ title: 'Free Mostar & Herzegovina Travel Guide: 12 Local Tips · Mostarly Guide', desc: 'Free guide from a licensed local guide: when to see the Old Bridge without crowds, what to eat in Mostar and how to plan Blagaj, Počitelj and Kravice. Free PDF.', url: '/guide/', image: '/img/hero-d.jpg' }) + page({ body, bare: true }));
 
   // the guide itself
   let n = 0;
